@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <h2>Welcome to EMMA Dashboard!</h2>
+
+    <table 
+    border = "1"
+    style="width:100%">
+        <tr>
+          <th style="width:10%">participant_id</th>
+          <th style="width:30%">username</th>
+          <th style="width:30%">first name</th>
+          <th style="width:30%">last name</th>
+
+        </tr>
+        {% for key, value in user_t.iterrows() %}
+            <tr>
+                <td>{{ value['participant_id'] }}</td>
+                <td>{{ value['username'] }}</td>
+                <td>{{ value['first_name'] }}</td>
+                <td>{{ value['last_name'] }}</td>
+            </tr>
+        {% endfor %}
+       
+      </table>
+</body>
+</html>
