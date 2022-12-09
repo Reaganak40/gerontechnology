@@ -1,15 +1,17 @@
 
 # * Imports
+import csv
 from colorama import just_fix_windows_console
-from termcolor import colored
-import pandas as pd
+from datetime import datetime, timedelta
 import numpy as np
 import os
+import pandas as pd
 import sys
-from datetime import datetime, timedelta
-import csv
+from termcolor import colored
 
 class Utils:
+    # Last Edit on 12/7/2022 by Reagan Kelley
+    # Originally written from EMMA_data_wrangling.ipynb
     def next_sunday(original_datetime):
         """Returns the date of the next Sunday relative to the given date.
 
@@ -24,9 +26,13 @@ class Utils:
             days_left = 7
         return (pd.to_datetime(original_datetime) + timedelta(days=days_left)).floor(freq='D')
 
+    # Last Edit on 12/7/2022 by Reagan Kelley
+    # Originally written from EMMA_data_wrangling.ipynb
     def filter_to_distinct_interactions(df):
         return df
 
+    # Last Edit on 12/7/2022 by Reagan Kelley
+    # Originally written from EMMA_data_wrangling.ipynb
     def filter_to_day_of_week(df, day=0):
         """Filters and creates a new DataFrame of interactions that only includes entries of the given day of the week. 
         Precondition: DataFrame only includes a week's worth set of data.
@@ -42,7 +48,6 @@ class Utils:
         return new_df
 
 class DataWrangling:
-
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
     def __init__(self, args):
@@ -85,6 +90,8 @@ class DataWrangling:
         interactions_df.rename({'index':'participantId'}, axis='columns', inplace=True)
         interactions_df.to_csv(self.OUTPUT_DIR + "\\{}".format(outfile_name), index=False)
 
+    # Last Edit on 12/7/2022 by Reagan Kelley
+    # Originally written from EMMA_data_wrangling.ipynb
     def __get_interaction_counts(self, df, elementIDs, day_of_week=-1, distinct=False):
         """Given a DataFrame which contains participant interactions,
         returns a count of interactions for given elementIDs for each participant.
