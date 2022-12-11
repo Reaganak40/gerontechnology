@@ -1,6 +1,10 @@
+#!/usr/bin/python
 
+""" This program allows us to take in EMMA datasets, a collection of 
+    entries of participants who use the EMMA app, and aggregate calculations 
+    that are both used in research and in the medical field.
+"""
 # * Imports
-import csv
 from colorama import just_fix_windows_console
 from datetime import datetime, timedelta
 import numpy as np
