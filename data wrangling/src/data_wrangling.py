@@ -53,18 +53,17 @@ class DataWrangling:
     def __init__(self, args):
         self.INPUT_DIR = os.getcwd() + R'\..\data\input'
         self.OUTPUT_DIR = os.getcwd() + R'\..\data\output'
+        self.weekly_dfs = dict()
         self.__read_args(args)
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
     def __read_args(self, args):
-        try:
-            infile_index = args.index("--input") + 1
-            self.INFILE = self.INPUT_DIR + RF"\{args[infile_index]}"
-        except:
-            self.INFILE = None
-            print(colored("WARNING: No file given for data wrangling! (use --input filename)", 'red'))
+        """Takes command line arguments to setup all parameters or variables for data wrangling.
 
+        Args:
+            args (string[]): Contains each argument and parameter in the CLI command.
+        """
         try:
             debug_index = args.index("--debug") + 1
             if int(args[debug_index]) == 1:
@@ -73,12 +72,19 @@ class DataWrangling:
                 self.debug = False
         except:
             self.debug = False
+        
+        try:
+            infile_index = args.index("--input") + 1                    # the argument after --input will be the file that gets read
+            self.INFILE = self.INPUT_DIR + RF"\{args[infile_index]}"   
+        except:
+            self.INFILE = None
+            if(self.debug):
+                print(colored("WARNING: No file given for data wrangling! (use --input filename)", 'red'))
 
-        self.weekly_dfs = dict()
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def __participant_dict_to_csv(self, participants, outfile_name="output.csv"):
+    def participant_dict_to_csv(self, participants, outfile_name="output.csv"):
         """Given an instantiated dictionary, converts to a DataFrame to then be translated to a csv file.
 
         Args:
@@ -92,7 +98,7 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def __get_interaction_counts(self, df, elementIDs, day_of_week=-1, distinct=False):
+    def get_interaction_counts(self, df, elementIDs, day_of_week=-1, distinct=False):
         """Given a DataFrame which contains participant interactions,
         returns a count of interactions for given elementIDs for each participant.
 
@@ -104,11 +110,11 @@ class DataWrangling:
         """
         query_string = ""
 
-        # Filter the Dataset further to only include rows from the given day of the week.
+        # Filter the Dataset to only include rows from the given day of the week.
         if(day_of_week >= 0):
             df = Utils.filter_to_day_of_week(df, day_of_week)
         
-        # Filter the Dataset further to only include rows that are distinct uses.
+        # Filter the Dataset to only include rows that are distinct uses.
         if(distinct):
             df = Utils.filter_to_distinct_interactions(df)    
 
@@ -125,7 +131,7 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def __create_variable(self, participants_dict, interactions_df, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False):
+    def create_variable(self, participants_dict, interactions_df, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False):
         """Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
@@ -142,7 +148,7 @@ class DataWrangling:
         """
         
         # Each interaction is a pair (participantID, count)
-        element_count_list = self.__get_interaction_counts(interactions_df, elementIDs, day_of_week=day_of_week, distinct=distinct).iteritems()
+        element_count_list = self.get_interaction_counts(interactions_df, elementIDs, day_of_week=day_of_week, distinct=distinct).iteritems()
 
         for element_count in element_count_list:
             participant_id = element_count[0]
@@ -157,7 +163,7 @@ class DataWrangling:
     
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def __get_variable_calculations(self, df, outfile_name):
+    def get_variable_calculations(self, df):
         """Given a dataset of interactions from participants, computes and stores calculation dependent variables to an output file.
 
         Args:
@@ -171,45 +177,44 @@ class DataWrangling:
                         "TodayPageGoal-Monday", "TodayPageGoal-Tuesday", "TodayPageGoal-Wednesday", "TodayPageGoal-Thursday", "TodayPageGoal-Friday", "TodayPageGoal-Saturday",
                         "LTGFolderUse", "SumTotalLTGNoteInteractions", "LTGGoal", "FZFolderUse", "SumTotalFZNoteInteractions", "FZGoal"]
 
-        participants = self.__create_variable(participants, df, "CalenderUse", [9], lambda x: x/(7))
-        participants = self.__create_variable(participants, df, "SumTotalCalendarInteractions", [9, 18, 19, 20], lambda x: x/(7))
-        participants = self.__create_variable(participants, df, "CalendaringGoal", [9], lambda x: x/(4))
+        participants = self.create_variable(participants, df, "CalenderUse", [9], lambda x: x/(7))
+        participants = self.create_variable(participants, df, "SumTotalCalendarInteractions", [9, 18, 19, 20], lambda x: x/(7))
+        participants = self.create_variable(participants, df, "CalendaringGoal", [9], lambda x: x/(4))
 
-        participants = self.__create_variable(participants, df, "TodayPageUse-Sunday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=0, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageUse-Monday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=1, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageUse-Tuesday",   [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=2, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageUse-Wednesday", [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=3, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageUse-Thursday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=4, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageUse-Friday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=5, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageUse-Saturday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=6, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Sunday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=0, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Monday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=1, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Tuesday",   [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=2, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Wednesday", [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=3, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Thursday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=4, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Friday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=5, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageUse-Saturday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=6, distinct=True)
 
-        participants = self.__create_variable(participants, df, "SumTotalEventInteractions", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(7))
+        participants = self.create_variable(participants, df, "SumTotalEventInteractions", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(7))
 
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Sunday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=0, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Monday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=1, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Tuesday",   [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=2, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Wednesday", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=3, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Thursday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=4, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Friday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=5, distinct=True)
-        participants = self.__create_variable(participants, df, "TodayPageGoal-Saturday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=6, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Sunday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=0, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Monday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=1, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Tuesday",   [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=2, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Wednesday", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=3, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Thursday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=4, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Friday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=5, distinct=True)
+        participants = self.create_variable(participants, df, "TodayPageGoal-Saturday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=6, distinct=True)
 
         # ! Resolve function zone token v. LTG token
-        participants = self.__create_variable(participants, df, "LTGFolderUse",  [24, 220, 322], lambda x: x/(7), distinct=True)
-        participants = self.__create_variable(participants, df, "SumTotalLTGNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7))
-        participants = self.__create_variable(participants, df, "LTGGoal",  [24, 220, 322], lambda x: x)
-        participants = self.__create_variable(participants, df, "FZFolderUse",  [24, 220, 322], lambda x: x/(7), distinct=True)
-        participants = self.__create_variable(participants, df, "SumTotalFZNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7))
-        participants = self.__create_variable(participants, df, "FZGoal",  [24, 220, 322], lambda x: x) # ! this is currently the same as LTGGoal
+        participants = self.create_variable(participants, df, "LTGFolderUse",  [24, 220, 322], lambda x: x/(7), distinct=True)
+        participants = self.create_variable(participants, df, "SumTotalLTGNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7))
+        participants = self.create_variable(participants, df, "LTGGoal",  [24, 220, 322], lambda x: x)
+        participants = self.create_variable(participants, df, "FZFolderUse",  [24, 220, 322], lambda x: x/(7), distinct=True)
+        participants = self.create_variable(participants, df, "SumTotalFZNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7))
+        participants = self.create_variable(participants, df, "FZGoal",  [24, 220, 322], lambda x: x) # ! this is currently the same as LTGGoal
 
-        # set the values of variables not calculated to 0 (the use of them by he participants never appeared in the dataset)
+        # set the values of variables not calculated to 0 (the use of them by the participants never appeared in the dataset)
         for participant_id in participants:
             keys = participants[participant_id].keys()
             undeclared_variables = list(set(variableNames).difference(keys)) # these are the variables for each participant that were not calculated. (=0)
             for variable in undeclared_variables:
                 participants[participant_id][variable] = 0
         
-        # write to outfile
-        self.__participant_dict_to_csv(participants, outfile_name=outfile_name)
+        return participants
 
         
     # Last Edit on 12/7/2022 by Reagan Kelley
@@ -229,21 +234,24 @@ class DataWrangling:
         if self.INFILE == None:
             raise Exception("INFILE is None")
 
+        # gets the entire dataset from the provided infile.
+        interactions_raw = pd.read_excel(self.INFILE)
 
-        interactions = pd.read_excel(self.INFILE)
+        # Get the date range in the dataset -> will be used to create weekly dataframes
+        start_date = interactions_raw['timestamp_local'].min()  # the earliest entry in the dataset
+        end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
+        end_date = interactions_raw['timestamp_local'].max()    # the latest entry in the dataset
 
-        start_date = interactions['timestamp_local'].min()
-        end_parsec = Utils.next_sunday(start_date)
-        end_date = interactions['timestamp_local'].max()
-
+        # separate entries by weekly ranges (sunday to saturday)
         while(start_date < end_date):
-            df = interactions.loc[(interactions["timestamp_local"] >= start_date) & (interactions["timestamp_local"] < end_parsec)]
+            df = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
             self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
             start_date = end_parsec
             end_parsec = Utils.next_sunday(start_date)
         
         if self.debug:
             print("* Results: {} weeks of data gathered.".format(len(self.weekly_dfs)))
+
         return self.weekly_dfs
 
     # Last Edit on 12/7/2022 by Reagan Kelley
@@ -259,19 +267,22 @@ class DataWrangling:
 
 
         for date, df in self.weekly_dfs.items():
-            filename = "Week {}, {}".format(date[0], date[1])
-            print(f"* Calculating variables for ({filename})")
-            self.__get_variable_calculations(df, "{}.csv".format(filename))
-
+            filename = "Week {}, {}".format(date[0], date[1])  # The Week and Year of the next dataframe that will be used to calculate variables.
+            
+            if(self.debug):
+                print(f"* Calculating variables for ({filename})")
+            
+            participants = self.get_variable_calculations(df)                          # Get variable calculations for each participant that week
+            self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
 
 # Last Edit on 12/7/2022 by Reagan Kelley
 # Initial Implementation
 def main():
     """Executes data wrangling from the provided command-line arguments
     """
-    dw = DataWrangling(args = sys.argv[1:])
-    dw.read_file()
-    dw.create_weekly_calculations_table()
+    dw = DataWrangling(args = sys.argv[1:])   # use arguments to choose data file and user options (e.g. debug)
+    dw.read_file()                            # read data file provided in command line arguments
+    dw.create_weekly_calculations_table()     # now that data file is read into program, output the variable calculations for each week.
 
 if os.name == 'nt':
     just_fix_windows_console()
