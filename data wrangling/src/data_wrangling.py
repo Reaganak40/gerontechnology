@@ -28,8 +28,37 @@ class Utils:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def filter_to_distinct_interactions(df):
-        return df
+    def filter_to_distinct_interactions(df, sec_gap=300):
+        """Filters a dataframe to only include entries that are distinct use, that is the last action of a particular elementID happened more than sec_gap seconds ago.
+
+        Args:
+            df (DataFrame): The dataframe that will be filtered, should be limited to a day worth of entries.
+            sec_gap (int, optional): The amount of seconds required for a distinct use. Defaults to 300.
+
+        Returns:
+            _type_: _description_
+        """
+        df = df.sort_values(by=['timestamp_local'])
+
+        participant_distinct_use = {}
+        not_distinct = []
+
+        for index in range(len(df)):
+            current_entry = df.iloc[index]
+            participant = participant_distinct_use[current_entry['participantId']] = participant_distinct_use.get(current_entry['participantId'], {})
+            last_time = participant.get(current_entry['elementId'])
+
+            if(last_time != None):
+                delta = current_entry['timestamp_local'] - last_time
+                if(delta.total_seconds() < 300):
+                    not_distinct.append(index)
+            participant_distinct_use[current_entry['participantId']][current_entry['elementId']] = current_entry['timestamp_local']
+
+        return df.drop(df.index[not_distinct])
+
+
+
+
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
