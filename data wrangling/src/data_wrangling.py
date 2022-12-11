@@ -86,6 +86,7 @@ class DataWrangling:
     def __init__(self, args):
         self.INPUT_DIR = os.getcwd() + R'\..\data\input'
         self.OUTPUT_DIR = os.getcwd() + R'\..\data\output'
+        self.__init_token_dict()
         self.weekly_dfs = dict()
         self.__read_args(args)
 
@@ -114,6 +115,11 @@ class DataWrangling:
             if(self.debug):
                 print(colored("WARNING: No file given for data wrangling! (use --input filename)", 'red'))
 
+    def __init_token_dict(self):
+        self.emma_token = {}
+        self.emma_token['LTG'] = '280B85CE-E425-46CA-B4E5-F09933601883'
+        self.emma_token['FZ']  = '180B85CE-E425-46CA-B4E5-F09933601773'
+
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
@@ -131,15 +137,19 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def get_interaction_counts(self, df, elementIDs, day_of_week=-1, distinct=False):
-        """Given a DataFrame which contains participant interactions,
-        returns a count of interactions for given elementIDs for each participant.
+    def get_interaction_counts(self, df, elementIDs, day_of_week=-1, distinct=False, tokens=[]):
+        """ Given a DataFrame which contains participant interactions,
+            returns a count of interactions for given elementIDs for each participant.
 
         Args:
             df (Pandas DataFrame): Created earlier from read_excel
             elementIDs (list): A list of elementIDs where each elementID number is to be aggregated.
             day_of_week (int, optional): Discriminates further on query to only when its this day of the week (Sunday = 0, Saturday = 6)
             distinct (bool, optional): Allows us to filter the dataset further to only count distinct uses (5 minute intervals). Defaults to False.
+            tokens (list, optional): A string list of token names that each entry must also have. Defaults to [].
+
+        Returns:
+            DataFrame: The variable value for each participant in the df
         """
         query_string = ""
 
@@ -149,13 +159,25 @@ class DataWrangling:
         
         # Filter the Dataset to only include rows that are distinct uses.
         if(distinct):
-            df = Utils.filter_to_distinct_interactions(df)    
+            df = Utils.filter_to_distinct_interactions(df)
+
 
         # create a SQL string to filter DataFrame to only include rows with the desired interaction elementIDs
+        query_string += "("
         for i in range(len(elementIDs)):
             query_string += 'elementId == {}'.format(elementIDs[i])
             if((i+1) < len(elementIDs)):
                 query_string += " or "
+        query_string += ")"
+        
+        # Add to the SQL string to filter DataFrame to only include those elementIDs with these tokens
+        if(len(tokens) > 0):
+            query_string += " and ("
+            for i in range(len(tokens)):
+                query_string += 'token == {}'.format(self.emma_token[tokens[i]]) # use emma_token dict to find the alpha-numerical key-value
+                if((i+1) < len(tokens)):
+                    query_string += " or "
+            query_string += ")"
         
         count = df.query(query_string) # count is a new DataFrame that only includes row entries with the given elementIDs
         grouping1 = count.groupby(['participantId', 'elementId']).size() # groups each elementID to how many times each participant used it.
@@ -164,8 +186,8 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def create_variable(self, participants_dict, interactions_df, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False):
-        """Creates a new variable and calculates it, storing the results for each participant in a dictionary.
+    def create_variable(self, participants_dict, interactions_df, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False, tokens=[]):
+        """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
             participants_dict (Dict): Participant data, key = participantID, value = dict of variables
@@ -175,9 +197,10 @@ class DataWrangling:
             variable_func (Lambda Function): Describes how the aggregated count will be calculated, typically division due to weekly or daily averages.
             day_of_week (int, optional): Allows us to filter the dataset further to only look at interactions on a specific day of the week (0 = Sunday to 6 = Saturday). Defaults to -1.
             distinct (bool, optional): Allows us to filter the dataset further to only count distinct uses (5 minute intervals). Defaults to False.
+            tokens (list, optional): A string list of token names that each entry must also have. Defaults to [].
 
         Returns:
-            Dict: An updated dictionary containing the calculated variable for all participants in the dataset, interactions_df
+             Dict: An updated dictionary containing the calculated variable for all participants in the dataset, interactions_df
         """
         
         # Each interaction is a pair (participantID, count)
@@ -232,13 +255,13 @@ class DataWrangling:
         participants = self.create_variable(participants, df, "TodayPageGoal-Friday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=5, distinct=True)
         participants = self.create_variable(participants, df, "TodayPageGoal-Saturday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=6, distinct=True)
 
-        # ! Resolve function zone token v. LTG token
-        participants = self.create_variable(participants, df, "LTGFolderUse",  [24, 220, 322], lambda x: x/(7), distinct=True)
-        participants = self.create_variable(participants, df, "SumTotalLTGNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7))
-        participants = self.create_variable(participants, df, "LTGGoal",  [24, 220, 322], lambda x: x)
-        participants = self.create_variable(participants, df, "FZFolderUse",  [24, 220, 322], lambda x: x/(7), distinct=True)
-        participants = self.create_variable(participants, df, "SumTotalFZNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7))
-        participants = self.create_variable(participants, df, "FZGoal",  [24, 220, 322], lambda x: x) # ! this is currently the same as LTGGoal
+        # * These ones use tokens
+        participants = self.create_variable(participants, df, "LTGFolderUse",                 [24, 220, 322],    lambda x: x/(7), tokens=['LTG'], distinct=True) # ! Distinct?
+        participants = self.create_variable(participants, df, "SumTotalLTGNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7), tokens=['LTG'])
+        participants = self.create_variable(participants, df, "LTGGoal",                      [24, 220, 322],    lambda x: x,     tokens=['LTG'])
+        participants = self.create_variable(participants, df, "FZFolderUse",                  [24, 220, 322],    lambda x: x/(7), tokens=['FZ'], distinct=True)  # ! Distinct?
+        participants = self.create_variable(participants, df, "SumTotalFZNoteInteractions",   [24, 64, 65, 220], lambda x: x/(7), tokens=['FZ'])
+        participants = self.create_variable(participants, df, "FZGoal",                       [24, 220, 322],    lambda x: x,     tokens=['FZ']) 
 
         # set the values of variables not calculated to 0 (the use of them by the participants never appeared in the dataset)
         for participant_id in participants:

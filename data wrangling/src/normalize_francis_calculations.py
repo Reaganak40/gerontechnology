@@ -17,6 +17,7 @@ END_DAY = 182
 FIRST_WEEK = 23
 LAST_WEEK = 26
 FIRST_PARTICIPANT = 95
+YEAR_2022_SUNDAY_OFFSET = 2
 # ===========================================================================================================
 
 class VariableType():
@@ -31,6 +32,9 @@ def get_variable(df, participant=FIRST_PARTICIPANT, variable_name = "CalenderUse
         if(relative_week > 0):
             variable_name += ".{}".format(relative_week)
         return row[variable_name].values[0]
+    elif (variable_type == VariableType.DAILY):
+        absolute_day = (7 * (week - 1)) + day_of_week + YEAR_2022_SUNDAY_OFFSET
+        return absolute_day
 
 
 def normalize():
@@ -38,10 +42,11 @@ def normalize():
 
     val = get_variable(
         df,
-        participant=131,
-        variable_name= "CalendaringGoal", 
-        variable_type=VariableType.WEEKLY,
-        week = (26)
+        participant=95,
+        variable_name= "TodayPageUse", 
+        variable_type=VariableType.DAILY,
+        week = (FIRST_WEEK),
+        day_of_week=0
         )
     print(val)
 
