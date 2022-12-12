@@ -187,11 +187,11 @@ class DataWrangling:
         if(len(tokens) > 0):
             query_string += " and ("
             for i in range(len(tokens)):
-                query_string += 'token == {}'.format(self.emma_token[tokens[i]]) # use emma_token dict to find the alpha-numerical key-value
+                query_string += "token == '{}'".format(self.emma_token[tokens[i]]) # use emma_token dict to find the alpha-numerical key-value
                 if((i+1) < len(tokens)):
                     query_string += " or "
             query_string += ")"
-        
+
         count = df.query(query_string) # count is a new DataFrame that only includes row entries with the given elementIDs
         grouping1 = count.groupby(['participantId', 'elementId']).size() # groups each elementID to how many times each participant used it.
         
@@ -217,7 +217,7 @@ class DataWrangling:
         """
         
         # Each interaction is a pair (participantID, count)
-        element_count_list = self.get_interaction_counts(interactions_df, elementIDs, day_of_week=day_of_week, distinct=distinct).iteritems()
+        element_count_list = self.get_interaction_counts(interactions_df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens).iteritems()
 
         for element_count in element_count_list:
             participant_id = element_count[0]
@@ -239,9 +239,7 @@ class DataWrangling:
             interactions_filename (string): Excel file where all interaction data is stored (absolute path)
             data_date_range (int, optional): The range of days by which this data was collected. Defaults to 7 (week's worth of data).
         """
-        participants = dict()
-
-        
+        participants = {}
 
         participants = self.create_variable(participants, df, "CalenderUse", [9], lambda x: x/(7))
         participants = self.create_variable(participants, df, "SumTotalCalendarInteractions", [9, 18, 19, 20], lambda x: x/(7))
