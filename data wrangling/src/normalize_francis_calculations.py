@@ -6,6 +6,8 @@
 # * Imports
 import os
 import pandas as pd
+import datetime
+
 
 # ===========================================================================================================
 # ? STRUCTURE OF FRANCIS CALCULATED VARIABLES - AFTER MANUALLY NORMALIZED
@@ -17,7 +19,11 @@ END_DAY = 182
 FIRST_WEEK = 23
 LAST_WEEK = 26
 FIRST_PARTICIPANT = 95
-YEAR_2022_SUNDAY_OFFSET = 2
+
+DAY_1 = datetime.datetime.strptime("10/31/21", '%m/%d/%y') 
+
+# since dates in francis calculations are relative to study
+ACTUAL_START_DATE = DAY_1 + datetime.timedelta(days=(7*(FIRST_WEEK-1)))
 # ===========================================================================================================
 
 class VariableType():
@@ -38,6 +44,9 @@ def get_variable(df, participant=FIRST_PARTICIPANT, variable_name = "CalenderUse
 
 
 def normalize():
+    print(ACTUAL_START_DATE)
+    #print((DAY_1.strftime("%U"), DAY_1.strftime("%Y")))
+    return
     df = pd.read_excel(TARGET_FILE, skiprows=[0])
 
     val = get_variable(
