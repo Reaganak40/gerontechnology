@@ -90,6 +90,11 @@ class DataWrangling:
         self.weekly_dfs = dict()
         self.__read_args(args)
 
+        self.variableNames = ["CalenderUse", "SumTotalCalendarInteractions", "CalendaringGoal", "TodayPageUse-Sunday", "TodayPageUse-Monday", "TodayPageUse-Tuesday",
+                        "TodayPageUse-Wednesday", "TodayPageUse-Thursday", "TodayPageUse-Friday", "TodayPageUse-Saturday", "SumTotalEventInteractions", "TodayPageGoal-Sunday",
+                        "TodayPageGoal-Monday", "TodayPageGoal-Tuesday", "TodayPageGoal-Wednesday", "TodayPageGoal-Thursday", "TodayPageGoal-Friday", "TodayPageGoal-Saturday",
+                        "LTGFolderUse", "SumTotalLTGNoteInteractions", "LTGGoal", "FZFolderUse", "SumTotalFZNoteInteractions", "FZGoal"]
+
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
     def __read_args(self, args):
@@ -133,6 +138,14 @@ class DataWrangling:
         interactions_df = pd.DataFrame.from_dict(participants, orient='index')
         interactions_df.reset_index(inplace=True)
         interactions_df.rename({'index':'participantId'}, axis='columns', inplace=True)
+
+        column_order = self.variableNames
+        column_order.insert(0, 'participantId')
+        
+        # make sure columns are in the correct order
+        interactions_df = interactions_df.loc[:, column_order]
+        interactions_df = interactions_df.sort_values(by=['participantId'])
+
         interactions_df.to_csv(self.OUTPUT_DIR + "\\{}".format(outfile_name), index=False)
 
     # Last Edit on 12/7/2022 by Reagan Kelley
@@ -228,10 +241,7 @@ class DataWrangling:
         """
         participants = dict()
 
-        variableNames = ["CalenderUse", "SumTotalCalendarInteractions", "CalendaringGoal", "TodayPageUse-Sunday", "TodayPageUse-Monday", "TodayPageUse-Tuesday",
-                        "TodayPageUse-Wednesday", "TodayPageUse-Thursday", "TodayPageUse-Friday", "TodayPageUse-Saturday", "SumTotalEventInteractions", "TodayPageGoal-Sunday",
-                        "TodayPageGoal-Monday", "TodayPageGoal-Tuesday", "TodayPageGoal-Wednesday", "TodayPageGoal-Thursday", "TodayPageGoal-Friday", "TodayPageGoal-Saturday",
-                        "LTGFolderUse", "SumTotalLTGNoteInteractions", "LTGGoal", "FZFolderUse", "SumTotalFZNoteInteractions", "FZGoal"]
+        
 
         participants = self.create_variable(participants, df, "CalenderUse", [9], lambda x: x/(7))
         participants = self.create_variable(participants, df, "SumTotalCalendarInteractions", [9, 18, 19, 20], lambda x: x/(7))
@@ -266,7 +276,7 @@ class DataWrangling:
         # set the values of variables not calculated to 0 (the use of them by the participants never appeared in the dataset)
         for participant_id in participants:
             keys = participants[participant_id].keys()
-            undeclared_variables = list(set(variableNames).difference(keys)) # these are the variables for each participant that were not calculated. (=0)
+            undeclared_variables = list(set(self.variableNames).difference(keys)) # these are the variables for each participant that were not calculated. (=0)
             for variable in undeclared_variables:
                 participants[participant_id][variable] = 0
         
