@@ -133,7 +133,8 @@ class DataWrangling:
         def read_file(self):
             """ Reads the provided infile and takes that dataset and parses it into weekly segments. Results are in weekly_dfs.
             """
-
+            
+            # * Read Interactions Excel File and transform to weekly dataframes (weekly_dfs)
             if self.type == DatasetType.INTERACTIONS:
                 # gets the entire dataset from the provided infile.
                 interactions_raw = pd.read_excel(self.infile)
@@ -150,11 +151,31 @@ class DataWrangling:
                     start_date = end_parsec
                     end_parsec = Utils.next_sunday(start_date)
 
+            # * Read Events Excel File and transform to weekly dataframes (weekly_dfs)
+            elif self.type == DatasetType.EVENTS:
+                # gets the entire dataset from the provided infile.
+                events_raw = pd.read_excel(self.infile)
+                
+                # Get the date range in the dataset -> will be used to create weekly dataframes
+                start_date = events_raw['timestamp_local'].min()  # the earliest entry in the dataset
+                end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
+                end_date = events_raw['timestamp_local'].max()    # the latest entry in the dataset
+
+                # separate entries by weekly ranges (sunday to saturday)
+                while(start_date < end_date):
+                    df = events_raw.loc[(events_raw["timestamp_local"] >= start_date) & (events_raw["timestamp_local"] < end_parsec)]
+                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
+                    start_date = end_parsec
+                    end_parsec = Utils.next_sunday(start_date)
+                
+
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
     def __init__(self, args):
+        # TODO: Provide absolute and relative path functionality
         self.INPUT_DIR = os.getcwd() + R'\..\data\input'
         self.OUTPUT_DIR = os.getcwd() + R'\..\data\output'
+
         self.__init_token_dict()
         self.weekly_dfs = {}
         self.data = {}
@@ -179,7 +200,7 @@ class DataWrangling:
         # ? --events           => Provided path to events excel data
         # ? --verify-integrity => When true, will move bad variable calculations to trash dir
         # ?                       Bad Variable Calculations Are:
-        # ?                             * Weekly_dfs with incomplete weeks (missing days)
+        # ?                             * Weekly_dfs with incomplete weeks (missing days - particularly at edge weeks)
         # ?                             * If there is a weekly_df for interactions but not one for events (or vice versa)
         # ? ==============================================================================================================
 
@@ -223,6 +244,8 @@ class DataWrangling:
 
     def __init_token_dict(self):
         self.emma_token = {}
+
+        # Keys provided via EMMA Microsoft Teams
         self.emma_token['LTG'] = '280B85CE-E425-46CA-B4E5-F09933601883'
         self.emma_token['FZ']  = '180B85CE-E425-46CA-B4E5-F09933601773'
 
@@ -412,7 +435,7 @@ class DataWrangling:
         # * Get events data
         # * ====================================================================
         if self.debug:
-            print(colored("\nEvents Interactions from Dataset...", 'blue'))
+            print(colored("\nReading Events from Dataset...", 'blue'))
 
         if self.data[DatasetType.EVENTS] == None:
             raise Exception("Events infile is None")
@@ -432,6 +455,8 @@ class DataWrangling:
         Args:
             interactions_filename (string): Absolute path to large dataset
         """
+        used_weeks = []
+        extract_count = 0
 
         if self.debug:
             print(colored("\nCalculating Variables for each week...", 'blue'))
@@ -442,7 +467,7 @@ class DataWrangling:
             events_df = self.data[DatasetType.EVENTS].weekly_dfs.get((date[0], date[1]))
             
             if(events_df is not None):
-                pass
+                used_weeks.append(date)
             else:
                 pass
 
@@ -452,6 +477,27 @@ class DataWrangling:
             
             participants = self.get_variable_calculations(interactions_df)             # Get variable calculations for each participant that week
             self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
+            extract_count += 1
+        
+        if self.debug:
+            unused = []
+            for date in self.data[DatasetType.INTERACTIONS].weekly_dfs.keys():
+                if(date not in used_weeks):
+                    unused.append(["Interactions", date])
+            for date in self.data[DatasetType.EVENTS].weekly_dfs.keys():
+                if(date not in used_weeks):
+                    unused.append(["Events", date])
+            if(len(unused) > 0):
+                print(colored("\n* Weeks not used ===========================", 'red'))
+                print(pd.DataFrame(unused, columns=['Dataset', '(Week, Year)']))
+                print(colored("============================================", 'red'))
+        
+        if self.debug:
+            print(colored("\nOutput Results...", 'blue'))
+            print("* {} calculation tables created in dir [{}]".format(extract_count, self.OUTPUT_DIR))
+        
+
+
 
 # Last Edit on 12/7/2022 by Reagan Kelley
 # Initial Implementation
