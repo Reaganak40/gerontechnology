@@ -139,7 +139,7 @@ class DataWrangling:
         interactions_df.reset_index(inplace=True)
         interactions_df.rename({'index':'participantId'}, axis='columns', inplace=True)
 
-        column_order = self.variableNames
+        column_order = self.variableNames.copy()
         column_order.insert(0, 'participantId')
         
         # make sure columns are in the correct order
