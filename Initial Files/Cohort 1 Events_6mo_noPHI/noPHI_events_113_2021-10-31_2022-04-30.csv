@@ -1,6 +1,0 @@
-eventId,participantId,eventToken,action,timestamp_local,timestamp_utcoffset,eventType,eventDate,noSpecifiedTime,startTime,endTime,priority,reminderPrior,reminderPriorSixth,reminderPriorQuarter,reminderPriorHalf,reminderPriorWhole,reminderAtEvent,completed,recurring,recurringStartDate,recurringEndDate,recurringFrequency,recurringSunday,recurringMonday,recurringTuesday,recurringWednesday,recurringThursday,recurringFriday,recurringSaturday,recurringHide,isHealthTrack,healthTrackGoal,healthTrackData,healthTrackType
-7448,113,66920407-C3E0-42A7-A32F-4BB9EC06B69C,create,12/6/21 17:02,-800,todo,12/6/21,1,,,0,0,0,0,0,0,1,0,1,12/6/21,12/12/21,daily,0,0,0,0,0,0,0,1,0,,,
-7449,113,66920407-C3E0-42A7-A32F-4BB9EC06B69C,delete,12/6/21 17:02,-800,todo,12/6/21,1,,,0,0,0,0,0,0,1,0,1,12/6/21,12/12/21,daily,0,0,0,0,0,0,0,1,0,,,
-7451,113,AC7CDB20-3FE6-4377-8B7E-5D2C00F5077B,create,12/6/21 17:03,-800,todo,12/6/21,1,,,0,0,0,0,0,0,1,0,1,12/6/21,12/12/21,daily,0,0,0,0,0,0,0,0,1,,,phex
-7452,113,25A853F6-9F7C-40FD-8C22-A60F86FADF65,create,12/6/21 17:03,-800,todo,12/6/21,1,,,0,0,0,0,0,0,1,0,1,12/6/21,12/12/21,daily,0,0,0,0,0,0,0,0,1,,,wellx
-7453,113,2C9BB13A-F12D-4171-B390-683917A90CD6,create,12/6/21 17:03,-800,todo,12/6/21,1,,,0,0,0,0,0,0,1,0,1,12/6/21,12/12/21,daily,0,0,0,0,0,0,0,0,1,,,meex
