@@ -13,6 +13,17 @@ import pandas as pd
 import sys
 from termcolor import colored
 
+# ? VSCode Extensions Used:
+# ?     - Better Comments
+# ?     - autoDocstring
+
+# * Quick Reference =============================================================================
+# * Utils           => Contains general helpful functions that goes beyond EMMA data wrangling
+# * DatasetType     => Includes enums that is used to identify a provided dataset
+# * DataWrangling   => Class that includes all use-cases and execution to create variables
+# * Dataset         => Private class object that contains all data and attributes of a dataset
+# * =============================================================================================
+
 class Utils:
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
@@ -30,8 +41,8 @@ class Utils:
             days_left = 7
         return (pd.to_datetime(original_datetime) + timedelta(days=days_left)).floor(freq='D')
 
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Originally written from EMMA_data_wrangling.ipynb
+    # Last Edit on 12/12/2022 by Reagan Kelley
+    # Rewritten because it was accidentally deleted.
     def filter_to_distinct_interactions(df, sec_gap=300):
         """Filters a dataframe to only include entries that are distinct use, that is the last action of a particular elementID happened more than sec_gap seconds ago.
 
@@ -60,10 +71,6 @@ class Utils:
 
         return df.drop(df.index[not_distinct])
 
-
-
-
-
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
     def filter_to_day_of_week(df, day=0):
@@ -80,29 +87,103 @@ class Utils:
         new_df = df.loc[(df["timestamp_local"] >= start_date) & (df["timestamp_local"] < end_date)]
         return new_df
 
+
+class DatasetType():
+            INTERACTIONS = 0
+            EVENTS = 1
+            
+            # Last Edit on 12/13/2022 by Reagan Kelley
+            # Initial Implementation
+            def IsType(val):
+                """Returns true if a provided value is a defined enumerator for a DatasetType
+
+                Args:
+                    val (int): Enumerator, int identifier for a dataset
+
+                Returns:
+                    Bool: True if this int enum is defined, false otherwise.
+                """
+                return True if val == DatasetType.INTERACTIONS or val == DatasetType.EVENTS else False
+
+
 class DataWrangling:
+
+    class Dataset:
+        # Last Edit on 12/13/2022 by Reagan Kelley
+        # Initial Implementation
+        def __init__(self, dataset_type, infile):
+            """ Creates a new instance of a dataset, which included the utility functions to manage and parse the dataset.
+
+            Args:
+                dataset_type (Enum of DatasetType): Identifies the type of dataset this is.
+                infile (string): The filepath to where the dataset file. EXCEL FILE
+
+            Raises:
+                Exception: Throws if the dataset_type is not defined.
+            """
+            if DatasetType.IsType(dataset_type) == False:
+                raise Exception("Invalid dataset_type argument. {}".format(dataset_type))
+            
+            self.type = dataset_type    # the type of data in this Dataset -> Events or interactions
+            self.infile = infile        # The filepath to the read file
+            self.weekly_dfs = {}        # This will eventually contain parsed datasets from the original dataset, but separated by weekly segments.
+
+        # Last Edit on 12/13/2022 by Reagan Kelley
+        # Initial Implementation
+        def read_file(self):
+            """ Reads the provided infile and takes that dataset and parses it into weekly segments. Results are in weekly_dfs.
+            """
+
+            if self.type == DatasetType.INTERACTIONS:
+                # gets the entire dataset from the provided infile.
+                interactions_raw = pd.read_excel(self.infile)
+
+                # Get the date range in the dataset -> will be used to create weekly dataframes
+                start_date = interactions_raw['timestamp_local'].min()  # the earliest entry in the dataset
+                end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
+                end_date = interactions_raw['timestamp_local'].max()    # the latest entry in the dataset
+
+                # separate entries by weekly ranges (sunday to saturday)
+                while(start_date < end_date):
+                    df = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
+                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
+                    start_date = end_parsec
+                    end_parsec = Utils.next_sunday(start_date)
+
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
     def __init__(self, args):
         self.INPUT_DIR = os.getcwd() + R'\..\data\input'
         self.OUTPUT_DIR = os.getcwd() + R'\..\data\output'
         self.__init_token_dict()
-        self.weekly_dfs = dict()
+        self.weekly_dfs = {}
+        self.data = {}
         self.__read_args(args)
 
         self.variableNames = ["CalenderUse", "SumTotalCalendarInteractions", "CalendaringGoal", "TodayPageUse-Sunday", "TodayPageUse-Monday", "TodayPageUse-Tuesday",
                         "TodayPageUse-Wednesday", "TodayPageUse-Thursday", "TodayPageUse-Friday", "TodayPageUse-Saturday", "SumTotalEventInteractions", "TodayPageGoal-Sunday",
                         "TodayPageGoal-Monday", "TodayPageGoal-Tuesday", "TodayPageGoal-Wednesday", "TodayPageGoal-Thursday", "TodayPageGoal-Friday", "TodayPageGoal-Saturday",
                         "LTGFolderUse", "SumTotalLTGNoteInteractions", "LTGGoal", "FZFolderUse", "SumTotalFZNoteInteractions", "FZGoal"]
-
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Initial implementation
+    
+    # Last Edit on 12/13/2022 by Reagan Kelley
+    # Added Event args and verify-integrity
     def __read_args(self, args):
         """Takes command line arguments to setup all parameters or variables for data wrangling.
 
         Args:
             args (string[]): Contains each argument and parameter in the CLI command.
         """
+        # ? Argument Dictionary ==========================================================================================
+        # ? --debug            => When true, Prints processes to console throughout the application
+        # ? --interactions     => Provided path to interactions excel data
+        # ? --events           => Provided path to events excel data
+        # ? --verify-integrity => When true, will move bad variable calculations to trash dir
+        # ?                       Bad Variable Calculations Are:
+        # ?                             * Weekly_dfs with incomplete weeks (missing days)
+        # ?                             * If there is a weekly_df for interactions but not one for events (or vice versa)
+        # ? ==============================================================================================================
+
+        # * Debug Options (--debug) => Defaults to False
         try:
             debug_index = args.index("--debug") + 1
             if int(args[debug_index]) == 1:
@@ -112,13 +193,33 @@ class DataWrangling:
         except:
             self.debug = False
         
+        # * Interactions Dataset Options (--interactions) => Defaults to None (this is bad)
         try:
-            infile_index = args.index("--input") + 1                    # the argument after --input will be the file that gets read
-            self.INFILE = self.INPUT_DIR + RF"\{args[infile_index]}"   
+            interactions_infile_index = args.index("--interactions") + 1   # the argument after --interactions will be the file that gets read
+            self.data[DatasetType.INTERACTIONS] = self.Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR + RF"\{args[interactions_infile_index]}")
         except:
-            self.INFILE = None
+            self.data[DatasetType.INTERACTIONS] = None
             if(self.debug):
-                print(colored("WARNING: No file given for data wrangling! (use --input filename)", 'red'))
+                print(colored("WARNING: No file provided for interactions! (use --interactions filename)", 'red'))
+        
+        # * Events Dataset Options (--events) => Defaults to None (this is bad)
+        try:
+            events_infile_index = args.index("--events") + 1              # the argument after --events will be the file that gets read
+            self.data[DatasetType.EVENTS] = self.Dataset(DatasetType.EVENTS, self.INPUT_DIR + RF"\{args[events_infile_index]}")
+        except:
+            self.data[DatasetType.EVENTS] = None
+            if(self.debug):
+                print(colored("WARNING: No file provided for events! (use --events filename)", 'red'))
+
+        # * Verify Integrity Options (--verify-integrity) => Defaults to False
+        try:
+            verify_integrity_index = args.index("--verify-integrity") + 1
+            if int(args[verify_integrity_index]) == 1:
+                self.verify_integrity = True
+            else:
+                self.verify_integrity = False
+        except:
+            self.verify_integrity = False
 
     def __init_token_dict(self):
         self.emma_token = {}
@@ -281,9 +382,9 @@ class DataWrangling:
         return participants
 
         
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Initial Implementation
-    def read_file(self):
+    # Last Edit on 12/13/2022 by Reagan Kelley
+    # Refactored to allow for event datasets
+    def read_data(self):
         """Given a csv file, converts a dataset of interactions spanning many weeks into many datasets by week.
 
         Args:
@@ -292,51 +393,64 @@ class DataWrangling:
         Returns:
             Dict: Dictionary of interaction DataFrames. Key = StartDate, Value=DataFrame
         """
+        # * ====================================================================
+        # * Get interactions data
+        # * ====================================================================
         if self.debug:
             print(colored("\nReading Interactions from Dataset...", 'blue'))
 
-        if self.INFILE == None:
-            raise Exception("INFILE is None")
+        if self.data[DatasetType.INTERACTIONS] == None:
+            raise Exception("Interactions infile is None")
 
-        # gets the entire dataset from the provided infile.
-        interactions_raw = pd.read_excel(self.INFILE)
+        # Get weekly dfs for interactions
+        self.data[DatasetType.INTERACTIONS].read_file()
 
-        # Get the date range in the dataset -> will be used to create weekly dataframes
-        start_date = interactions_raw['timestamp_local'].min()  # the earliest entry in the dataset
-        end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
-        end_date = interactions_raw['timestamp_local'].max()    # the latest entry in the dataset
-
-        # separate entries by weekly ranges (sunday to saturday)
-        while(start_date < end_date):
-            df = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
-            self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
-            start_date = end_parsec
-            end_parsec = Utils.next_sunday(start_date)
-        
         if self.debug:
-            print("* Results: {} weeks of data gathered.".format(len(self.weekly_dfs)))
+            print("* Results: {} weeks of data gathered.".format(len(self.data[DatasetType.INTERACTIONS].weekly_dfs)))
 
-        return self.weekly_dfs
+        # * ====================================================================
+        # * Get events data
+        # * ====================================================================
+        if self.debug:
+            print(colored("\nEvents Interactions from Dataset...", 'blue'))
 
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Originally written from EMMA_data_wrangling.ipynb
+        if self.data[DatasetType.EVENTS] == None:
+            raise Exception("Events infile is None")
+
+        # Get weekly dfs for interactions
+        self.data[DatasetType.EVENTS].read_file()
+
+        if self.debug:
+            print("* Results: {} weeks of data gathered.".format(len(self.data[DatasetType.EVENTS].weekly_dfs)))
+
+
+    # Last Edit on 12/13/2022 by Reagan Kelley
+    # Refactored to allow for event datasets
     def create_weekly_calculations_table(self):
         """Given a large dataset of interactions from multiple participants, outputs all weekly csv files from that data showcasing desired calculated variables.
 
         Args:
             interactions_filename (string): Absolute path to large dataset
         """
+
         if self.debug:
             print(colored("\nCalculating Variables for each week...", 'blue'))
+        
 
-
-        for date, df in self.weekly_dfs.items():
+        for date, interactions_df in self.data[DatasetType.INTERACTIONS].weekly_dfs.items():
             filename = "Week {}, {}".format(date[0], date[1])  # The Week and Year of the next dataframe that will be used to calculate variables.
+            events_df = self.data[DatasetType.EVENTS].weekly_dfs.get((date[0], date[1]))
+            
+            if(events_df is not None):
+                pass
+            else:
+                pass
+
             
             if(self.debug):
                 print(f"* Calculating variables for ({filename})")
             
-            participants = self.get_variable_calculations(df)                          # Get variable calculations for each participant that week
+            participants = self.get_variable_calculations(interactions_df)             # Get variable calculations for each participant that week
             self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
 
 # Last Edit on 12/7/2022 by Reagan Kelley
@@ -344,8 +458,8 @@ class DataWrangling:
 def main():
     """Executes data wrangling from the provided command-line arguments
     """
-    dw = DataWrangling(args = sys.argv[1:])   # use arguments to choose data file and user options (e.g. debug)
-    dw.read_file()                            # read data file provided in command line arguments
+    dw = DataWrangling(args = sys.argv[1:])   # use arguments to choose data files and user options (e.g. --debug)
+    dw.read_data()                            # read data files provided in command line arguments
     dw.create_weekly_calculations_table()     # now that data file is read into program, output the variable calculations for each week.
 
 if os.name == 'nt':
