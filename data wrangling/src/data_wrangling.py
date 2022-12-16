@@ -4,14 +4,16 @@
     entries of participants who use the EMMA app, and aggregate calculations 
     that are both used in research and in the medical field.
 """
-# * Imports
+# * Modules
 from colorama import just_fix_windows_console
-from datetime import datetime, timedelta
-import numpy as np
 import os
 import pandas as pd
 import sys
 from termcolor import colored
+
+# Local Imports
+from dataset import DatasetType, Dataset
+from utils import Utils
 
 # ? VSCode Extensions Used:
 # ?     - Better Comments
@@ -24,150 +26,7 @@ from termcolor import colored
 # * Dataset         => Private class object that contains all data and attributes of a dataset
 # * =============================================================================================
 
-class Utils:
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Originally written from EMMA_data_wrangling.ipynb
-    def next_sunday(original_datetime):
-        """Returns the date of the next Sunday relative to the given date.
-
-        Args:
-            original_datetime (Datetime): A date
-
-        Returns:
-            Datetime: This will be a Sunday datetime.
-        """
-        days_left = 7 - (original_datetime.floor(freq='D').day_of_week + 1) # offset needed because day of week starts on monday
-        if(days_left == 0):
-            days_left = 7
-        return (pd.to_datetime(original_datetime) + timedelta(days=days_left)).floor(freq='D')
-
-    # Last Edit on 12/12/2022 by Reagan Kelley
-    # Rewritten because it was accidentally deleted.
-    def filter_to_distinct_interactions(df, sec_gap=300):
-        """Filters a dataframe to only include entries that are distinct use, that is the last action of a particular elementID happened more than sec_gap seconds ago.
-
-        Args:
-            df (DataFrame): The dataframe that will be filtered, should be limited to a day worth of entries.
-            sec_gap (int, optional): The amount of seconds required for a distinct use. Defaults to 300.
-
-        Returns:
-            _type_: _description_
-        """
-        df = df.sort_values(by=['timestamp_local'])
-
-        participant_distinct_use = {}
-        not_distinct = []
-
-        for index in range(len(df)):
-            current_entry = df.iloc[index]
-            participant = participant_distinct_use[current_entry['participantId']] = participant_distinct_use.get(current_entry['participantId'], {})
-            last_time = participant.get(current_entry['elementId'])
-
-            if(last_time != None):
-                delta = current_entry['timestamp_local'] - last_time
-                if(delta.total_seconds() < 300):
-                    not_distinct.append(index)
-            participant_distinct_use[current_entry['participantId']][current_entry['elementId']] = current_entry['timestamp_local']
-
-        return df.drop(df.index[not_distinct])
-
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Originally written from EMMA_data_wrangling.ipynb
-    def filter_to_day_of_week(df, day=0):
-        """Filters and creates a new DataFrame of interactions that only includes entries of the given day of the week. 
-        Precondition: DataFrame only includes a week's worth set of data.
-
-        Args:
-            df (DataFrame): At most a week's worth of interactions
-            day (int, optional): Discriminates further on query to only when its this day of the week (Sunday = 0, Saturday = 6), Defaults to 0.
-        """
-        # Filter df to only include interactions on this day of the week
-        end_date = Utils.next_sunday(df['timestamp_local'].max()) - timedelta(days=(6-day))
-        start_date = end_date - timedelta(days=1)
-        new_df = df.loc[(df["timestamp_local"] >= start_date) & (df["timestamp_local"] < end_date)]
-        return new_df
-
-
-class DatasetType():
-            INTERACTIONS = 0
-            EVENTS = 1
-            
-            # Last Edit on 12/13/2022 by Reagan Kelley
-            # Initial Implementation
-            def IsType(val):
-                """Returns true if a provided value is a defined enumerator for a DatasetType
-
-                Args:
-                    val (int): Enumerator, int identifier for a dataset
-
-                Returns:
-                    Bool: True if this int enum is defined, false otherwise.
-                """
-                return True if val == DatasetType.INTERACTIONS or val == DatasetType.EVENTS else False
-
-
 class DataWrangling:
-
-    class Dataset:
-        # Last Edit on 12/13/2022 by Reagan Kelley
-        # Initial Implementation
-        def __init__(self, dataset_type, infile):
-            """ Creates a new instance of a dataset, which included the utility functions to manage and parse the dataset.
-
-            Args:
-                dataset_type (Enum of DatasetType): Identifies the type of dataset this is.
-                infile (string): The filepath to where the dataset file. EXCEL FILE
-
-            Raises:
-                Exception: Throws if the dataset_type is not defined.
-            """
-            if DatasetType.IsType(dataset_type) == False:
-                raise Exception("Invalid dataset_type argument. {}".format(dataset_type))
-            
-            self.type = dataset_type    # the type of data in this Dataset -> Events or interactions
-            self.infile = infile        # The filepath to the read file
-            self.weekly_dfs = {}        # This will eventually contain parsed datasets from the original dataset, but separated by weekly segments.
-
-        # Last Edit on 12/13/2022 by Reagan Kelley
-        # Initial Implementation
-        def read_file(self):
-            """ Reads the provided infile and takes that dataset and parses it into weekly segments. Results are in weekly_dfs.
-            """
-            
-            # * Read Interactions Excel File and transform to weekly dataframes (weekly_dfs)
-            if self.type == DatasetType.INTERACTIONS:
-                # gets the entire dataset from the provided infile.
-                interactions_raw = pd.read_excel(self.infile)
-
-                # Get the date range in the dataset -> will be used to create weekly dataframes
-                start_date = interactions_raw['timestamp_local'].min()  # the earliest entry in the dataset
-                end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
-                end_date = interactions_raw['timestamp_local'].max()    # the latest entry in the dataset
-
-                # separate entries by weekly ranges (sunday to saturday)
-                while(start_date < end_date):
-                    df = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
-                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
-                    start_date = end_parsec
-                    end_parsec = Utils.next_sunday(start_date)
-
-            # * Read Events Excel File and transform to weekly dataframes (weekly_dfs)
-            elif self.type == DatasetType.EVENTS:
-                # gets the entire dataset from the provided infile.
-                events_raw = pd.read_excel(self.infile)
-                
-                # Get the date range in the dataset -> will be used to create weekly dataframes
-                start_date = events_raw['timestamp_local'].min()  # the earliest entry in the dataset
-                end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
-                end_date = events_raw['timestamp_local'].max()    # the latest entry in the dataset
-
-                # separate entries by weekly ranges (sunday to saturday)
-                while(start_date < end_date):
-                    df = events_raw.loc[(events_raw["timestamp_local"] >= start_date) & (events_raw["timestamp_local"] < end_parsec)]
-                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
-                    start_date = end_parsec
-                    end_parsec = Utils.next_sunday(start_date)
-                
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
@@ -177,8 +36,7 @@ class DataWrangling:
         self.OUTPUT_DIR = os.getcwd() + R'\..\data\output'
 
         self.__init_token_dict()
-        self.weekly_dfs = {}
-        self.data = {}
+        self.data : dict[str, Dataset] = {}
         self.__read_args(args)
 
         self.variableNames = ["CalenderUse", "SumTotalCalendarInteractions", "CalendaringGoal", "TodayPageUse-Sunday", "TodayPageUse-Monday", "TodayPageUse-Tuesday",
@@ -217,7 +75,7 @@ class DataWrangling:
         # * Interactions Dataset Options (--interactions) => Defaults to None (this is bad)
         try:
             interactions_infile_index = args.index("--interactions") + 1   # the argument after --interactions will be the file that gets read
-            self.data[DatasetType.INTERACTIONS] = self.Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR + RF"\{args[interactions_infile_index]}")
+            self.data[DatasetType.INTERACTIONS] = Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR + RF"\{args[interactions_infile_index]}")
         except:
             self.data[DatasetType.INTERACTIONS] = None
             if(self.debug):
@@ -226,7 +84,7 @@ class DataWrangling:
         # * Events Dataset Options (--events) => Defaults to None (this is bad)
         try:
             events_infile_index = args.index("--events") + 1              # the argument after --events will be the file that gets read
-            self.data[DatasetType.EVENTS] = self.Dataset(DatasetType.EVENTS, self.INPUT_DIR + RF"\{args[events_infile_index]}")
+            self.data[DatasetType.EVENTS] = Dataset(DatasetType.EVENTS, self.INPUT_DIR + RF"\{args[events_infile_index]}")
         except:
             self.data[DatasetType.EVENTS] = None
             if(self.debug):
@@ -468,17 +326,15 @@ class DataWrangling:
             
             if(events_df is not None):
                 used_weeks.append(date)
+                if(self.debug):
+                    print(f"* Calculating variables for ({filename})")
+            
+                participants = self.get_variable_calculations(interactions_df)             # Get variable calculations for each participant that week
+                self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
+                extract_count += 1
             else:
                 pass
 
-            
-            if(self.debug):
-                print(f"* Calculating variables for ({filename})")
-            
-            participants = self.get_variable_calculations(interactions_df)             # Get variable calculations for each participant that week
-            self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
-            extract_count += 1
-        
         if self.debug:
             unused = []
             for date in self.data[DatasetType.INTERACTIONS].weekly_dfs.keys():
