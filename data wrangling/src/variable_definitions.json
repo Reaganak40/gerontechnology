@@ -1,0 +1,98 @@
+{
+    "Variables" : [
+        {
+            "name" : "CalenderUse",
+            "dataset" : "Interactions",
+            "elementIDs" : [9],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumTotalCalendarInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [9, 18, 19, 20],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "CalendaringGoal",
+            "dataset" : "Interactions",
+            "elementIDs" : [9],
+            "scope" : "weekly",
+            "function" : ["x", "x/4"]
+        },
+        {
+            "name" : "TodayPageUse",
+            "dataset" : "Interactions",
+            "elementIDs" : [8, 13, 379, 380, 381, 384],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "distinct" : true
+        },
+        {
+            "name" : "SumTotalEventInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [13, 103, 104, 379, 380, 381, 384],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "TodayPageGoal",
+            "dataset" : "Interactions",
+            "elementIDs" : [13, 103, 104, 379, 380, 381, 384],
+            "scope" : "daily",
+            "function" : ["x", "x/3"],
+            "distinct" : true
+        },
+        {
+            "name" : "LTGFolderUse",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["LTG"],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "distinct" : true
+        },
+        {
+            "name" : "SumTotalLTGNoteInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 64, 65, 220],
+            "tokens" : ["LTG"],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "LTGGoal",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["LTG"],
+            "scope" : "weekly",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "FZFolderUse",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["FZ"],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "distinct" : true
+        },
+        {
+            "name" : "SumTotalFZNoteInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 64, 65, 220],
+            "tokens" : ["FZ"],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "FZGoal",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["FZ"],
+            "scope" : "weekly",
+            "function" : ["x", "x"]
+        }
+    ]
+}

@@ -181,12 +181,13 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def create_variable(self, participants_dict, interactions_df, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False, tokens=[]):
+    def create_variable(self, participants_dict, df, dataset_type, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False, tokens=[]):
         """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
             participants_dict (Dict): Participant data, key = participantID, value = dict of variables
-            interactions_df (DataFrame): An already created DataFrame that is data collected from some excel file
+            df (DataFrame): An already created DataFrame that is data collected from some excel file
+            dataset_type (Dataset.Type) : The type of data that is represented in df.
             variable_name (string): Identifier by which this variable is known as.
             elementIDs (list): A list of elementIDs that are counted and summed for this variable.
             variable_func (Lambda Function): Describes how the aggregated count will be calculated, typically division due to weekly or daily averages.
@@ -199,7 +200,12 @@ class DataWrangling:
         """
         
         # Each interaction is a pair (participantID, count)
-        element_count_list = self.get_interaction_counts(interactions_df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens).iteritems()
+        if(dataset_type == DatasetType.INTERACTIONS):
+            element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens).iteritems()
+        elif(dataset_type == DatasetType.EVENTS):
+            element_count_list = None
+        else:
+            raise Exception("{} is not a defined dataset type.".format(dataset_type))
 
         for element_count in element_count_list:
             participant_id = element_count[0]
@@ -214,44 +220,47 @@ class DataWrangling:
     
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def get_variable_calculations(self, df):
-        """Given a dataset of interactions from participants, computes and stores calculation dependent variables to an output file.
+    def get_variable_calculations(self, interactions_df, events_df):
+        """Given a week's worth of data in two DataFrames, interactions and events respectively, created a calculation table.
 
         Args:
-            interactions_filename (string): Excel file where all interaction data is stored (absolute path)
-            data_date_range (int, optional): The range of days by which this data was collected. Defaults to 7 (week's worth of data).
+            interactions_df (DataFrame): Contains interaction entries for a given week
+            events_df (DataFrame): Contains event entries for a given week
+
+        Returns:
+            dict: [participant_id : the variable calculations for that participant]
         """
         participants = {}
 
-        participants = self.create_variable(participants, df, "CalenderUse", [9], lambda x: x/(7))
-        participants = self.create_variable(participants, df, "SumTotalCalendarInteractions", [9, 18, 19, 20], lambda x: x/(7))
-        participants = self.create_variable(participants, df, "CalendaringGoal", [9], lambda x: x/(4))
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "CalenderUse", [9], lambda x: x/(7))
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "SumTotalCalendarInteractions", [9, 18, 19, 20], lambda x: x/(7))
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "CalendaringGoal", [9], lambda x: x/(4))
 
-        participants = self.create_variable(participants, df, "TodayPageUse-Sunday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=0, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageUse-Monday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=1, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageUse-Tuesday",   [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=2, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageUse-Wednesday", [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=3, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageUse-Thursday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=4, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageUse-Friday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=5, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageUse-Saturday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=6, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Sunday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=0, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Monday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=1, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Tuesday",   [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=2, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Wednesday", [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=3, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Thursday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=4, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Friday",    [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=5, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageUse-Saturday",  [8, 13, 379, 380, 381, 384], lambda x: x, day_of_week=6, distinct=True)
 
-        participants = self.create_variable(participants, df, "SumTotalEventInteractions", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(7))
+        participants = self.create_variable(participants, interactions_df, "SumTotalEventInteractions", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(7))
 
-        participants = self.create_variable(participants, df, "TodayPageGoal-Sunday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=0, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageGoal-Monday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=1, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageGoal-Tuesday",   [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=2, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageGoal-Wednesday", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=3, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageGoal-Thursday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=4, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageGoal-Friday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=5, distinct=True)
-        participants = self.create_variable(participants, df, "TodayPageGoal-Saturday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=6, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Sunday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=0, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Monday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=1, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Tuesday",   [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=2, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Wednesday", [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=3, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Thursday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=4, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Friday",    [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=5, distinct=True)
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "TodayPageGoal-Saturday",  [13, 103, 104, 379, 380, 381, 384], lambda x: x/(3), day_of_week=6, distinct=True)
 
         # * These ones use tokens
-        participants = self.create_variable(participants, df, "LTGFolderUse",                 [24, 220, 322],    lambda x: x/(7), tokens=['LTG'], distinct=True) # ! Distinct?
-        participants = self.create_variable(participants, df, "SumTotalLTGNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7), tokens=['LTG'])
-        participants = self.create_variable(participants, df, "LTGGoal",                      [24, 220, 322],    lambda x: x,     tokens=['LTG'])
-        participants = self.create_variable(participants, df, "FZFolderUse",                  [24, 220, 322],    lambda x: x/(7), tokens=['FZ'], distinct=True)  # ! Distinct?
-        participants = self.create_variable(participants, df, "SumTotalFZNoteInteractions",   [24, 64, 65, 220], lambda x: x/(7), tokens=['FZ'])
-        participants = self.create_variable(participants, df, "FZGoal",                       [24, 220, 322],    lambda x: x,     tokens=['FZ']) 
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "LTGFolderUse",                 [24, 220, 322],    lambda x: x/(7), tokens=['LTG'], distinct=True) # ! Distinct?
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "SumTotalLTGNoteInteractions",  [24, 64, 65, 220], lambda x: x/(7), tokens=['LTG'])
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "LTGGoal",                      [24, 220, 322],    lambda x: x,     tokens=['LTG'])
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "FZFolderUse",                  [24, 220, 322],    lambda x: x/(7), tokens=['FZ'], distinct=True)  # ! Distinct?
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "SumTotalFZNoteInteractions",   [24, 64, 65, 220], lambda x: x/(7), tokens=['FZ'])
+        participants = self.create_variable(participants, interactions_df, DatasetType.INTERACTIONS, "FZGoal",                       [24, 220, 322],    lambda x: x,     tokens=['FZ']) 
 
         # set the values of variables not calculated to 0 (the use of them by the participants never appeared in the dataset)
         for participant_id in participants:
@@ -329,7 +338,7 @@ class DataWrangling:
                 if(self.debug):
                     print(f"* Calculating variables for ({filename})")
             
-                participants = self.get_variable_calculations(interactions_df)             # Get variable calculations for each participant that week
+                participants = self.get_variable_calculations(interactions_df, events_df)  # Get variable calculations for each participant that week
                 self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
                 extract_count += 1
             else:
