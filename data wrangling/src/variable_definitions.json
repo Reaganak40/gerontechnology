@@ -93,6 +93,24 @@
             "tokens" : ["FZ"],
             "scope" : "weekly",
             "function" : ["x", "x"]
+        },
+        {
+            "name" : "TotalPEWeeklyPHEX",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["phex"],
+            "completed" : true,
+            "scope" : "weekly",
+            "function" : ["x", "x"]
+        }
+        {
+            "name" : "PEGoal",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["phex"],
+            "completed" : true,
+            "scope" : "weekly",
+            "function" : ["x", "x"]
         }
     ]
 }

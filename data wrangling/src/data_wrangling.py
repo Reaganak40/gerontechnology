@@ -42,10 +42,9 @@ class DataWrangling:
         self.__read_args(args)
         self.variables : dict[str, Variable] = create_variable_dictionary("variable_definitions.json")
 
-        self.variableNames = ["CalenderUse", "SumTotalCalendarInteractions", "CalendaringGoal", "TodayPageUse-Sunday", "TodayPageUse-Monday", "TodayPageUse-Tuesday",
-                        "TodayPageUse-Wednesday", "TodayPageUse-Thursday", "TodayPageUse-Friday", "TodayPageUse-Saturday", "SumTotalEventInteractions", "TodayPageGoal-Sunday",
-                        "TodayPageGoal-Monday", "TodayPageGoal-Tuesday", "TodayPageGoal-Wednesday", "TodayPageGoal-Thursday", "TodayPageGoal-Friday", "TodayPageGoal-Saturday",
-                        "LTGFolderUse", "SumTotalLTGNoteInteractions", "LTGGoal", "FZFolderUse", "SumTotalFZNoteInteractions", "FZGoal"]
+        self.variableNames = []
+        for key in self.variables.keys():
+            self.variableNames.append(key)
     
     # Last Edit on 12/13/2022 by Reagan Kelley
     # Added Event args and verify-integrity
@@ -181,9 +180,42 @@ class DataWrangling:
         
         return grouping1.groupby(['participantId']).sum() # returns the sum of each elementIDs use for each participant
 
+    def get_events_counts(self, df, sum, healthTrackType, completed = False, day_of_week=-1):
+        """ Given a DataFrame which contains participant events,
+            returns a sum in a column for given healthTrackType for each participant.
+
+        Args:
+            df (Pandas DataFrame): Created earlier from read_excel
+            count (str): the name of the column in the events table to count.
+            healthTrackType (list[str]): Which healthTracking tags to filter by.
+            day_of_week (int, optional): Discriminates further on query to only when its this day of the week (Sunday = 0, Saturday = 6)
+        Returns:
+            DataFrame: The variable value for each participant in the df
+        """
+        query_string = ""
+
+        # create a SQL string to filter DataFrame to only include rows with the desired interaction elementIDs
+        query_string += "("
+        for i in range(len(healthTrackType)):
+            query_string += "healthTrackType == '{}'".format(healthTrackType[i].lower())
+            if((i+1) < len(healthTrackType)):
+                query_string += " or "
+        query_string += ")"
+
+        # Add to the SQL string if want to only check completed events.
+        if(completed):
+            query_string += " and (completed == 1)"
+
+        filtered_entries = df.query(query_string)
+        filtered_entries = filtered_entries[filtered_entries['healthTrackData'].notna()] #remove entries where the healthTrackData has no value. 
+
+        grouping1 = filtered_entries.groupby('participantId')[sum].sum() # groups by participantID whilst summing the healthTrackingData values.
+        return grouping1
+
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def create_variable(self, participants_dict, df, dataset_type, variable_name, elementIDs, variable_func, day_of_week=-1, distinct=False, tokens=[]):
+    def create_variable(self, participants_dict, df, dataset_type, variable_name, variable_func, elementIDs = None, day_of_week=-1, distinct=False, tokens=None,
+    sum = None, healthTrackType=None, completed=False):
         """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
@@ -201,17 +233,16 @@ class DataWrangling:
              Dict: An updated dictionary containing the calculated variable for all participants in the dataset, interactions_df
         """
         
-        # Each interaction is a pair (participantID, count)
+        # Each is a pair (participantID, count)
         if(dataset_type == DatasetType.INTERACTIONS):
             element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens).iteritems()
         elif(dataset_type == DatasetType.EVENTS):
-            element_count_list = None
+            element_count_list = self.get_events_counts(df, sum, healthTrackType, completed=completed, day_of_week=day_of_week).iteritems()
         else:
             raise Exception("{} is not a defined dataset type.".format(dataset_type))
-
+        
         for element_count in element_count_list:
             participant_id = element_count[0]
-
             if participant_id in participants_dict:
                 participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : element_count[1]}) # eval example ("x", {"x" : count})
             else:
@@ -238,25 +269,41 @@ class DataWrangling:
         # * ================================================================
         for name, properties in self.variables.items(): # variable properties were gather from variable_definitions.json
             dataset_type = properties.dataset_type
-            elementIDs = properties.elementIDs
             function = properties.lambda_function
-            tokens = properties.tokens
-            distinct = properties.distinct
             day_of_week = properties.day_of_week
+            
+            if(dataset_type == DatasetType.INTERACTIONS):
+                elementIDs = properties.elementIDs
+                tokens = properties.tokens
+                distinct = properties.distinct
+                participants = self.create_variable(
+                    participants,                      # this participants dict will be updated
+                    interactions_df,                   # the dataset used in this variable
+                    dataset_type,                      # what type of dataset this variable needs
+                    name,                              # the name of the variable
+                    function,                          # the lambda function to do on every aggregate call
+                    elementIDs = elementIDs,           # elementIDs used
+                    day_of_week=day_of_week,           # if not -1, specifies the day to calculate
+                    distinct=distinct,                 # only count distinct uses
+                    tokens=tokens                      # what tokens to look at for the variable
+                    )
 
-            participants = self.create_variable(
-                participants,                      # this participants dict will be updated
-                interactions_df                    # the dataset used in this variable
-                if dataset_type == DatasetType.INTERACTIONS
-                else events_df,
-                dataset_type,                      # what type of dataset this variable needs
-                name,                              # the name of the variable
-                elementIDs,                        # elementIDs used
-                function,                          # the lambda function to do on every aggregate call
-                day_of_week=day_of_week,           # if not -1, specifies the day to calculate
-                distinct=distinct,                 # only count distinct uses
-                tokens=tokens                      # what tokens to look at for the variable
+            elif(dataset_type == DatasetType.EVENTS):
+                sum = properties.sum
+                healthTrackType = properties.healthTrackType
+                completed = properties.completed
+                participants = self.create_variable(
+                    participants,                      # this participants dict will be updated
+                    events_df,                         # the dataset used in this variable
+                    dataset_type,                      # what type of dataset this variable needs
+                    name,                              # the name of the variable
+                    function,                          # the lambda function to do on every aggregate call
+                    day_of_week=day_of_week,           # if not -1, specifies the day to calculate
+                    sum=sum,                           # the column to count
+                    healthTrackType=healthTrackType,   # What tags to filter by for the healthTrackType
+                    completed=completed                # only look at completed events when true
                 )
+
 
         # set the values of variables not calculated to 0 (the use of them by the participants never appeared in the dataset)
         for participant_id in participants:

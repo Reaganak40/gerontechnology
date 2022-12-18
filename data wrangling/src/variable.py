@@ -18,7 +18,6 @@ class Variable:
             variable_definition (dict): Holds the variable definition attributes such as the name and the elementIDs used.
         """
         self.name = variable_definition["name"]
-        self.elementIDs = variable_definition["elementIDs"]
         self.lambda_function = variable_definition["function"]
 
         if variable_definition["dataset"] == "Interactions":
@@ -30,6 +29,10 @@ class Variable:
 
         self.tokens = variable_definition.get("tokens", None)
         self.distinct = variable_definition.get("distinct", False)
+        self.elementIDs = variable_definition.get("elementIDs", None)
+        self.sum = variable_definition.get("sum", None)
+        self.healthTrackType = variable_definition.get("healthTrackType", None)
+        self.completed = variable_definition.get("completed", False)
         self.day_of_week = day_of_week
 
 # Last Edit on 12/16/2022 by Reagan Kelley
