@@ -102,15 +102,48 @@
             "completed" : true,
             "scope" : "weekly",
             "function" : ["x", "x"]
-        }
+        },
         {
             "name" : "PEGoal",
             "dataset" : "Events",
             "sum" : "healthTrackData",
             "healthTrackType" : ["phex"],
+            "scope" : "weekly",
+            "function" : ["x", "x/150"]
+        },
+        {
+            "name" : "TotalCEWeeklyMEEX",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["meex"],
             "completed" : true,
             "scope" : "weekly",
             "function" : ["x", "x"]
+        },
+        {
+            "name" : "CEGoal",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["meex"],
+            "scope" : "weekly",
+            "function" : ["x", "x/12"]
+        },
+        {
+            "name" : "TotalWEWeeklyWELLX",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["WELLX"],
+            "completed" : true,
+            "scope" : "weekly",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "WEGoal",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["WELLX"],
+            "scope" : "weekly",
+            "function" : ["x", "x/3"]
         }
     ]
 }
