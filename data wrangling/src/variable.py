@@ -19,13 +19,13 @@ class Variable:
         """
         self.name = variable_definition["name"]
         self.lambda_function = variable_definition["function"]
-
-        if variable_definition["dataset"] == "Interactions":
+        
+        if variable_definition.get("dataset") == None:
+            self.dataset_type = None
+        elif variable_definition["dataset"] == "Interactions":
             self.dataset_type = DatasetType.INTERACTIONS
         elif variable_definition["dataset"] == "Events":
             self.dataset_type = DatasetType.EVENTS
-        else:
-            raise Exception("Variable {} does not have properly defined dataset type: {}".format(self.name, variable_definition["dataset"]))
 
         self.tokens = variable_definition.get("tokens", None)
         self.distinct = variable_definition.get("distinct", False)
@@ -34,6 +34,9 @@ class Variable:
         self.healthTrackType = variable_definition.get("healthTrackType", None)
         self.completed = variable_definition.get("completed", False)
         self.day_of_week = day_of_week
+
+        self.defined_variable_x = variable_definition.get("defined-variable-x", None)
+        # TODO: Add functionality for multiple predefined variables
 
 # Last Edit on 12/16/2022 by Reagan Kelley
 # Initial Implementation
@@ -54,16 +57,15 @@ def variable_factory(variable_definition : dict):
     name = variable_definition["name"]
     
     # if daily, provide 7 variables with the day in their definition name.
-    if(variable_definition["scope"] == "daily"): 
+    if(variable_definition.get("scope") == "daily"): 
         day_of_week = 0
         for day in ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]:
             variable_definition["name"] = name + "-{}".format(day)
             res.append(Variable(variable_definition, day_of_week))
             day_of_week += 1
-    elif (variable_definition["scope"] == "weekly"):
-        res.append(Variable(variable_definition, -1))
     else:
-        raise Exception("Variable Scope '{}' is not a defined range".format(variable_definition["scope"]))
+        # if not daily or not defined, assume weekly
+        res.append(Variable(variable_definition, -1))
 
     return res
 

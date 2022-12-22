@@ -215,7 +215,7 @@ class DataWrangling:
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
     def create_variable(self, participants_dict, df, dataset_type, variable_name, variable_func, elementIDs = None, day_of_week=-1, distinct=False, tokens=None,
-    sum = None, healthTrackType=None, completed=False):
+    sum = None, healthTrackType=None, completed=False, defined_variable_x = None):
         """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
@@ -238,16 +238,24 @@ class DataWrangling:
             element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens).iteritems()
         elif(dataset_type == DatasetType.EVENTS):
             element_count_list = self.get_events_counts(df, sum, healthTrackType, completed=completed, day_of_week=day_of_week).iteritems()
-        else:
-            raise Exception("{} is not a defined dataset type.".format(dataset_type))
-        
-        for element_count in element_count_list:
-            participant_id = element_count[0]
-            if participant_id in participants_dict:
-                participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : element_count[1]}) # eval example ("x", {"x" : count})
+
+        if(dataset_type == None):
+            if(defined_variable_x is not None):
+                for participant_id, variables in participants_dict.items():
+                    X = variables.get(defined_variable_x) # get existing value for a variable
+
+                    if(X is not None):
+                        participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : X}) # set variable x to an already defined variable
             else:
-                participants_dict[participant_id] = dict()
-                participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : element_count[1]}) # eval example ("x", {"x" : count})
+                raise Exception("No dataset given but also no defined variables given either.")
+        else:
+            for element_count in element_count_list:
+                participant_id = element_count[0]
+                if participant_id in participants_dict:
+                    participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : element_count[1]}) # eval example ("x", {"x" : count})
+                else:
+                    participants_dict[participant_id] = dict()
+                    participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : element_count[1]}) # eval example ("x", {"x" : count})
         
         return participants_dict
     
@@ -271,21 +279,23 @@ class DataWrangling:
             dataset_type = properties.dataset_type
             function = properties.lambda_function
             day_of_week = properties.day_of_week
+            defined_variable_x = properties.defined_variable_x
             
             if(dataset_type == DatasetType.INTERACTIONS):
                 elementIDs = properties.elementIDs
                 tokens = properties.tokens
                 distinct = properties.distinct
                 participants = self.create_variable(
-                    participants,                      # this participants dict will be updated
-                    interactions_df,                   # the dataset used in this variable
-                    dataset_type,                      # what type of dataset this variable needs
-                    name,                              # the name of the variable
-                    function,                          # the lambda function to do on every aggregate call
-                    elementIDs = elementIDs,           # elementIDs used
-                    day_of_week=day_of_week,           # if not -1, specifies the day to calculate
-                    distinct=distinct,                 # only count distinct uses
-                    tokens=tokens                      # what tokens to look at for the variable
+                    participants,                           # this participants dict will be updated
+                    interactions_df,                        # the dataset used in this variable
+                    dataset_type,                           # what type of dataset this variable needs
+                    name,                                   # the name of the variable
+                    function,                               # the lambda function to do on every aggregate call
+                    elementIDs = elementIDs,                # elementIDs used
+                    day_of_week=day_of_week,                # if not -1, specifies the day to calculate
+                    distinct=distinct,                      # only count distinct uses
+                    tokens=tokens,                          # what tokens to look at for the variable
+                    defined_variable_x= defined_variable_x  # when not None, provided a definition for X for the function
                     )
 
             elif(dataset_type == DatasetType.EVENTS):
@@ -293,17 +303,27 @@ class DataWrangling:
                 healthTrackType = properties.healthTrackType
                 completed = properties.completed
                 participants = self.create_variable(
-                    participants,                      # this participants dict will be updated
-                    events_df,                         # the dataset used in this variable
-                    dataset_type,                      # what type of dataset this variable needs
-                    name,                              # the name of the variable
-                    function,                          # the lambda function to do on every aggregate call
-                    day_of_week=day_of_week,           # if not -1, specifies the day to calculate
-                    sum=sum,                           # the column to count
-                    healthTrackType=healthTrackType,   # What tags to filter by for the healthTrackType
-                    completed=completed                # only look at completed events when true
+                    participants,                           # this participants dict will be updated
+                    events_df,                              # the dataset used in this variable
+                    dataset_type,                           # what type of dataset this variable needs
+                    name,                                   # the name of the variable
+                    function,                               # the lambda function to do on every aggregate call
+                    day_of_week=day_of_week,                # if not -1, specifies the day to calculate
+                    sum=sum,                                # the column to count
+                    healthTrackType=healthTrackType,        # What tags to filter by for the healthTrackType
+                    completed=completed,                    # only look at completed events when true
+                    defined_variable_x= defined_variable_x  # when not None, provided a definition for X for the function
                 )
-
+            else:
+                participants = self.create_variable(
+                    participants,                           # this participants dict will be updated
+                    None,                                   # the dataset used in this variable, when None used other defined variables
+                    None,                                   # what type of dataset this variable needs
+                    name,                                   # the name of the variable
+                    function,                               # the lambda function, in this case includes predefined variables
+                    day_of_week=day_of_week,                # if not -1, specifies the day to calculate
+                    defined_variable_x=defined_variable_x   # when not None, provided a definition for X for the function.
+                )
 
         # set the values of variables not calculated to 0 (the use of them by the participants never appeared in the dataset)
         for participant_id in participants:

@@ -105,10 +105,7 @@
         },
         {
             "name" : "PEGoal",
-            "dataset" : "Events",
-            "sum" : "healthTrackData",
-            "healthTrackType" : ["phex"],
-            "scope" : "weekly",
+            "defined-variable-x" : "TotalPEWeeklyPHEX",
             "function" : ["x", "x/150"]
         },
         {
@@ -122,10 +119,7 @@
         },
         {
             "name" : "CEGoal",
-            "dataset" : "Events",
-            "sum" : "healthTrackData",
-            "healthTrackType" : ["meex"],
-            "scope" : "weekly",
+            "defined-variable-x" : "TotalCEWeeklyMEEX",
             "function" : ["x", "x/12"]
         },
         {
@@ -139,10 +133,7 @@
         },
         {
             "name" : "WEGoal",
-            "dataset" : "Events",
-            "sum" : "healthTrackData",
-            "healthTrackType" : ["WELLX"],
-            "scope" : "weekly",
+            "defined-variable-x" : "TotalWEWeeklyWELLX",
             "function" : ["x", "x/3"]
         }
     ]
