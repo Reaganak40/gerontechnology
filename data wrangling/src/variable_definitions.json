@@ -45,15 +45,6 @@
             "distinct" : true
         },
         {
-            "name" : "LTGFolderUse",
-            "dataset" : "Interactions",
-            "elementIDs" : [24, 220, 322],
-            "tokens" : ["LTG"],
-            "scope" : "weekly",
-            "function" : ["x", "x/7"],
-            "distinct" : true
-        },
-        {
             "name" : "SumTotalLTGNoteInteractions",
             "dataset" : "Interactions",
             "elementIDs" : [24, 64, 65, 220],
@@ -70,13 +61,9 @@
             "function" : ["x", "x"]
         },
         {
-            "name" : "FZFolderUse",
-            "dataset" : "Interactions",
-            "elementIDs" : [24, 220, 322],
-            "tokens" : ["FZ"],
-            "scope" : "weekly",
-            "function" : ["x", "x/7"],
-            "distinct" : true
+            "name" : "LTGFolderUse",
+            "defined-variable-x" : "LTGGoal",
+            "function" : ["x", "x/7"]
         },
         {
             "name" : "SumTotalFZNoteInteractions",
@@ -93,6 +80,11 @@
             "tokens" : ["FZ"],
             "scope" : "weekly",
             "function" : ["x", "x"]
+        },
+        {
+            "name" : "FZFolderUse",
+            "defined-variable-x" : "FZGoal",
+            "function" : ["x", "x/7"]
         },
         {
             "name" : "TotalPEWeeklyPHEX",
