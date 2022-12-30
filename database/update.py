@@ -16,7 +16,8 @@ def get_dashboard_variables():
         data = json.load(json_file)
         return data['Variables']
 
-def update_schema():
+
+def update_schema_file():
     variable_schema = get_dashboard_variables()
     variables = ""
 
@@ -52,7 +53,13 @@ CREATE TABLE IF NOT EXISTS Calculations
     with open("EMMA_variables_schema.sql", "w") as fd:
         fd.write(sql_schema)
 
+def update_schema():
+    #update_schema_file()
+
+    variables = [d["name"] for d in get_dashboard_variables()]
+    print(variables)
+
+
 if __name__ == "__main__":
     #update_from_csv(TEST_FILE)
-    #get_dashboard_variables()
     update_schema()
