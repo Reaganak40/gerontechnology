@@ -1,7 +1,7 @@
 -- EMMA Variables SCHEMA
 -- Last Modified By: Reagan Kelley
 
-CREATE TABLE Participants
+CREATE TABLE IF NOT EXISTS Participants
 (
     participant_id INTEGER,
     first_name varchar(256),
@@ -10,7 +10,7 @@ CREATE TABLE Participants
     PRIMARY KEY (participant_id)
 );
 
-CREATE TABLE Calculations
+CREATE TABLE IF NOT EXISTS Calculations
 (
     participant_id INTEGER,
     week_number INTEGER,
@@ -37,5 +37,5 @@ CREATE TABLE Calculations
     v_WEGoal FLOAT,
 
     PRIMARY KEY (participant_id, week_number, year_number),
-    FOREIGN KEY (participant_id) REFERENCES Calculations(participant_id)
+    FOREIGN KEY (participant_id) REFERENCES Participants(participant_id)
 );

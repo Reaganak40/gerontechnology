@@ -22,7 +22,7 @@ from termcolor import colored
 # *                    to send sql queries.
 # * =============================================================================================
 
-def connect_to_db(database_name : str):
+def connect_to_db(database_name : str, user= None, password = None, create=False):
     """ Prompts for user and password and then when validated connects
         to back-end database
     Args:
@@ -32,10 +32,33 @@ def connect_to_db(database_name : str):
         mysql.connector.MySQLConnection: A valid connection to the database.
     """
     try:
-        cxn = mysql.connector.connect(host="localhost",
-                user=input("Enter username: "),
-                password=getpass("Enter password: "),
-                database=database_name,)
+        if(not create):
+            if(user is not None and password is not None):
+                cxn = mysql.connector.connect(host="localhost",
+                        user=user,
+                        password=password,
+                        database=database_name
+                        )
+            else:
+                cxn = mysql.connector.connect(host="localhost",
+                        user=input("Enter username: "),
+                        password=getpass("Enter password: "),
+                        database=database_name
+                        )
+        else:
+            if(user is not None and password is not None):
+                cxn = mysql.connector.connect(host="localhost",
+                        user=user,
+                        password=password,
+                        )
+            else:
+                cxn = mysql.connector.connect(host="localhost",
+                        user=input("Enter username: "),
+                        password=getpass("Enter password: "),
+                        )
+            cursor = cxn.cursor()
+            cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(database_name))
+            cxn.connect(database=database_name)
         return cxn
     except Error as e:
         print(e)
@@ -56,19 +79,20 @@ def sql_shell(cxn : mysql.connector.MySQLConnection = None):
 
                 if(sql_string == "quit"):
                     connected = False
+                    cxn.commit()
                 else:
                     try:
                         cursor.execute(sql_string)
                         result = cursor.fetchall()
                         for row in result:
-                            print(row[0])
+                            print(row)
                     except Error as e:
                         print(e)
             
             
 
 def main():
-    cxn = connect_to_db("testdb")
+    cxn = connect_to_db("emma_backend", create=True)
     sql_shell(cxn)
 
 if os.name == 'nt':
