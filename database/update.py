@@ -1,8 +1,14 @@
 #!/usr/bin/python
 
+""" This python script contains update utilities to modify and add entries to the database.
+"""
+
 # * Modules
 import pandas as pd
 import json
+from globals import Globals
+from sqlalchemy import create_engine
+import numpy as np
 
 # Local Imports
 from sql_shell import connect_to_db
@@ -22,14 +28,71 @@ from sql_shell import connect_to_db
 
 TEST_FILE = R"C:\dev\Gerontechnology\data wrangling\data\output\Week 14, 2022.csv"
 
-def update_from_csv(filename: str):
+def update_from_csv(filename: str, week, year, allow_missing_values=False, check_participants_exist=True):
     """Updates the database from a csv calculations file.
 
     Args:
         filename (str): The csv file to reference new variable calculations from.
     """
     calculations_table = pd.read_csv(filename)
-    print(calculations_table)
+    update_from_calculation_table(calculations_table, week, year, allow_missing_values=allow_missing_values, check_participants_exist=check_participants_exist)
+
+
+def update_from_calculation_table(calculations_table : pd.DataFrame, week, year, allow_missing_values=False, check_participants_exist=True):
+    cxn = connect_to_db("emma_backend", user="root", password="root", create=True)
+    cursor = cxn.cursor()
+
+    # The following list comprehension changes the data wrangling variable names to proper SQL names.
+    # variables = [(SQL Name, Original Name)]
+    variables : list(tuple) = [(("v_" + x).replace("-", "_"), x) for x in list(filter(lambda x: x != "participantId", list(calculations_table.columns)))]
+
+    cursor.execute("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'Calculations'")
+
+    # The variables defined in the SQL table use in the dashboard
+    database_defined_variables = list(filter(lambda x: x != "participant_id" and x != 'week_number' and x != 'year_number', [result[0] for result in cursor.fetchall()]))
+
+    # the following list comprehension provides all variables needed by the SQL table not present in the calculations table
+    # undefined_variables = [(SQL Name)]
+    undefined_variables : list(str) = [x for x in database_defined_variables if x not in [x[0] for x in variables]]
+
+    if(not allow_missing_values):
+        if (len(undefined_variables) > 0):
+            raise Exception("Cannot proceed, these variables are not present in the calculation table: {}".format(undefined_variables))
+
+    variable_translations : dict(str, str) = dict((y, x) for x, y in variables)
+
+    if(check_participants_exist):
+        add_undefined_participants(calculations_table, cxn)
+
+    # Get DataFrame read to to_sql
+    calculations_table.rename(columns= {"participantId" : "participant_id"}, inplace=True)
+    calculations_table.rename(columns=variable_translations, inplace=True)
+    calculations_table['week_number'] = [week] * calculations_table.shape[0]
+    calculations_table['year_number'] = [year] * calculations_table.shape[0]
+
+    for uv in undefined_variables:
+        calculations_table[uv] = [np.nan] * calculations_table.shape[0]
+
+    connection_str = "mysql://{}:{}@localhost/emma_backend".format(Globals.db_username, Globals.db_username)
+    engine = create_engine(connection_str)
+    engine.connect()
+
+    calculations_table.to_sql('Calculations', con=engine, if_exists='append', index=False)
+
+
+
+def add_undefined_participants(calculations_table, cxn):
+    cursor = cxn.cursor()
+    cursor.execute("SELECT participant_id FROM Participants")
+    defined_participants = [result[0] for result in cursor.fetchall()]
+    undefined_participants = [x for x in calculations_table["participantId"].to_list() if x not in defined_participants]
+
+    # to maintain foreign key integrity, participants not defined will be created with the name 'Unknown Participant'.
+    for to_define in undefined_participants:
+        cursor.execute("INSERT INTO Participants (participant_id, first_name, last_name) VALUES({}, 'Unknown', 'Participant')".format(to_define))
+
+    cxn.commit()
+
 
 def get_dashboard_variables():
     """Gets the dashboard variables defined in dashboard_variables.json
@@ -105,8 +168,8 @@ def update_schema(force_delete=False):
     extra_variables = [x for x in variables if x["name"] not in already_defined_variables]
     variables_to_drop = [x for x in already_defined_variables if x not in variable_names]
 
-    print(extra_variables)
-    print(variables_to_drop)
+    #print(extra_variables)
+    #print(variables_to_drop)
 
     for variable in extra_variables:
         sql_str = "ALTER TABLE Calculations Add {} {};".format(variable["name"], variable["type"])
@@ -119,5 +182,5 @@ def update_schema(force_delete=False):
     cxn.commit()
 
 if __name__ == "__main__":
-    #update_from_csv(TEST_FILE)
-    update_schema(force_delete=True)
+    update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
+    #update_schema(force_delete=True)

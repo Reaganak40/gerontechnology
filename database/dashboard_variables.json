@@ -13,7 +13,31 @@
             "type" : "FLOAT"
         },
         {
-            "name" : "v_TodayPageUse",
+            "name" : "v_TodayPageUse_Sunday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_TodayPageUse_Monday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_TodayPageUse_Tuesday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_TodayPageUse_Wednesday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_TodayPageUse_Thursday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_TodayPageUse_Friday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_TodayPageUse_Saturday",
             "type" : "INT"
         },
         {
@@ -21,7 +45,31 @@
             "type" : "FLOAT"
         },
         {
-            "name" : "v_TodayPageGoal",
+            "name" : "v_TodayPageGoal_Sunday",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "v_TodayPageGoal_Monday",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "v_TodayPageGoal_Tuesday",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "v_TodayPageGoal_Wednesday",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "v_TodayPageGoal_Thursday",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "v_TodayPageGoal_Friday",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "v_TodayPageGoal_Saturday",
             "type" : "FLOAT"
         },
         {
@@ -70,6 +118,10 @@
         },
         {
             "name" : "v_WEGoal",
+            "type" : "FLOAT"
+        },
+        {
+            "name" : "fake_value",
             "type" : "FLOAT"
         }
     ]
