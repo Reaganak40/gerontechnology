@@ -119,10 +119,6 @@
         {
             "name" : "v_WEGoal",
             "type" : "FLOAT"
-        },
-        {
-            "name" : "fake_value",
-            "type" : "FLOAT"
         }
     ]
 }

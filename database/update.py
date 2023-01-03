@@ -28,6 +28,30 @@ from sql_shell import connect_to_db
 
 TEST_FILE = R"C:\dev\Gerontechnology\data wrangling\data\output\Week 14, 2022.csv"
 
+# ===================================================================================================================
+#    Title: my_sql_replace_into function
+#    Author: Frank He
+#    Date: 1/3/2023
+#    Code version: 1.0
+#    Availability: https://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update/11762400#11762400
+# ==================================================================================================================
+def mysql_replace_into(table, conn, keys, data_iter):
+    from sqlalchemy.dialects.mysql import insert
+    from sqlalchemy.ext.compiler import compiles
+    from sqlalchemy.sql.expression import Insert
+
+    @compiles(Insert)
+    def replace_string(insert, compiler, **kw):
+        s = compiler.visit_insert(insert, **kw)
+        s = s.replace("INSERT INTO", "REPLACE INTO")
+        return s
+
+    data = [dict(zip(keys, row)) for row in data_iter]
+
+    # ! Leads to SAWarning -> Better Solution Encouraged
+    conn.execute(table.table.insert(replace_string=""), data)
+
+
 def update_from_csv(filename: str, week, year, allow_missing_values=False, check_participants_exist=True):
     """Updates the database from a csv calculations file.
 
@@ -35,10 +59,10 @@ def update_from_csv(filename: str, week, year, allow_missing_values=False, check
         filename (str): The csv file to reference new variable calculations from.
     """
     calculations_table = pd.read_csv(filename)
-    update_from_calculation_table(calculations_table, week, year, allow_missing_values=allow_missing_values, check_participants_exist=check_participants_exist)
+    update_from_dataframe(calculations_table, week, year, allow_missing_values=allow_missing_values, check_participants_exist=check_participants_exist)
 
 
-def update_from_calculation_table(calculations_table : pd.DataFrame, week, year, allow_missing_values=False, check_participants_exist=True):
+def update_from_dataframe(calculations_table : pd.DataFrame, week, year, allow_missing_values=False, check_participants_exist=True):
     cxn = connect_to_db("emma_backend", user="root", password="root", create=True)
     cursor = cxn.cursor()
 
@@ -77,7 +101,7 @@ def update_from_calculation_table(calculations_table : pd.DataFrame, week, year,
     engine = create_engine(connection_str)
     engine.connect()
 
-    calculations_table.to_sql('Calculations', con=engine, if_exists='append', index=False)
+    calculations_table.to_sql('calculations', con=engine, if_exists='append', method=mysql_replace_into, index=False)
 
 
 
@@ -143,7 +167,7 @@ CREATE TABLE IF NOT EXISTS Calculations
     with open("EMMA_variables_schema.sql", "w") as fd:
         fd.write(sql_schema)
 
-def update_schema(force_delete=False):
+def update_schema(force_delete=False, debug=False):
     """ Updates the database calculations table columns given
         updates from the dashboard variables json file.
 
@@ -168,8 +192,9 @@ def update_schema(force_delete=False):
     extra_variables = [x for x in variables if x["name"] not in already_defined_variables]
     variables_to_drop = [x for x in already_defined_variables if x not in variable_names]
 
-    #print(extra_variables)
-    #print(variables_to_drop)
+    if(debug):
+        print("Variables added: {}".format(extra_variables))
+        print("Variables removed: {}".format(variables_to_drop))
 
     for variable in extra_variables:
         sql_str = "ALTER TABLE Calculations Add {} {};".format(variable["name"], variable["type"])
@@ -183,4 +208,4 @@ def update_schema(force_delete=False):
 
 if __name__ == "__main__":
     update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
-    #update_schema(force_delete=True)
+    #update_schema(force_delete=True, debug=True)

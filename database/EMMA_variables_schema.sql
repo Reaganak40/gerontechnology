@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS Calculations
     v_CEGoal FLOAT,
     v_TotalWEWeeklyWELLX INT,
     v_WEGoal FLOAT,
-    fake_value FLOAT,
     
     PRIMARY KEY (participant_id, week_number, year_number),
     FOREIGN KEY (participant_id) REFERENCES Participants(participant_id)
