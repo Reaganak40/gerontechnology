@@ -1,16 +1,18 @@
 #!/usr/bin/python
 
-""" This python script contains update utilities to modify and add entries to the database.
+""" This python script contains update utilities to modify and add entries to the EMMA Backend database.
 """
 
 # * Modules
-import pandas as pd
 import json
-from globals import Globals
-from sqlalchemy import create_engine
 import numpy as np
+import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy import exc as sa_exc
+import warnings
 
 # Local Imports
+from globals import Globals
 from sql_shell import connect_to_db
 
 # ? VSCode Extensions Used:
@@ -29,6 +31,7 @@ from sql_shell import connect_to_db
 TEST_FILE = R"C:\dev\Gerontechnology\data wrangling\data\output\Week 14, 2022.csv"
 
 # ===================================================================================================================
+#   * replace_string was found on stackoverflow
 #    Title: my_sql_replace_into function
 #    Author: Frank He
 #    Date: 1/3/2023
@@ -36,6 +39,15 @@ TEST_FILE = R"C:\dev\Gerontechnology\data wrangling\data\output\Week 14, 2022.cs
 #    Availability: https://stackoverflow.com/questions/6611563/sqlalchemy-on-duplicate-key-update/11762400#11762400
 # ==================================================================================================================
 def mysql_replace_into(table, conn, keys, data_iter):
+    """ This is a method function used by pandas to_sql call. This allows upsert
+        functionality, a method to deal with duplicate or pre-existing entries.
+
+    Args:
+        table (SQLTable): Pandas created SQLTable instance
+        conn (MySQL.Connector): Connection to database
+        keys (str): Name of column values for table
+        data_iter (list()): Values for each column per row
+    """
     from sqlalchemy.dialects.mysql import insert
     from sqlalchemy.ext.compiler import compiles
     from sqlalchemy.sql.expression import Insert
@@ -49,9 +61,12 @@ def mysql_replace_into(table, conn, keys, data_iter):
     data = [dict(zip(keys, row)) for row in data_iter]
 
     # ! Leads to SAWarning -> Better Solution Encouraged
-    conn.execute(table.table.insert(replace_string=""), data)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+        conn.execute(table.table.insert(replace_string=""), data)
 
-
+# Last Edit on 1/1/2023 by Reagan Kelley
+# Added parameters
 def update_from_csv(filename: str, week, year, allow_missing_values=False, check_participants_exist=True):
     """Updates the database from a csv calculations file.
 
@@ -61,8 +76,21 @@ def update_from_csv(filename: str, week, year, allow_missing_values=False, check
     calculations_table = pd.read_csv(filename)
     update_from_dataframe(calculations_table, week, year, allow_missing_values=allow_missing_values, check_participants_exist=check_participants_exist)
 
-
+# Last Edit on 1/3/2023 by Reagan Kelley
+# Added Upsert functionality for calculation rows
 def update_from_dataframe(calculations_table : pd.DataFrame, week, year, allow_missing_values=False, check_participants_exist=True):
+    """ Updates the calculation table of the database with entries from a dataframe.
+
+    Args:
+        calculations_table (pd.DataFrame): A dataset of calculations
+        week (int): The Week number for these entries
+        year (int): The year number for these values (e.g, 2023)
+        allow_missing_values (bool, optional): If true, will fill unprovided columns with NaN values. Defaults to False.
+        check_participants_exist (bool, optional): When True, participants in an entry table that are not defined 
+                                                   in the Participants table will be added with an 'Unknown Participant' Tag. Defaults to True.
+    Raises:
+        Exception: Will raise an exception if variables are mismatched, and given parameters for how to deal with them (e.g, allow_missing_values)
+    """
     cxn = connect_to_db("emma_backend", user="root", password="root", create=True)
     cursor = cxn.cursor()
 
@@ -103,9 +131,15 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, allow_m
 
     calculations_table.to_sql('calculations', con=engine, if_exists='append', method=mysql_replace_into, index=False)
 
-
-
+# Last Edit on 12/31/2022 by Reagan Kelley
+# Initial Implementation
 def add_undefined_participants(calculations_table, cxn):
+    """ Looks through a dataframe and any participants not in the participant db table will be added as an Unknown Participant.
+
+    Args:
+        calculations_table (pd.DataFrame): A Calculation Table
+        cxn (MySQL.Connector): Connection to a mysql database.
+    """
     cursor = cxn.cursor()
     cursor.execute("SELECT participant_id FROM Participants")
     defined_participants = [result[0] for result in cursor.fetchall()]
@@ -117,7 +151,8 @@ def add_undefined_participants(calculations_table, cxn):
 
     cxn.commit()
 
-
+# Last Edit on 12/30/2022 by Reagan Kelley
+# Initial Implementation
 def get_dashboard_variables():
     """Gets the dashboard variables defined in dashboard_variables.json
 
@@ -128,7 +163,8 @@ def get_dashboard_variables():
         data = json.load(json_file)
         return data['Variables']
 
-
+# Last Edit on 12/30/2022 by Reagan Kelley
+# Initial Implementation
 def update_schema_file():
     """ Updates the schema sql file that is referenced by create_db()
     """
@@ -167,6 +203,8 @@ CREATE TABLE IF NOT EXISTS Calculations
     with open("EMMA_variables_schema.sql", "w") as fd:
         fd.write(sql_schema)
 
+# Last Edit on 12/30/2022 by Reagan Kelley
+# Initial Implementation
 def update_schema(force_delete=False, debug=False):
     """ Updates the database calculations table columns given
         updates from the dashboard variables json file.

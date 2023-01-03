@@ -24,6 +24,8 @@ from sqlalchemy import create_engine
 # *                    to send sql queries.
 # * =============================================================================================
 
+# Last Edit on 12/30/2022 by Reagan Kelley
+# Initial implementation
 def connect_to_db(database_name : str, user= None, password = None, create=False):
     """ Prompts for user and password and then when validated connects
         to back-end database
@@ -66,6 +68,8 @@ def connect_to_db(database_name : str, user= None, password = None, create=False
         print(e)
         return None
 
+# Last Edit on 12/30/2022 by Reagan Kelley
+# Initial implementation
 def sql_shell(cxn : mysql.connector.MySQLConnection = None):
     """Given a valid connection to a mysql database, can use this shell
     to send sql queries.
@@ -92,7 +96,8 @@ def sql_shell(cxn : mysql.connector.MySQLConnection = None):
                         print(e)
             
             
-
+# Last Edit on 12/30/2022 by Reagan Kelley
+# Initial implementation
 def main():
     cxn = connect_to_db("emma_backend", create=True)
     sql_shell(cxn)
