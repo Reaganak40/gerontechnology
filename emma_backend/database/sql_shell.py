@@ -9,9 +9,16 @@ from getpass import getpass
 from mysql.connector import Error
 import mysql.connector
 import os
-from termcolor import colored
-from globals import Globals
 from sqlalchemy import create_engine
+import sys
+from termcolor import colored
+
+try:
+    from globals import Globals
+except:
+    sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+    from globals import Globals
+
 
 # ? VSCode Extensions Used:
 # ?     - Better Comments
@@ -26,7 +33,7 @@ from sqlalchemy import create_engine
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial implementation
-def connect_to_db(database_name : str, user= None, password = None, create=False):
+def connect_to_db(database_name : str, user= None, password = None, create=False, use_engine=False):
     """ Prompts for user and password and then when validated connects
         to back-end database
     Args:
@@ -35,38 +42,45 @@ def connect_to_db(database_name : str, user= None, password = None, create=False
     Returns:
         mysql.connector.MySQLConnection: A valid connection to the database.
     """
-    try:
-        if(not create):
-            if(user is not None and password is not None):
-                cxn = mysql.connector.connect(host="localhost",
-                        user=user,
-                        password=password,
-                        database=database_name
-                        )
+    if(not use_engine):
+        try:
+            if(not create):
+                if(user is not None and password is not None):
+                    cxn = mysql.connector.connect(host="localhost",
+                            user=user,
+                            password=password,
+                            database=database_name
+                            )
+                else:
+                    cxn = mysql.connector.connect(host="localhost",
+                            user=input("Enter username: "),
+                            password=getpass("Enter password: "),
+                            database=database_name
+                            )
             else:
-                cxn = mysql.connector.connect(host="localhost",
-                        user=input("Enter username: "),
-                        password=getpass("Enter password: "),
-                        database=database_name
-                        )
-        else:
-            if(user is not None and password is not None):
-                cxn = mysql.connector.connect(host="localhost",
-                        user=user,
-                        password=password,
-                        )
-            else:
-                cxn = mysql.connector.connect(host="localhost",
-                        user=input("Enter username: "),
-                        password=getpass("Enter password: "),
-                        )
-            cursor = cxn.cursor()
-            cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(database_name))
-            cxn.connect(database=database_name)
-        return cxn
-    except Error as e:
-        print(e)
-        return None
+                if(user is not None and password is not None):
+                    cxn = mysql.connector.connect(host="localhost",
+                            user=user,
+                            password=password,
+                            )
+                else:
+                    cxn = mysql.connector.connect(host="localhost",
+                            user=input("Enter username: "),
+                            password=getpass("Enter password: "),
+                            )
+                cursor = cxn.cursor()
+                cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(database_name))
+                cxn.connect(database=database_name)
+            return cxn
+        except Error as e:
+            print(e)
+            return None
+    else:
+        if(user is None or password is None):
+            user=input("Enter username: "),
+            password=getpass("Enter password: ")
+        connection_str = "mysql://{}:{}@localhost/{}".format(user, password, database_name)
+        return create_engine(connection_str)
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial implementation

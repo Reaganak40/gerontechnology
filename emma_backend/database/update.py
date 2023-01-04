@@ -10,11 +10,17 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy import exc as sa_exc
+import sys
 import warnings
 
 # Local Imports
-from globals import Globals
-from sql_shell import connect_to_db
+try:
+    from globals import Globals
+    from sql_shell import connect_to_db
+except:
+    sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+    from globals import Globals
+    from sql_shell import connect_to_db
 
 # ? VSCode Extensions Used:
 # ?     - Better Comments
@@ -87,14 +93,12 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
         week (int): The Week number for these entries
         year (int): The year number for these values (e.g, 2023)
         allow_missing_values (bool, optional): If true, will fill unprovided columns with NaN values. Defaults to False.
-        check_participants_exist (bool, optional): When True, participants in an entry table that are not defined 
-                                                   in the Participants table will be added with an 'Unknown Participant' Tag. Defaults to True.
+        check_participants_exist (bool, optional): When True, participants in an entry table that are not defined in the Participants table will be added with an 'Unknown Participant' Tag. Defaults to True.
     Raises:
         Exception: Will raise an exception if variables are mismatched, and given parameters for how to deal with them (e.g, allow_missing_values)
     """
     if(cxn_engine is None):
-        connection_str = "mysql://{}:{}@localhost/emma_backend".format(Globals.db_username, Globals.db_username)
-        cxn_engine = create_engine(connection_str)
+        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
 
     # The following list comprehension changes the data wrangling variable names to proper SQL names.
     # variables = [(SQL Name, Original Name)]
