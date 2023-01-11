@@ -11,6 +11,7 @@ import pandas as pd
 import sys
 from termcolor import colored
 
+
 # Local Imports
 try:
     from dataset import DatasetType, Dataset
@@ -40,8 +41,8 @@ class DataWrangling:
     def __init__(self, args):
         # TODO: Provide absolute and relative path functionality
         
-        self.INPUT_DIR = os.path.realpath(os.path.dirname(__file__)) + R'\..\data\input'
-        self.OUTPUT_DIR = os.path.realpath(os.path.dirname(__file__)) + R'\..\data\output'
+        self.INPUT_DIR = os.path.realpath(os.path.dirname(__file__)) + '/../data/input'
+        self.OUTPUT_DIR = os.path.realpath(os.path.dirname(__file__)) + '/../data/output'
 
         self.__init_token_dict()
         self.data : dict[str, Dataset] = {}
@@ -83,7 +84,7 @@ class DataWrangling:
         # * Interactions Dataset Options (--interactions) => Defaults to None (this is bad)
         try:
             interactions_infile_index = args.index("--interactions") + 1   # the argument after --interactions will be the file that gets read
-            self.data[DatasetType.INTERACTIONS] = Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR + RF"\{args[interactions_infile_index]}")
+            self.data[DatasetType.INTERACTIONS] = Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR + F"/{args[interactions_infile_index]}")
         except:
             self.data[DatasetType.INTERACTIONS] = None
             if(self.debug):
@@ -92,7 +93,7 @@ class DataWrangling:
         # * Events Dataset Options (--events) => Defaults to None (this is bad)
         try:
             events_infile_index = args.index("--events") + 1              # the argument after --events will be the file that gets read
-            self.data[DatasetType.EVENTS] = Dataset(DatasetType.EVENTS, self.INPUT_DIR + RF"\{args[events_infile_index]}")
+            self.data[DatasetType.EVENTS] = Dataset(DatasetType.EVENTS, self.INPUT_DIR + F"/{args[events_infile_index]}")
         except:
             self.data[DatasetType.EVENTS] = None
             if(self.debug):
@@ -124,7 +125,7 @@ class DataWrangling:
             participants (Dict): Participant data, key = participantID, value = dict of variables
             outfile_name (str, optional): The name of the file to be write to. Relative path, using global OUTPUT_DIR. Defaults to "output.csv".
         """
-        self.participant_dict_to_df(participants).to_csv(self.OUTPUT_DIR + "\\{}".format(outfile_name), index=False)
+        self.participant_dict_to_df(participants).to_csv(self.OUTPUT_DIR + "/{}".format(outfile_name), index=False)
 
     def participant_dict_to_df(self, participants):
         interactions_df = pd.DataFrame.from_dict(participants, orient='index')

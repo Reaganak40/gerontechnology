@@ -85,7 +85,7 @@ def create_variable_dictionary(filename):
     """
 
     variables = {}
-    with open(os.path.realpath(os.path.dirname(__file__) + "\\" + filename)) as json_file:
+    with open(os.path.realpath(os.path.dirname(__file__) + "/" + filename)) as json_file:
         data = json.load(json_file)
         variable_defs = data['Variables']
 
