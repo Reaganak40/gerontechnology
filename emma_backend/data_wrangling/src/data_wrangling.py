@@ -10,6 +10,7 @@ import os
 import pandas as pd
 import sys
 from termcolor import colored
+from pathlib import Path
 
 
 # Local Imports
@@ -41,8 +42,18 @@ class DataWrangling:
     def __init__(self, args):
         # TODO: Provide absolute and relative path functionality
         
-        self.INPUT_DIR = os.path.realpath(os.path.dirname(__file__)) + '/../data/input'
-        self.OUTPUT_DIR = os.path.realpath(os.path.dirname(__file__)) + '/../data/output'
+        self.INPUT_DIR : Path = Path(os.path.realpath(os.path.dirname(__file__))).parent.absolute()
+        self.INPUT_DIR = self.INPUT_DIR.joinpath("data")
+        
+        if not self.INPUT_DIR.exists():
+            raise FileNotFoundError(colored("[Data Wrangling Error]\nThere must be a 'data' directory in the parent directory of this script.\nIn this directory: {}".format(self.INPUT_DIR.parent.absolute()), "yellow"))
+        self.INPUT_DIR = self.INPUT_DIR.joinpath("input")
+        if not self.INPUT_DIR.exists():
+           raise FileNotFoundError(colored("[Data Wrangling Error]\nThere must be an 'input' directory in that data directory.\nLocation: {}".format(self.INPUT_DIR.parent.absolute()), "yellow"))
+
+        self.OUTPUT_DIR = self.INPUT_DIR.parent.absolute().joinpath("output")
+        if not self.OUTPUT_DIR.exists():
+            Path.mkdir(self.OUTPUT_DIR)
 
         self.__init_token_dict()
         self.data : dict[str, Dataset] = {}
@@ -84,20 +95,19 @@ class DataWrangling:
         # * Interactions Dataset Options (--interactions) => Defaults to None (this is bad)
         try:
             interactions_infile_index = args.index("--interactions") + 1   # the argument after --interactions will be the file that gets read
-            self.data[DatasetType.INTERACTIONS] = Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR + F"/{args[interactions_infile_index]}")
-        except:
-            self.data[DatasetType.INTERACTIONS] = None
-            if(self.debug):
-                print(colored("WARNING: No file provided for interactions! (use --interactions filename)", 'red'))
+        except ValueError:
+            print(colored("[Data Wrangling Error]\nNo interactions file provided. Use --interactions 'filename'", "yellow"))
+            quit()
+        self.data[DatasetType.INTERACTIONS] = Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR.joinpath(args[interactions_infile_index]))
+
         
         # * Events Dataset Options (--events) => Defaults to None (this is bad)
         try:
             events_infile_index = args.index("--events") + 1              # the argument after --events will be the file that gets read
-            self.data[DatasetType.EVENTS] = Dataset(DatasetType.EVENTS, self.INPUT_DIR + F"/{args[events_infile_index]}")
-        except:
-            self.data[DatasetType.EVENTS] = None
-            if(self.debug):
-                print(colored("WARNING: No file provided for events! (use --events filename)", 'red'))
+        except ValueError:
+            print(colored("[Data Wrangling Error]\nNo Events file provided. Use --events 'filename'", "yellow"))
+            quit()
+        self.data[DatasetType.EVENTS] = Dataset(DatasetType.EVENTS, self.INPUT_DIR.joinpath(args[events_infile_index]))
 
         # * Verify Integrity Options (--verify-integrity) => Defaults to False
         try:
@@ -125,7 +135,7 @@ class DataWrangling:
             participants (Dict): Participant data, key = participantID, value = dict of variables
             outfile_name (str, optional): The name of the file to be write to. Relative path, using global OUTPUT_DIR. Defaults to "output.csv".
         """
-        self.participant_dict_to_df(participants).to_csv(self.OUTPUT_DIR + "/{}".format(outfile_name), index=False)
+        self.participant_dict_to_df(participants).to_csv(self.OUTPUT_DIR.joinpath(outfile_name), index=False)
 
     def participant_dict_to_df(self, participants):
         interactions_df = pd.DataFrame.from_dict(participants, orient='index')

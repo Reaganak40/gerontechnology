@@ -4,6 +4,9 @@
 """
 # * Modules
 import pandas as pd
+from pathlib import Path
+from colorama import just_fix_windows_console
+from termcolor import colored
 
 # Local Imports
 from utils import Utils
@@ -28,7 +31,7 @@ class DatasetType():
 class Dataset:
         # Last Edit on 12/13/2022 by Reagan Kelley
         # Initial Implementation
-        def __init__(self, dataset_type, infile):
+        def __init__(self, dataset_type : int, infile : Path):
             """ Creates a new instance of a dataset, which included the utility functions to manage and parse the dataset.
 
             Args:
@@ -43,6 +46,10 @@ class Dataset:
             
             self.type = dataset_type    # the type of data in this Dataset -> Events or interactions
             self.infile = infile        # The filepath to the read file
+
+            if not self.infile.exists():
+                raise FileNotFoundError(colored("[Data Wrangling Error]\nThe provided file does not exist:\n{}".format(self.infile), "yellow"))
+
             self.weekly_dfs : dict[tuple, pd.DataFrame] = {}        # This will eventually contain parsed datasets from the original dataset, but separated by weekly segments.
 
         # Last Edit on 12/13/2022 by Reagan Kelley
