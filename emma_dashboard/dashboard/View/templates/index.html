@@ -13,7 +13,6 @@
     style="width:100%">
         <tr>
           <th style="width:10%">participant_id</th>
-          <th style="width:30%">username</th>
           <th style="width:30%">first name</th>
           <th style="width:30%">last name</th>
 
@@ -21,7 +20,6 @@
         {% for key, value in user_t.iterrows() %}
             <tr>
                 <td>{{ value['participant_id'] }}</td>
-                <td>{{ value['username'] }}</td>
                 <td>{{ value['first_name'] }}</td>
                 <td>{{ value['last_name'] }}</td>
             </tr>

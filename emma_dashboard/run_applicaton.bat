@@ -1,1 +1,1 @@
-set FLASK_DEBUG=1 && set FLASK_APP=main.py && python -m flask run
+set FLASK_DEBUG=1 && set FLASK_APP=dashboard.py && python -m flask run

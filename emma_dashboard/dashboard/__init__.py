@@ -1,5 +1,20 @@
+#!/usr/bin/python
+
+""" This file contains app configuration and database connection code.
+"""
+
+# * Modules
 from flask import Flask
 from config import Config
+from sqlalchemy import create_engine
+from .Model.database import Database
+
+def connect_db(config_class = Config):
+    connection_str = "mysql://{}:{}@localhost/{}".format(Config.DB_USER, Config.DB_PASSWORD, Config.DB_NAME)
+    db_engine = create_engine(connection_str)
+    return Database(db_engine)
+
+db : Database = connect_db()
 
 # ==========================================================
 # ? Recent Updates: Added blueprints.

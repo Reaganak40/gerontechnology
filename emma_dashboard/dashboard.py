@@ -28,8 +28,8 @@ app = create_app()
 # * Update Date:    10/29/2022
 # ==========================================================
 @app.before_first_request
-def init_db():
-    db.create_all()
+def before_request():
+    print("Connected to Database: {}".format(db.name))
  
 if __name__ == "__main__":
     app.run()
