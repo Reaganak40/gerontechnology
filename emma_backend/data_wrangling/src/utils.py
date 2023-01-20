@@ -5,13 +5,13 @@
 """
 
 # * Modules
-from datetime import timedelta
+from datetime import datetime, timedelta
 import pandas as pd
 
 class Utils:
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def next_sunday(original_datetime):
+    def next_sunday(original_datetime : datetime) -> datetime:
         """Returns the date of the next Sunday relative to the given date.
 
         Args:
@@ -25,9 +25,9 @@ class Utils:
             days_left = 7
         return (pd.to_datetime(original_datetime) + timedelta(days=days_left)).floor(freq='D')
 
-    # Last Edit on 12/12/2022 by Reagan Kelley
-    # Rewritten because it was accidentally deleted.
-    def filter_to_distinct_interactions(df, sec_gap=300):
+    # Last Edit on 1/19/2023 by Reagan Kelley
+    # Changed definition of distinct (in code)
+    def filter_to_distinct_interactions(df : pd.DataFrame, sec_gap=300) -> pd.DataFrame:
         """Filters a dataframe to only include entries that are distinct use, that is the last action of a particular elementID happened more than sec_gap seconds ago.
 
         Args:
@@ -44,20 +44,23 @@ class Utils:
 
         for index in range(len(df)):
             current_entry = df.iloc[index]
-            participant = participant_distinct_use[current_entry['participantId']] = participant_distinct_use.get(current_entry['participantId'], {})
-            last_time = participant.get(current_entry['elementId'])
 
-            if(last_time != None):
+            # get participant for this row
+            last_time = participant_distinct_use.get(current_entry['participantId'])
+            
+            if(last_time != None): # last_time is not None when there was a previous entry from this participant
                 delta = current_entry['timestamp_local'] - last_time
                 if(delta.total_seconds() < sec_gap):
                     not_distinct.append(index)
-            participant_distinct_use[current_entry['participantId']][current_entry['elementId']] = current_entry['timestamp_local']
+            
+            # update participant's last used time to this entries time
+            participant_distinct_use[current_entry['participantId']] = current_entry['timestamp_local']
 
         return df.drop(df.index[not_distinct])
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def filter_to_day_of_week(df, day=0):
+    def filter_to_day_of_week(df : pd.DataFrame, day=0) -> pd.DataFrame:
         """Filters and creates a new DataFrame of interactions that only includes entries of the given day of the week. 
         Precondition: DataFrame only includes a week's worth set of data.
 

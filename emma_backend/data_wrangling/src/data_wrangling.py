@@ -39,7 +39,7 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Initial implementation
-    def __init__(self, args):
+    def __init__(self, args : list[str]):
         # TODO: Provide absolute and relative path functionality
         
         self.INPUT_DIR : Path = Path(os.path.realpath(os.path.dirname(__file__))).parent.absolute()
@@ -51,7 +51,7 @@ class DataWrangling:
         if not self.INPUT_DIR.exists():
            raise FileNotFoundError(colored("[Data Wrangling Error]\nThere must be an 'input' directory in that data directory.\nLocation: {}".format(self.INPUT_DIR.parent.absolute()), "yellow"))
 
-        self.OUTPUT_DIR = self.INPUT_DIR.parent.absolute().joinpath("output")
+        self.OUTPUT_DIR : Path = self.INPUT_DIR.parent.absolute().joinpath("output")
         if not self.OUTPUT_DIR.exists():
             Path.mkdir(self.OUTPUT_DIR)
 
@@ -60,13 +60,13 @@ class DataWrangling:
         self.__read_args(args)
         self.variables : dict[str, Variable] = create_variable_dictionary("variable_definitions.json")
 
-        self.variableNames = []
+        self.variableNames : list[str] = []
         for key in self.variables.keys():
             self.variableNames.append(key)
     
     # Last Edit on 12/13/2022 by Reagan Kelley
     # Added Event args and verify-integrity
-    def __read_args(self, args):
+    def __read_args(self, args : list[str]):
         """Takes command line arguments to setup all parameters or variables for data wrangling.
 
         Args:
@@ -137,7 +137,7 @@ class DataWrangling:
         """
         self.participant_dict_to_df(participants).to_csv(self.OUTPUT_DIR.joinpath(outfile_name), index=False)
 
-    def participant_dict_to_df(self, participants):
+    def participant_dict_to_df(self, participants : dict):
         interactions_df = pd.DataFrame.from_dict(participants, orient='index')
         interactions_df.reset_index(inplace=True)
         interactions_df.rename({'index':'participantId'}, axis='columns', inplace=True)
