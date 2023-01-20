@@ -127,6 +127,13 @@
             "name" : "WEGoal",
             "defined-variable-x" : "TotalWEWeeklyWELLX",
             "function" : ["x", "x/3"]
+        },
+        {
+            "name" : "DistinctUse",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "function" : ["x", "x"],
+            "distinct" : true
         }
     ]
 }

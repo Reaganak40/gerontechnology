@@ -11,6 +11,7 @@ import pandas as pd
 import sys
 from termcolor import colored
 from pathlib import Path
+from typing import Callable
 
 
 # Local Imports
@@ -150,9 +151,9 @@ class DataWrangling:
         interactions_df = interactions_df.sort_values(by=['participantId'])
         return interactions_df
 
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Originally written from EMMA_data_wrangling.ipynb
-    def get_interaction_counts(self, df, elementIDs, day_of_week=-1, distinct=False, tokens=[]):
+    # Last Edit on 1/19/2023 by Reagan Kelley
+    # Updated for new distinct use
+    def get_interaction_counts(self, df : pd.DataFrame, elementIDs : list, day_of_week=-1, distinct=False, tokens=[]):
         """ Given a DataFrame which contains participant interactions,
             returns a count of interactions for given elementIDs for each participant.
 
@@ -172,30 +173,38 @@ class DataWrangling:
         if(day_of_week >= 0):
             df = Utils.filter_to_day_of_week(df, day_of_week)
         
-        # Filter the Dataset to only include rows that are distinct uses.
-        if(distinct):
-            df = Utils.filter_to_distinct_interactions(df)
-
-
         # create a SQL string to filter DataFrame to only include rows with the desired interaction elementIDs
-        query_string += "("
-        for i in range(len(elementIDs)):
-            query_string += 'elementId == {}'.format(elementIDs[i])
-            if((i+1) < len(elementIDs)):
-                query_string += " or "
-        query_string += ")"
+
+        if len(elementIDs) > 0:
+            query_string += "("
+            for i in range(len(elementIDs)):
+                query_string += 'elementId == {}'.format(elementIDs[i])
+                if((i+1) < len(elementIDs)):
+                    query_string += " or "
+            query_string += ")"
+
         
         # Add to the SQL string to filter DataFrame to only include those elementIDs with these tokens
         if(tokens is not None):
-            query_string += " and ("
+            if len(elementIDs) > 0:
+                query_string += " and "
+            query_string += "("
+            
             for i in range(len(tokens)):
                 query_string += "token == '{}'".format(self.emma_token[tokens[i]]) # use emma_token dict to find the alpha-numerical key-value
                 if((i+1) < len(tokens)):
                     query_string += " or "
             query_string += ")"
+        
+        if len(query_string) > 0:
+            df = df.query(query_string) # count is a new DataFrame that only includes row entries with the given elementIDs
 
-        count = df.query(query_string) # count is a new DataFrame that only includes row entries with the given elementIDs
-        grouping1 = count.groupby(['participantId', 'elementId']).size() # groups each elementID to how many times each participant used it.
+        # Filter the Dataset to only include rows that are distinct uses.
+        # Note: We do this after filtering by elementIDs
+        if(distinct):
+            df = Utils.filter_to_distinct_interactions(df)
+        
+        grouping1 = df.groupby(['participantId', 'elementId']).size() # groups each elementID to how many times each participant used it.
         
         return grouping1.groupby(['participantId']).sum() # returns the sum of each elementIDs use for each participant
 
@@ -233,8 +242,8 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def create_variable(self, participants_dict, df, dataset_type, variable_name, variable_func, elementIDs = None, day_of_week=-1, distinct=False, tokens=None,
-    sum = None, healthTrackType=None, completed=False, defined_variable_x = None):
+    def create_variable(self, participants_dict : dict, df, dataset_type : int, variable_name : str, variable_func : Callable, elementIDs : list[int] = None, day_of_week=-1, distinct=False, tokens=None,
+    sum = None, healthTrackType=None, completed=False, defined_variable_x = None) -> dict:
         """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
@@ -280,7 +289,7 @@ class DataWrangling:
     
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def get_variable_calculations(self, interactions_df, events_df):
+    def get_variable_calculations(self, interactions_df : pd.DataFrame, events_df : pd.DataFrame) -> dict:
         """Given a week's worth of data in two DataFrames, interactions and events respectively, created a calculation table.
 
         Args:
