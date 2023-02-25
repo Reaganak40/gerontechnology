@@ -153,7 +153,7 @@ class DataWrangling:
 
     # Last Edit on 1/19/2023 by Reagan Kelley
     # Updated for new distinct use
-    def get_interaction_counts(self, df : pd.DataFrame, elementIDs : list, day_of_week=-1, distinct=False, tokens=[]):
+    def get_interaction_counts(self, df : pd.DataFrame, elementIDs : list, day_of_week=-1, distinct=False, tokens=[], source=None, type=None):
         """ Given a DataFrame which contains participant interactions,
             returns a count of interactions for given elementIDs for each participant.
 
@@ -195,6 +195,12 @@ class DataWrangling:
                 if((i+1) < len(tokens)):
                     query_string += " or "
             query_string += ")"
+
+        # Add to the SQL string to filter DataFrame to only include those elementIDs with these tokens
+        if(source is not None):
+            if len(elementIDs) > 0 or tokens is not None:
+                query_string += " and "
+            query_string += '(source == "{}")'.format(source.lower())
         
         if len(query_string) > 0:
             df = df.query(query_string) # count is a new DataFrame that only includes row entries with the given elementIDs
@@ -208,7 +214,7 @@ class DataWrangling:
         
         return grouping1.groupby(['participantId']).sum() # returns the sum of each elementIDs use for each participant
 
-    def get_events_counts(self, df, sum, healthTrackType, completed = False, day_of_week=-1):
+    def get_events_counts(self, df, sum, count, filter_by, healthTrackType, completed = False, day_of_week=-1):
         """ Given a DataFrame which contains participant events,
             returns a sum in a column for given healthTrackType for each participant.
 
@@ -220,15 +226,48 @@ class DataWrangling:
         Returns:
             DataFrame: The variable value for each participant in the df
         """
+        # Filter the Dataset to only include rows from the given day of the week.
+        if(day_of_week >= 0):
+            df = Utils.filter_to_day_of_week(df, day_of_week)
+
         query_string = ""
 
-        # create a SQL string to filter DataFrame to only include rows with the desired interaction elementIDs
-        query_string += "("
-        for i in range(len(healthTrackType)):
-            query_string += "healthTrackType == '{}'".format(healthTrackType[i].lower())
-            if((i+1) < len(healthTrackType)):
-                query_string += " or "
-        query_string += ")"
+        # create a SQL string to filter DataFrame to only include rows with desired healthTrackType vlaues
+        if healthTrackType is not None:
+            query_string += "("
+            for i in range(len(healthTrackType)):
+                query_string += "healthTrackType == '{}'".format(healthTrackType[i].lower())
+                if((i+1) < len(healthTrackType)):
+                    query_string += " or "
+            query_string += ")"
+        
+        # create a SQL string to filter DataFrame to only include rows with filter values
+        if filter_by is not None and len(filter_by) > 0:
+            if healthTrackType is not None:
+                query_string += " and "
+            
+            index = 0
+            for column_name, filter_value in filter_by:
+                if type(filter_value) is int or type(filter_value) is bool:
+                    query_string += '({} == {})'.format(column_name, filter_value)
+                elif type(filter_value) is str:
+                    query_string += '({} == "{}")'.format(column_name, filter_value.lower())
+                elif type(filter_value) is list:
+                    if len(filter_value) > 0:
+                        query_string += "("
+                        for i in range(len(filter_value)):
+                            query_string += '{} == {}'.format(column_name, filter_value[i])
+                            if((i+1) < len(filter_value)):
+                                query_string += " or "
+                        query_string += ")"
+                    else:
+                        raise Exception("filter_by variable of type 'list' cannot be empty")
+                else:
+                    raise Exception("filter_by variable of type '{}' is not supported".format(type(filter_value)))
+
+                index += 1
+                if index < len(filter_by):
+                    query_string += " and "
 
         # Add to the SQL string if want to only check completed events.
         if(completed):
@@ -237,13 +276,19 @@ class DataWrangling:
         filtered_entries = df.query(query_string)
         filtered_entries = filtered_entries[filtered_entries['healthTrackData'].notna()] #remove entries where the healthTrackData has no value. 
 
-        grouping1 = filtered_entries.groupby('participantId')[sum].sum() # groups by participantID whilst summing the healthTrackingData values.
+        if sum is not None:
+            grouping1 = filtered_entries.groupby('participantId')[sum].sum() # groups by participantID whilst summing the sum-column values.
+        elif count is not None:
+            grouping1 = filtered_entries.groupby('participantId')[sum].count() # groups by participantID whilst summing the count of value instances.
+        else:
+            raise Exception("sum nor count variable defined for event variable.")
+
         return grouping1
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
     def create_variable(self, participants_dict : dict, df, dataset_type : int, variable_name : str, variable_func : Callable, elementIDs : list[int] = None, day_of_week=-1, distinct=False, tokens=None,
-    sum = None, healthTrackType=None, completed=False, defined_variable_x = None) -> dict:
+    source=None, type=None, sum = None, count = None, filter_by = None, healthTrackType=None, completed=False, defined_variable_x = None) -> dict:
         """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
@@ -263,9 +308,9 @@ class DataWrangling:
         
         # Each is a pair (participantID, count)
         if(dataset_type == DatasetType.INTERACTIONS):
-            element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens).iteritems()
+            element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens, source=source).iteritems()
         elif(dataset_type == DatasetType.EVENTS):
-            element_count_list = self.get_events_counts(df, sum, healthTrackType, completed=completed, day_of_week=day_of_week).iteritems()
+            element_count_list = self.get_events_counts(df, sum, count, filter_by, healthTrackType, completed=completed, day_of_week=day_of_week).iteritems()
 
         if(dataset_type == None):
             if(defined_variable_x is not None):
@@ -313,6 +358,8 @@ class DataWrangling:
                 elementIDs = properties.elementIDs
                 tokens = properties.tokens
                 distinct = properties.distinct
+                type = properties.type
+                source = properties.source
                 participants = self.create_variable(
                     participants,                           # this participants dict will be updated
                     interactions_df,                        # the dataset used in this variable
@@ -323,13 +370,18 @@ class DataWrangling:
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
                     distinct=distinct,                      # only count distinct uses
                     tokens=tokens,                          # what tokens to look at for the variable
+                    type=type,                              # interaction type
+                    source=source,                          # name of source to filter by 
                     defined_variable_x= defined_variable_x  # when not None, provided a definition for X for the function
                     )
 
             elif(dataset_type == DatasetType.EVENTS):
                 sum = properties.sum
+                count = properties.count
                 healthTrackType = properties.healthTrackType
                 completed = properties.completed
+                filter_by = properties.filter_by
+
                 participants = self.create_variable(
                     participants,                           # this participants dict will be updated
                     events_df,                              # the dataset used in this variable
@@ -337,7 +389,9 @@ class DataWrangling:
                     name,                                   # the name of the variable
                     function,                               # the lambda function to do on every aggregate call
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
-                    sum=sum,                                # the column to count
+                    sum=sum,                                # the column to sum by participantIDs
+                    count = count,                          # the column to count by ParticipantIDs
+                    filter_by=filter_by,                    # the columns and values to filter the rows by before sum/count
                     healthTrackType=healthTrackType,        # What tags to filter by for the healthTrackType
                     completed=completed,                    # only look at completed events when true
                     defined_variable_x= defined_variable_x  # when not None, provided a definition for X for the function

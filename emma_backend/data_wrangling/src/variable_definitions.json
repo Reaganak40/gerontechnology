@@ -133,7 +133,92 @@
             "dataset" : "Interactions",
             "elementIDs" : [],
             "function" : ["x", "x"],
+            "distinct" : true,
+            "scope" : "daily"
+        },
+        {
+            "name" : "DistinctUseTotal",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "function" : ["x", "x"],
             "distinct" : true
+        },
+        {
+            "name" : "DistinctUseAverage",
+            "defined-variable-x" : "DistinctUseTotal",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "TotalTapsAverage",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name": "TodayPageAverage",
+            "dataset": "Interactions",
+            "elementIDs": [8],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "CalendarPageAverage",
+            "dataset": "Interactions",
+            "elementIDs": [9],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "HealthPageAverage",
+            "dataset": "Interactions",
+            "elementIDs": [201],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "NotesPageAverage",
+            "dataset": "Interactions",
+            "elementIDs": [11],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "HelpPageAverage",
+            "dataset": "Interactions",
+            "elementIDs": [12],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "CreateEventAverage",
+            "dataset": "Interactions",
+            "elementIDs": [13],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "ViewEventAverage",
+            "dataset": "Interactions",
+            "elementIDs": [379,384,14],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EditEventAverage",
+            "dataset": "Interactions",
+            "elementIDs": [104],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "DeleteEventAverage",
+            "dataset": "Interactions",
+            "elementIDs": [82],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "CompleteEventAverage",
+            "dataset": "Interactions",
+            "elementIDs": [380,381],
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "SumEventInteractionsAverage",
+            "dataset": "Interactions",
+            "elementIDs": [13, 379, 384, 14, 104, 82, 380, 381],
+            "function": ["x", "x/7"]
         }
     ]
 }

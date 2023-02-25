@@ -33,7 +33,13 @@ class Variable:
         self.tokens = variable_definition.get("tokens", None)
         self.distinct = variable_definition.get("distinct", False)
         self.elementIDs = variable_definition.get("elementIDs", None)
+        self.type = variable_definition.get("type", None)
+        self.source = variable_definition.get("source", None)
+        
         self.sum = variable_definition.get("sum", None)
+        self.count = variable_definition.get("count", None)
+        self.filter_by = variable_definition.get("filter_by", None)
+
         self.healthTrackType = variable_definition.get("healthTrackType", None)
         self.completed = variable_definition.get("completed", False)
         self.day_of_week = day_of_week
