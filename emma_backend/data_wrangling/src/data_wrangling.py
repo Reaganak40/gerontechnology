@@ -256,7 +256,13 @@ class DataWrangling:
                     if len(filter_value) > 0:
                         query_string += "("
                         for i in range(len(filter_value)):
-                            query_string += '{} == {}'.format(column_name, filter_value[i])
+                            if type(filter_value[i]) is int:
+                                query_string += '{} == {}'.format(column_name, filter_value[i])
+                            elif type(filter_value[i]) is str:
+                                query_string += '{} == "{}"'.format(column_name, filter_value[i])
+                            else:
+                                raise Exception("Unsupported list element: {}".format(type(filter_value[i])))
+
                             if((i+1) < len(filter_value)):
                                 query_string += " or "
                         query_string += ")"
@@ -275,14 +281,20 @@ class DataWrangling:
 
         filtered_entries = df.query(query_string)
         filtered_entries = filtered_entries[filtered_entries['healthTrackData'].notna()] #remove entries where the healthTrackData has no value. 
-
+        
+        #if filter_by is not None:
+        #    print(filtered_entries)
+        
         if sum is not None:
             grouping1 = filtered_entries.groupby('participantId')[sum].sum() # groups by participantID whilst summing the sum-column values.
         elif count is not None:
-            grouping1 = filtered_entries.groupby('participantId')[sum].count() # groups by participantID whilst summing the count of value instances.
+            grouping1 = filtered_entries.groupby('participantId')[count].count() # groups by participantID whilst summing the count of value instances.
         else:
             raise Exception("sum nor count variable defined for event variable.")
-
+        
+        #if filter_by is not None:
+        #    print("\n", grouping1)
+        #    quit()
         return grouping1
 
     # Last Edit on 12/7/2022 by Reagan Kelley
