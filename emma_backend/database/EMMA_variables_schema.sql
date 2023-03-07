@@ -4,8 +4,10 @@
 CREATE TABLE IF NOT EXISTS Participants
 (
     participant_id INTEGER,
-    first_name varchar(256),
-    last_name varchar(256),
+    participant_name varchar(256),
+    study varchar(10),
+    cohort int,
+    active int,
 
     PRIMARY KEY (participant_id)
 );

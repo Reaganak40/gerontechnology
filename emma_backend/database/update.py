@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import exc as sa_exc
 import sys
 import warnings
-
+from pathlib import Path
 # Local Imports
 try:
     from globals import Globals
@@ -36,6 +36,8 @@ except:
 # * =============================================================================================
 
 TEST_FILE = os.getcwd() + R'\..\data_wrangling\data\output\Week 14, 2022.csv'
+
+ParticipantDataPath = Path(os.path.realpath(os.path.dirname(__file__))).parent.joinpath("research").joinpath("participants").absolute()
 
 # ===================================================================================================================
 #   * replace_string was found on stackoverflow
@@ -61,8 +63,10 @@ def mysql_replace_into(table, conn, keys, data_iter):
 
     @compiles(Insert)
     def replace_string(insert, compiler, **kw):
-        s = compiler.visit_insert(insert, **kw)
+        s = "SET FOREIGN_KEY_CHECKS=0;"
+        s += compiler.visit_insert(insert, **kw)
         s = s.replace("INSERT INTO", "REPLACE INTO")
+        s += ";SET FOREIGN_KEY_CHECKS=1;"
         return s
 
     data = [dict(zip(keys, row)) for row in data_iter]
@@ -83,8 +87,8 @@ def update_from_csv(filename: str, week, year, allow_missing_values=False, check
     calculations_table = pd.read_csv(filename)
     update_from_dataframe(calculations_table, week, year, allow_missing_values=allow_missing_values, check_participants_exist=check_participants_exist)
 
-# Last Edit on 1/3/2023 by Reagan Kelley
-# Added Upsert functionality for calculation rows
+# Last Edit on 3/6/2023 by Reagan Kelley
+# Updates add participant according to new participant table schema
 def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_engine = None, allow_missing_values=False, check_participants_exist=True):
     """ Updates the calculation table of the database with entries from a dataframe.
 
@@ -113,6 +117,9 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
     # undefined_variables = [(SQL Name)]
     undefined_variables : list(str) = [x for x in database_defined_variables if x not in [x[0] for x in variables]]
 
+    # this is all the variables in the calculation table that need to be removed for database entry
+    bad_variables : list(str) = [x[0] for x in variables if x[0] not in database_defined_variables]
+
     if(not allow_missing_values):
         if (len(undefined_variables) > 0):
             raise Exception("Cannot proceed, these variables are not present in the calculation table: {}".format(undefined_variables))
@@ -122,7 +129,7 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
     if(check_participants_exist):
         add_undefined_participants(calculations_table, cxn_engine)
 
-    # Get DataFrame read to to_sql
+    # Get DataFrame ready for to_sql
     calculations_table.rename(columns= {"participantId" : "participant_id"}, inplace=True)
     calculations_table.rename(columns=variable_translations, inplace=True)
     calculations_table['week_number'] = [week] * calculations_table.shape[0]
@@ -130,6 +137,9 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
 
     for uv in undefined_variables:
         calculations_table[uv] = [np.nan] * calculations_table.shape[0]
+
+    # remove bad variables from calculation table
+    calculations_table.drop(bad_variables, axis=1, inplace=True)
 
     calculations_table.to_sql('calculations', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
 
@@ -148,7 +158,7 @@ def add_undefined_participants(calculations_table, cxn_engine):
 
     # to maintain foreign key integrity, participants not defined will be created with the name 'Unknown Participant'.
     for to_define in undefined_participants:
-        cxn_engine.execute("INSERT INTO Participants (participant_id, first_name, last_name) VALUES({}, 'Unknown', 'Participant')".format(to_define))
+        cxn_engine.execute("INSERT INTO Participants (participant_id, participant_name, study, cohort, active) VALUES({}, 'UnknownParticipant', NULL, NULL, NULL)".format(to_define))
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial Implementation
@@ -180,8 +190,10 @@ def update_schema_file():
 CREATE TABLE IF NOT EXISTS Participants
 (
     participant_id INTEGER,
-    first_name varchar(256),
-    last_name varchar(256),
+    participant_name varchar(256),
+    study varchar(10),
+    cohort int,
+    active int,
 
     PRIMARY KEY (participant_id)
 );
@@ -243,6 +255,27 @@ def update_schema(force_delete=False, debug=False):
     
     cxn.commit()
 
+def add_participants_from_file(absolute_path : str, cxn_engine = None):
+    extension = absolute_path.split(".")[1]
+
+    if extension == "csv":
+        participant_table = pd.read_csv(absolute_path)
+    elif extension == "xlsx":
+        participant_table = pd.read_excel(absolute_path)
+    else:
+        raise Exception(extension, "is not a valid extension to read.")
+
+    if(cxn_engine is None):
+        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
+    
+    participant_table.dropna(inplace=True)
+    print(participant_table)
+    participant_table.to_sql('participants', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
+
 if __name__ == "__main__":
-    update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
+    #update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
     #update_schema(force_delete=True, debug=True)
+    if not ParticipantDataPath.exists():
+        raise Exception("path:", str(ParticipantDataPath), "does not exist")
+    else:
+        add_participants_from_file(str(ParticipantDataPath.joinpath("Participant_Table.xlsx").absolute()))
