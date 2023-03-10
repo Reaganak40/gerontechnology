@@ -13,6 +13,7 @@ from sqlalchemy import exc as sa_exc
 import sys
 import warnings
 from pathlib import Path
+
 # Local Imports
 try:
     from globals import Globals
@@ -272,9 +273,18 @@ def add_participants_from_file(absolute_path : str, cxn_engine = None):
     print(participant_table)
     participant_table.to_sql('participants', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
 
+def add_participants_from_df(participant_table : pd.DataFrame, cxn_engine = None):
+    if(cxn_engine is None):
+        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
+    
+    participant_table.to_sql('participants', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
+    
+
+
 if __name__ == "__main__":
     #update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
     #update_schema(force_delete=True, debug=True)
+    
     if not ParticipantDataPath.exists():
         raise Exception("path:", str(ParticipantDataPath), "does not exist")
     else:

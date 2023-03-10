@@ -39,15 +39,16 @@ def get_all_participants(cxn_engine = None):
                 participants = current_participant_table
             else:
                 participants = pd.concat([participants, current_participant_table], ignore_index=True).drop_duplicates().reset_index(drop=True)
-
-        print(participants)
+        
+        participants.dropna(inplace=True)
         return participants
-    return None
+    
+    return pd.read_sql('SELECT * FROM PARTICIPANTS', cxn_engine)
         
 
 def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None):
     participants = get_all_participants(cxn_engine)
-    
+    print(participants)
     for weekly_calculation_table in calculation_tables:
         pass
         # weekly_calculation_table[1] is the dataframe for that week
