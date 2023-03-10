@@ -19,10 +19,31 @@ def get_all_participants(cxn_engine = None):
         if not participant_table_path.exists():
             raise Exception("Looking for directory with participant tables ...\nPath: [{}] does not exist.".format(str(participant_table_path)))
 
+        participants = None
         # get all excel files in the directory, exclude hidden recovery files
         filenames = glob.glob(str(participant_table_path) + "\[!~$]*.xlsx")
         for file in filenames:
-            print(pd.read_excel(file))
+            current_participant_table = pd.read_excel(file)
+            columns = current_participant_table.columns
+
+            bad_table = False
+            for check_column in ["participant_id", "participant_name", "study", "cohort", "active"]:
+                if check_column not in columns:
+                    print("Warning - Participant Table [{}] ignored because of missing column: {}".format(file.split("\\")[-1], check_column))
+                    bad_table = True
+                    break
+            if bad_table:
+                continue
+
+            if participants is None:
+                participants = current_participant_table
+            else:
+                participants = pd.concat([participants, current_participant_table], ignore_index=True).drop_duplicates().reset_index(drop=True)
+
+        print(participants)
+        return participants
+    return None
+        
 
 def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None):
     participants = get_all_participants(cxn_engine)
