@@ -24,7 +24,7 @@ def update_database(calculation_tables, cxn_engine = None, debug : bool = False)
 def update_research(calculation_tables, cxn_engine = None, debug : bool = False):
     if (debug):
         print(colored("\nCreating parsed calculation tables for research studies:", "blue"))
-    populate_research_tables(calculation_tables, cxn_engine)
+    populate_research_tables(calculation_tables, cxn_engine, debug=debug)
 
 
 def emma_backend(args):

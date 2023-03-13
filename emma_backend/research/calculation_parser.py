@@ -44,11 +44,42 @@ def get_all_participants(cxn_engine = None):
         return participants
     
     return pd.read_sql('SELECT * FROM PARTICIPANTS', cxn_engine)
-        
 
-def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None):
+def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None, debug : bool = False):
     participants = get_all_participants(cxn_engine)
-    print(participants)
-    for weekly_calculation_table in calculation_tables:
-        pass
-        # weekly_calculation_table[1] is the dataframe for that week
+    if (debug):
+        print("* {} participants found in {}".format(len(participants), "participant table(s)" if cxn_engine is None else "database"))
+    
+    data_dir = Path(os.path.realpath(os.path.dirname(__file__))).joinpath('data').absolute()
+    if not data_dir.exists():
+        data_dir.mkdir()
+    
+    for date, calculations in calculation_tables:
+        weekly_participants = participants[participants['participant_id'].isin(calculations['participantId'])]
+        study_options = weekly_participants['study'].unique()
+        
+        for study in study_options:
+            study_participants = participants[participants['study'] == study]
+            cohort_options = study_participants['cohort'].unique()
+            for cohort in cohort_options:
+                cohort_participants = study_participants[(study_participants['cohort'] == cohort) & (study_participants['active'] == 1)]
+                parsed_table = calculations[calculations['participantId'].isin(cohort_participants['participant_id'])]
+
+                missing_participants = set(list(cohort_participants['participant_id'])).difference(list(parsed_table['participantId']))
+                
+                if len(missing_participants) > 0:
+                    ct2_dict = {col_name:[0] * len(missing_participants) for col_name in parsed_table.columns}
+                    ct2_dict['participantId'] = list(missing_participants)
+                    ct2 = pd.DataFrame(ct2_dict)
+                    parsed_table = pd.concat([parsed_table, ct2], ignore_index=True)
+                    parsed_table.reset_index()
+                
+                output_dir = data_dir.joinpath(study).joinpath("Cohort {}".format(cohort))
+                
+                if not output_dir.exists():
+                    output_dir.mkdir(parents=True)
+                output_dir = output_dir.joinpath("Week {}, {}.csv".format(date[0], date[1]))
+                parsed_table.to_csv(output_dir, index=False)
+                
+                if (debug):
+                     print("* Calculation table created for [Study: {}, Cohort: {}] for (Week {}, {})".format(study, cohort, date[0], date[1]))
