@@ -46,27 +46,42 @@ def get_all_participants(cxn_engine = None):
     return pd.read_sql('SELECT * FROM PARTICIPANTS', cxn_engine)
 
 def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None, debug : bool = False):
-    participants = get_all_participants(cxn_engine)
+    """Gets participant data (their study and cohort) to create calculation tables for each respective study and cohort.
+
+    Args:
+        calculation_tables (list[tuple[tuple[str, str], pd.DataFrame]]): The weekly calculation tables and dates for those tables. 
+        cxn_engine (mySQL Connection, optional): If not None, will get the participant data from the database, otherwise will use
+        the participant directory and its participant excel files. Defaults to None.
+        debug (bool, optional): When true, debug information is printed to the console. Defaults to False.
+    """
+    participants : pd.DataFrame = get_all_participants(cxn_engine)
+    
     if (debug):
         print("* {} participants found in {}".format(len(participants), "participant table(s)" if cxn_engine is None else "database"))
     
+    # find or create the data directory to output research tables to.
     data_dir = Path(os.path.realpath(os.path.dirname(__file__))).joinpath('data').absolute()
     if not data_dir.exists():
         data_dir.mkdir()
     
+    # * Step 1. Iterate through the weekly calculation tables
     for date, calculations in calculation_tables:
         weekly_participants = participants[participants['participant_id'].isin(calculations['participantId'])]
         study_options = weekly_participants['study'].unique()
         
+        # * Step 2. For this week's calculation table, look through which studies are active this week
+        # ! Note: If no one in an active study participates, no table will be created for that study
         for study in study_options:
             study_participants = participants[participants['study'] == study]
             cohort_options = study_participants['cohort'].unique()
+
+            # * Step 3. For this week's calculation table, look through the cohorts for the studies active this week
             for cohort in cohort_options:
                 cohort_participants = study_participants[(study_participants['cohort'] == cohort) & (study_participants['active'] == 1)]
                 parsed_table = calculations[calculations['participantId'].isin(cohort_participants['participant_id'])]
-
                 missing_participants = set(list(cohort_participants['participant_id'])).difference(list(parsed_table['participantId']))
                 
+                # * Step 4. Get omitted participants in each study-cohort and add there 0's row to the participant table 
                 if len(missing_participants) > 0:
                     ct2_dict = {col_name:[0] * len(missing_participants) for col_name in parsed_table.columns}
                     ct2_dict['participantId'] = list(missing_participants)
@@ -74,11 +89,13 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
                     parsed_table = pd.concat([parsed_table, ct2], ignore_index=True)
                     parsed_table.reset_index()
                 
+                # * Step 5. Output calculation table to a csv
                 output_dir = data_dir.joinpath(study).joinpath("Cohort {}".format(cohort))
                 
                 if not output_dir.exists():
                     output_dir.mkdir(parents=True)
-                output_dir = output_dir.joinpath("Week {}, {}.csv".format(date[0], date[1]))
+                output_dir = output_dir.joinpath("Week {}, {} - Study {}, Cohort {}.csv".format(date[0], date[1], study, cohort))
+                parsed_table.sort_values(by=['participantId'], inplace=True)
                 parsed_table.to_csv(output_dir, index=False)
                 
                 if (debug):
