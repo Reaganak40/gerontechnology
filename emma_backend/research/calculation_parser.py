@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import glob
+import numpy as np
 from pathlib import Path
 
 
@@ -43,7 +44,9 @@ def get_all_participants(cxn_engine = None):
         participants.dropna(inplace=True)
         return participants
     
-    return pd.read_sql('SELECT * FROM PARTICIPANTS', cxn_engine)
+    # if connected to database get all participants and drop Unknown Participants (which have None columns)
+    df = pd.read_sql('SELECT * FROM PARTICIPANTS', cxn_engine)
+    return df.replace(to_replace='None', value=np.nan).dropna()
 
 def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None, debug : bool = False):
     """Gets participant data (their study and cohort) to create calculation tables for each respective study and cohort.

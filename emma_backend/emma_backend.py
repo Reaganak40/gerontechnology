@@ -17,7 +17,7 @@ def update_database(calculation_tables, cxn_engine = None, debug : bool = False)
     
     # table : ((week, year), dataframe)
     for table in calculation_tables:
-        update_from_dataframe(table[1], table[0][0], table[0][1], cxn_engine, allow_missing_values=False, check_participants_exist=True)
+        update_from_dataframe(table[1].copy(), table[0][0], table[0][1], cxn_engine, allow_missing_values=False, check_participants_exist=True)
         if (debug):
             print("* (Week {}, {}) data added to back-end database.".format(table[0][0], table[0][1]))
 

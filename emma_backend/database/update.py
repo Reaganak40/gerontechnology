@@ -23,6 +23,14 @@ except:
     from globals import Globals
     from sql_shell import connect_to_db
 
+try:
+    from research.calculation_parser import get_all_participants
+except:
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0,parent_dir) 
+    from research.calculation_parser import get_all_participants
+
+
 # ? VSCode Extensions Used:
 # ?     - Better Comments
 # ?     - autoDocstring
@@ -279,13 +287,18 @@ def add_participants_from_df(participant_table : pd.DataFrame, cxn_engine = None
     
     participant_table.to_sql('participants', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
     
-
+def add_participants_from_research(cxn_engine = None):
+    if(cxn_engine is None):
+        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
+    
+    participants = get_all_participants()
+    add_participants_from_df(participants, cxn_engine)
 
 if __name__ == "__main__":
     #update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
     #update_schema(force_delete=True, debug=True)
-    
-    if not ParticipantDataPath.exists():
-        raise Exception("path:", str(ParticipantDataPath), "does not exist")
-    else:
-        add_participants_from_file(str(ParticipantDataPath.joinpath("Participant_Table.xlsx").absolute()))
+    add_participants_from_research()
+    # if not ParticipantDataPath.exists():
+    #     raise Exception("path:", str(ParticipantDataPath), "does not exist")
+    # else:
+    #     add_participants_from_file(str(ParticipantDataPath.joinpath("Participant_Table.xlsx").absolute()))
