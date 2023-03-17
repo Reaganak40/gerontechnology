@@ -1,30 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{title}}</title>
-</head>
-<body>
-    <h1>Hello World!</h1>
-    <h2>Welcome to EMMA Dashboard!</h2>
 
-    <table 
-    border = "1"
-    style="width:100%">
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Hello World!</h1>
+<h2>Welcome to EMMA Dashboard!</h2>
+
+<table class="participant-table">
+    <tr>
+        <th style="width:5%">ID</th>
+        <th style="width:15%">Participant</th>
+        <th style="width:10%">Cohort</th>
+        <th style="width:10%">Study</th>
+        <th style="width:10%">Active</th>
+    </tr>
+    {% for key, value in user_t.iterrows() %}
         <tr>
-          <th style="width:10%">participant_id</th>
-          <th style="width:30%">first name</th>
-          <th style="width:30%">last name</th>
+            <td>{{ value['participant_id'] }}</td>
+            <td>{{ value['participant_name'] }}</td>
+            <td>{{ value['study'] }}</td>
+            <td>{{ value['cohort'] | int }}</td>
+            <td>{% if (value['active'] | int) == 1 %} Active {% else %} Inactive {% endif %}</td>
+
 
         </tr>
-        {% for key, value in user_t.iterrows() %}
-            <tr>
-                <td>{{ value['participant_id'] }}</td>
-                <td>{{ value['first_name'] }}</td>
-                <td>{{ value['last_name'] }}</td>
-            </tr>
-        {% endfor %}
-       
-      </table>
-</body>
-</html>
+    {% endfor %}
+    
+    </table>
+
+{% endblock %}

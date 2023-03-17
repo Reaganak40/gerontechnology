@@ -17,4 +17,4 @@ bp_routes.template_folder = Config.TEMPLATE_FOLDER #'..\\View\\templates'
 @bp_routes.route("/")
 def hello_world():
     user_table : DataFrame = db.get_users()
-    return render_template("index.html", title=db.name, user_t=user_table)
+    return render_template("index.html", title="Emma Dashboard", user_t=user_table)

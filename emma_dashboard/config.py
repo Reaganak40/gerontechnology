@@ -6,3 +6,4 @@ class Config(object):
     DB_USER = "root"        # ! Fix this.
     DB_PASSWORD = "root"    # ! Fix this.
     TEMPLATE_FOLDER = os.path.join(basedir, 'dashboard//View//templates')
+    STATIC_FOLDER = os.path.join(basedir, 'dashboard//View//static')

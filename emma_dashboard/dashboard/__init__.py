@@ -33,8 +33,9 @@ def create_app(config_class=Config):
     """
     app = Flask(__name__)
 
-    # This tells routes where to find html files.
+    # This tells routes where to find html and css files.
     app.template_folder = config_class.TEMPLATE_FOLDER
+    app.static_folder = config_class.STATIC_FOLDER
     
     # Using blueprints allows use to define routes in different parts
     #  of the application, which also allows us to use the MVC architecture model.

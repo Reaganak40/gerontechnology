@@ -1,0 +1,9 @@
+.participant-table {
+    border: 1px solid;
+}
+
+.participant-table tr, .participant-table th
+{
+    border: 1px solid black;
+    padding: 8px;
+}

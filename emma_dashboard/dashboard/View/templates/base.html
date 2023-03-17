@@ -1,0 +1,23 @@
+<!--    
+# ================================================================
+#   Name:           base html
+#   Description:    Initial implementation
+#   Last Changed:   3/16/23
+#   Changed By:     Reagan Kelley
+#   Patch Notes: None
+# ================================================================
+-->
+
+
+<html>
+    <head>
+       {% if title %}
+            <title>{{ title }}</title>
+       {% else %}
+            <title>Emma Dashboard</title>
+       {% endif %}
+       <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    </head>
+
+    {% block content %} {% endblock %}
+</html>

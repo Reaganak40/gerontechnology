@@ -5,6 +5,7 @@
 
 from sqlalchemy import engine
 import pandas as pd
+import numpy as np
 
 class Database():
 
@@ -21,4 +22,5 @@ class Database():
     
     def get_users(self) -> pd.DataFrame:
         with self.db.connect() as connection:
-            return pd.read_sql("SELECT * FROM participants", connection)
+            df = pd.read_sql('SELECT * FROM PARTICIPANTS', connection)
+            return df.replace(to_replace='None', value=np.nan).dropna()
