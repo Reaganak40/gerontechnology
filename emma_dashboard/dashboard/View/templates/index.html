@@ -3,8 +3,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Hello World!</h1>
-<h2>Welcome to EMMA Dashboard!</h2>
+<h1 align="center">Welcome to EMMA Dashboard!</h2>
 
 <table class="participant-table">
     <tr>
@@ -17,7 +16,7 @@
     {% for key, value in user_t.iterrows() %}
         <tr>
             <td>{{ value['participant_id'] }}</td>
-            <td>{{ value['participant_name'] }}</td>
+            <td> <a href="{{ url_for('routes.info', participant_id=value['participant_id']) }}">{{ value['participant_name'] }}</a> </td>
             <td>{{ value['study'] }}</td>
             <td>{{ value['cohort'] | int }}</td>
             <td>{% if (value['active'] | int) == 1 %} Active {% else %} Inactive {% endif %}</td>

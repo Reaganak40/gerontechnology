@@ -3,18 +3,38 @@
 """All routes or pages that a user can traverse.
 """
 
+import os
+
 # * Modules
 from pandas import DataFrame
-from flask import render_template
-from flask import Blueprint
+from flask import render_template, request, Blueprint, redirect, url_for
 from config import Config
 from dashboard import db
+
+try:
+    from Model.participant import Participant
+except:
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0,parent_dir) 
+    from Model.participant import Participant
+
+
 
 bp_routes = Blueprint("routes", __name__)
 bp_routes.template_folder = Config.TEMPLATE_FOLDER #'..\\View\\templates'
 
-# ! This Hello World is not permanent
 @bp_routes.route("/")
-def hello_world():
+def index():
     user_table : DataFrame = db.get_users()
     return render_template("index.html", title="Emma Dashboard", user_t=user_table)
+
+@bp_routes.route("/participant")
+def info():
+    participant_id = request.args.get('participant_id')
+
+    try:
+        p = Participant(participant_id)
+    except:
+        return redirect(url_for('routes.index'), code=302)
+
+    return render_template("participant.html", title="Participant", participant=p)
