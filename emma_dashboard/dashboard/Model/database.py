@@ -29,3 +29,8 @@ class Database():
         with self.db.connect() as connection:
             df = pd.read_sql('SELECT * FROM PARTICIPANTS WHERE participant_id={}'.format(id), connection)
             return df.replace(to_replace='None', value=np.nan).dropna()
+        
+    def get_tables(self, id) -> pd.DataFrame:
+        with self.db.connect() as connection:
+            df = pd.read_sql('SELECT * FROM calculations WHERE participant_id={}'.format(id), connection)
+            return df.replace(to_replace='None', value=np.nan).dropna()

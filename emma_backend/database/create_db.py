@@ -9,6 +9,7 @@ import mysql.connector
 
 # Local Imports
 from sql_shell import connect_to_db
+from update import *
 
 # ? VSCode Extensions Used:
 # ?     - Better Comments
@@ -49,6 +50,10 @@ def executeScriptsFromFile(filename : str, cxn : mysql.connector.MySQLConnection
 
     cxn.commit()
 
+def create_and_fill():
+    update_schema_file()
+    create_db()
+    add_participants_from_research()
 
 if __name__ == "__main__":
-    create_db()
+    create_and_fill()

@@ -34,7 +34,10 @@ def info():
 
     try:
         p = Participant(participant_id)
-    except:
+    except KeyError:
         return redirect(url_for('routes.index'), code=302)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
 
     return render_template("participant.html", title="Participant", participant=p)

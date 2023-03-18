@@ -20,8 +20,6 @@
             <td>{{ value['study'] }}</td>
             <td>{{ value['cohort'] | int }}</td>
             <td>{% if (value['active'] | int) == 1 %} Active {% else %} Inactive {% endif %}</td>
-
-
         </tr>
     {% endfor %}
     

@@ -68,7 +68,9 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
         data_dir.mkdir()
     
     # * Step 1. Iterate through the weekly calculation tables
-    for date, calculations in calculation_tables:
+    for index, value in enumerate(calculation_tables):
+        date = value[0]
+        calculations = value[1]
         weekly_participants = participants[participants['participant_id'].isin(calculations['participantId'])]
         study_options = weekly_participants['study'].unique()
         
@@ -90,8 +92,10 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
                     ct2_dict['participantId'] = list(missing_participants)
                     ct2 = pd.DataFrame(ct2_dict)
                     parsed_table = pd.concat([parsed_table, ct2], ignore_index=True)
-                    parsed_table.reset_index()
-                
+                    
+                    # Update the calculation tables to include omitted participants
+                    calculation_tables[index] = (date, pd.concat([calculation_tables[index][1], ct2], ignore_index=True))
+
                 # * Step 5. Output calculation table to a csv
                 output_dir = data_dir.joinpath(study).joinpath("Cohort {}".format(cohort))
                 
@@ -103,3 +107,4 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
                 
                 if (debug):
                      print("* Calculation table created for [Study: {}, Cohort: {}] for (Week {}, {})".format(study, cohort, date[0], date[1]))
+        

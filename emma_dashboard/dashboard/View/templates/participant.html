@@ -3,8 +3,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-{{ participant.id }} <br>
-{{ participant.name }} <br>
-{{ participant.study }} <br>
-{{ participant.cohort }} <br>
+<h1 align="center"> {{ participant.name }} </h1>
+
+
+<table class="calculations-table">
+    <tr>
+        {% for col_name in participant.tables.columns %}
+            <th style="width:5%"> {{ col_name }}</th>
+        {% endfor %}
+    </tr>
+    {% for key, value in participant.tables.iterrows() %}
+        <tr>
+            {% for col_name in participant.tables.columns %}
+            <td>{{ value[col_name] }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+
 {% endblock %}

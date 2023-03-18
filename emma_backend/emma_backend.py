@@ -48,13 +48,14 @@ def emma_backend(args):
     # * Add information to database if requested.
     if not no_database:
         cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
-        update_database(tables, cxn_engine, debug=dw.debug)
     else:
         cxn_engine = None
-    
+
     # * Add calculation tables to database if requested
     if research:
         update_research(tables, cxn_engine, debug=dw.debug)
+    
+    update_database(tables, cxn_engine, debug=dw.debug)
 
 
 if __name__ == "__main__":
