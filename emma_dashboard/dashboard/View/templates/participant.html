@@ -20,10 +20,9 @@
     {% endfor %}
 </table>
 
-<script src="../../../dependencies/Chart.js/dist/chart.umd.js"></script>
-<script>
-    const myChart = new Chart(ctx, {...});
-</script>
+
+{% include 'chart.html' %}
+
 
 
 {% endblock %}
