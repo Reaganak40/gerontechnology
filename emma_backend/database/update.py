@@ -8,10 +8,9 @@ import json
 import numpy as np
 import os
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy import exc as sa_exc
 import sys
-import warnings
 from pathlib import Path
 
 # Local Imports
@@ -67,23 +66,15 @@ def mysql_replace_into(table, conn, keys, data_iter):
         data_iter (list()): Values for each column per row
     """
     from sqlalchemy.dialects.mysql import insert
-    from sqlalchemy.ext.compiler import compiles
-    from sqlalchemy.sql.expression import Insert
-
-    @compiles(Insert)
-    def replace_string(insert, compiler, **kw):
-        s = "SET FOREIGN_KEY_CHECKS=0;"
-        s += compiler.visit_insert(insert, **kw)
-        s = s.replace("INSERT INTO", "REPLACE INTO")
-        s += ";SET FOREIGN_KEY_CHECKS=1;"
-        return s
 
     data = [dict(zip(keys, row)) for row in data_iter]
 
-    # ! Leads to SAWarning -> Better Solution Encouraged
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=sa_exc.SAWarning)
-        conn.execute(table.table.insert(replace_string=""), data)
+    stmt = insert(table.table).values(data)
+    update_stmt = stmt.on_duplicate_key_update(**dict(zip(stmt.inserted.keys(), stmt.inserted.values())))
+
+    conn.execute(update_stmt)
+    conn.commit()
+
 
 # Last Edit on 1/1/2023 by Reagan Kelley
 # Added parameters
@@ -117,7 +108,7 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
     # variables = [(SQL Name, Original Name)]
     variables : list(tuple) = [(("v_" + x).replace("-", "_"), x) for x in list(filter(lambda x: x != "participantId", list(calculations_table.columns)))]
 
-    exec_result = cxn_engine.execute("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'Calculations'")
+    exec_result = cxn_engine.connect().execute(text("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'Calculations'"))
 
     # The variables defined in the SQL table use in the dashboard
     database_defined_variables = list(filter(lambda x: x != "participant_id" and x != 'week_number' and x != 'year_number', [result[0] for result in exec_result.fetchall()]))
@@ -161,13 +152,14 @@ def add_undefined_participants(calculations_table, cxn_engine):
         calculations_table (pd.DataFrame): A Calculation Table
         cxn (MySQL.Connector): Connection to a mysql database.
     """
-    exec_results = cxn_engine.execute("SELECT participant_id FROM Participants")
+    exec_results = cxn_engine.connect().execute(text("SELECT participant_id FROM Participants"))
     defined_participants = [result[0] for result in exec_results.fetchall()]
     undefined_participants = [x for x in calculations_table["participantId"].to_list() if x not in defined_participants]
 
     # to maintain foreign key integrity, participants not defined will be created with the name 'Unknown Participant'.
-    for to_define in undefined_participants:
-        cxn_engine.execute("INSERT INTO Participants (participant_id, participant_name, study, cohort, active) VALUES({}, 'UnknownParticipant', NULL, NULL, NULL)".format(to_define))
+    with cxn_engine.begin() as connection:
+        for participant_id in undefined_participants:
+            connection.execute(text("INSERT INTO Participants (participant_id, participant_name, study, cohort, active) VALUES({}, 'UnknownParticipant', NULL, NULL, NULL)".format(participant_id)))
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial Implementation

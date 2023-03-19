@@ -3,7 +3,7 @@ import os
 import glob
 import numpy as np
 from pathlib import Path
-
+from sqlalchemy import create_engine, text
 
 def get_all_participants(cxn_engine = None):
     """Returns a dataframe of all participants who belong to a weekly calculation table, as well
@@ -45,7 +45,7 @@ def get_all_participants(cxn_engine = None):
         return participants
     
     # if connected to database get all participants and drop Unknown Participants (which have None columns)
-    df = pd.read_sql('SELECT * FROM PARTICIPANTS', cxn_engine)
+    df = pd.DataFrame(cxn_engine.connect().execute(text('SELECT * FROM PARTICIPANTS')))
     return df.replace(to_replace='None', value=np.nan).dropna()
 
 def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None, debug : bool = False):

@@ -320,9 +320,9 @@ class DataWrangling:
         
         # Each is a pair (participantID, count)
         if(dataset_type == DatasetType.INTERACTIONS):
-            element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens, source=source).iteritems()
+            element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens, source=source).items()
         elif(dataset_type == DatasetType.EVENTS):
-            element_count_list = self.get_events_counts(df, sum, count, filter_by, healthTrackType, completed=completed, day_of_week=day_of_week).iteritems()
+            element_count_list = self.get_events_counts(df, sum, count, filter_by, healthTrackType, completed=completed, day_of_week=day_of_week).items()
 
         if(dataset_type == None):
             if(defined_variable_x is not None):

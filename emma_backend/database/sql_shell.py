@@ -80,7 +80,7 @@ def connect_to_db(database_name : str, user= None, password = None, create=False
             user=input("Enter username: "),
             password=getpass("Enter password: ")
         connection_str = "mysql://{}:{}@localhost/{}".format(user, password, database_name)
-        return create_engine(connection_str)
+        return create_engine(connection_str, future=True)
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial implementation

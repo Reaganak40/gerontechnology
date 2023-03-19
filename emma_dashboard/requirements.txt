@@ -1,3 +1,0 @@
-flask
-jinja2
-pyodbc
