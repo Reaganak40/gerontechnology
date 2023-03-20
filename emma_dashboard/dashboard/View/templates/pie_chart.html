@@ -1,0 +1,87 @@
+
+
+<!-- Slideshow container -->
+<div class="slideshow-container">
+
+  <!-- Full-width slides/quotes -->
+  <div class="slideshow-div">
+    <canvas id="myChart" width="300px" height="300px" style="border:1px solid #000000;">
+    </canvas>
+  </div>
+
+  <!-- Next/prev buttons -->
+  <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+  <a class="next" onclick="plusSlides(1)">&#10095;</a>
+</div>
+
+<!-- Dots/bullets/indicators -->
+<div class="dot-container">
+  <span class="dot" onclick="currentSlide(0)"></span>
+  <span class="dot" onclick="currentSlide(1)"></span>
+  <span class="dot" onclick="currentSlide(2)"></span>
+  <span class="dot" onclick="currentSlide(3)"></span>
+
+</div>
+<script>
+  ctx = document.getElementById('myChart');
+
+  pie_chart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Blue', 'Red', 'Green'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 50, 30],
+        backgroundColor: ["#0074D9", "#FF4136", "#2ECC40"],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+</script>
+
+<script>
+  var slideIndex = 0;
+  showSlides(slideIndex);
+
+  function plusSlides(n) {
+    showSlides(slideIndex + n);
+  }
+
+  function currentSlide(n) {
+    showSlides(n);
+  }
+
+  function showSlides(n)
+  {
+    
+    var i;
+    var dots = document.getElementsByClassName("dot");
+
+    if (n >= dots.length)
+    {
+      slideIndex = 0;
+    }
+    else if (n < 0)
+    {
+      slideIndex = dots.length - 1;
+    }
+    else
+    {
+      slideIndex = n;
+    }
+
+    for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+    }
+    dots[slideIndex].className += " active";
+
+    pie_chart.data.datasets[0].data[0] = (slideIndex + 1) * 12;
+    pie_chart.update(); 
+  }
+
+</script>
+
