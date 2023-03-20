@@ -1,3 +1,11 @@
+
+{{ current_graph.title }} <br>
+{{ current_graph.type }} <br>
+{{ current_graph.x_labels }} <br>
+{{ current_graph.datasets[0]['data'] }} <br>
+{{ current_graph.datasets[0]['label'] }}
+
+
 <div>
   <canvas id="myChart" max-width="50px" max-height="50px" style="border:1px solid #000000;">
   </canvas>
@@ -7,18 +15,22 @@
     const ctx = document.getElementById('myChart');
   
     new Chart(ctx, {
-      type: 'bar',
+      type: '{{ current_graph.type }}',
       data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: {{ current_graph.x_labels | safe }},
         datasets: [{
-          label: '# of Votes',
-          data: [12, 19, 3, 5, 2, 3],
+          label: "{{ current_graph.datasets[0]['label'] | safe }}",
+          data: {{ current_graph.datasets[0]['data'] | safe }},
+          borderColor: "{{ current_graph.datasets[0]['border_color'] }}",
           borderWidth: 1
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
       }
     });
 </script>

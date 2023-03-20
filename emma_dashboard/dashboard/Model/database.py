@@ -22,7 +22,7 @@ class Database():
     
     def get_users(self) -> pd.DataFrame:
         with self.db.connect() as connection:
-            df = pd.read_sql(text('SELECT * FROM PARTICIPANTS'), connection)
+            df = pd.read_sql(text('SELECT * FROM PARTICIPANTS WHERE active=1'), connection)
             return df.replace(to_replace='None', value=np.nan).dropna()
     
     def get_user(self, id)  -> pd.DataFrame:

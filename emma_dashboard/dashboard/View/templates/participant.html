@@ -5,6 +5,10 @@
 {% block content %}
 <h1 align="center"> {{ participant.name }} </h1>
 
+{% set current_graph = participant.graphs['PE'] %}
+{% include 'chart.html' %}
+
+
 <table class="calculations-table">
     <tr>
         {% for col_name in participant.tables.columns %}
@@ -21,7 +25,6 @@
 </table>
 
 
-{% include 'chart.html' %}
 
 
 
