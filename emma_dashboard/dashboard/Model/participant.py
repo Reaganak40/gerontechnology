@@ -48,10 +48,21 @@ class Participant:
         self.graphs['WE'] = VariableGraph(
             chart_id      = 'WE_chart',
             title         = "Well-being Exercise",
-            graph_type    = "line",
+            graph_type    = "bar",
             df            = self.tables, 
             df_columns    = ['v_TotalWEWeeklyWELLX', 'v_WEGoal'], 
             scope         = 'weekly', 
             labels        = ['Weekly Hours of Activity', 'WE Goal'],
             border_color  = ['#228B22', '#AFE1AF']
+            )
+        
+        self.graphs['SumTotalEvent'] = VariableGraph(
+            chart_id      = 'SumTotalEvent_chart',
+            title         = "Total Event Interactions",
+            graph_type    = "line",
+            df            = self.tables, 
+            df_columns    = ['v_SumTotalEventInteractions'], 
+            scope         = 'weekly', 
+            labels        = ['Weekly Event Totals'],
+            border_color  = ['#CF9FFF']
             )

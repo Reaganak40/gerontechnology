@@ -1,3 +1,14 @@
+canvas{
+    margin: 0 auto;
+    }
+
+.variable-header {
+  padding: 20px;
+  text-align: center;
+  background: #1abc9c;
+  color: white;
+  font-size: 15px;
+}
 .participant-table {
     border: 1px solid;
     margin-left: auto;
@@ -14,3 +25,15 @@
 {
     border: 1px solid;
 }
+
+.column {
+    float: left;
+    width: 33%;
+  }
+  
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }

@@ -40,4 +40,4 @@ def info():
         print(f"Unexpected {err=}, {type(err)=}")
         raise
 
-    return render_template("participant.html", title="Participant", participant=p)
+    return render_template("participant.html", title="Participant - {}".format(p.name), participant=p)

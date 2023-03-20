@@ -1,5 +1,5 @@
 <div>
-  <canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:1px solid #000000;">
+  <canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:0px solid #000000;" margin="auto;">
   </canvas>
 </div>
   
@@ -35,7 +35,7 @@
                 text: "{{ current_graph.title | safe }} ",
                 color: 'black',
                 font: {
-                  size: 18,
+                  size: 14,
                   family: 'Helvetica Neue'
                 }
             },
@@ -43,8 +43,8 @@
                 labels: {
                     // This more specific font property overrides the global property
                     font: {
-                        family: "Arial",
-                        size: 14
+                      size: 12,
+                      family: 'Helvetica Neue'
                     }
                 }
             }
