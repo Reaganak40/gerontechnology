@@ -1,8 +1,32 @@
+#!/usr/bin/python
+
+""" This file defines the Participant class
+"""
+
+# * Modules
+# Local Imports
 from dashboard import db
 from .variable_graph import VariableGraph
 
+# * Quick Reference =============================================================================
+# * Participant     => Participant wrapper class that is used to contain all dashboard info for that participant.
+# * get_tables      => Gets or updates the weekly calculation tables that contain this participants EMMA variables.
+# * get_graphs      => Gets or updates the graphs for the EMMA calculation variables
+# * =============================================================================================
+
 class Participant:
+    """ Contains all use data about a participant so jinja2 may access it, specifically for the participant route.
+    """
     def __init__(self, id):
+        """Constructor for Participant object
+
+        Args:
+            id (int): The unique ID of this participant, which is used to access 
+            the database and find the rest of the information about the participant
+
+        Raises:
+            KeyError: Raises when the participant_id does not match any user in the database.
+        """
         _info = db.get_user(id)
         if(len(_info) == 0):
             raise KeyError("ID Not Found")
@@ -18,11 +42,21 @@ class Participant:
         self.get_graphs()
     
     def get_tables(self):
+        """ Gets the calculation tables from the database for this participant, and makes sure it is in chronological order.
+        """
         self.tables = db.get_tables(self.id).drop(columns=['participant_id']).sort_values(by=['year_number', 'week_number'], axis=0)
     
     def get_graphs(self):
+        """ After getting the calculation tables, uses the VariableGraph class to create a dictionary of
+            graphs that will by chart.js when accessing the participant page.
+        """
         self.graphs : dict[VariableGraph] = {}
         
+        # * GRAPH DEFINITIONS
+        
+        # ==========================================
+        # Health Tracking Data
+        # ==========================================
         self.graphs['PE'] = VariableGraph(
             chart_id      = 'PE_chart',
             title         = "Physical Exercise",
@@ -56,6 +90,9 @@ class Participant:
             border_color  = ['#228B22', '#AFE1AF']
             )
         
+        # ==========================================
+        # General Use Data
+        # ==========================================
         self.graphs['SumTotalEvent'] = VariableGraph(
             chart_id      = 'SumTotalEvent_chart',
             title         = "Total Event Interactions",

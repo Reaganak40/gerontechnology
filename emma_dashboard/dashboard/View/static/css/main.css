@@ -1,7 +1,17 @@
+/* =========================================================
+    This css file defines all style for the EMMA Dashboard
+    pages.
+
+    Created by: Reagan Kelley
+ =========================================================== */
+
+
+ /* Defines how all graphs by chart.js will look like. */
 canvas{
     margin: 0 auto;
     }
 
+/* Big header that divides the EMMA variable sections for the Participant page. */
 .variable-header {
   padding: 20px;
   text-align: center;
@@ -9,31 +19,36 @@ canvas{
   color: white;
   font-size: 15px;
 }
+
+/* Features for the Participant Table at the EMMA Dashboard index. */
 .participant-table {
     border: 1px solid;
     margin-left: auto;
     margin-right: auto;
 }
 
+/* Features for the Participant Table rows and header. */
 .participant-table tr, .participant-table th
 {
     border: 1px solid black;
     padding: 8px;
 }
 
+/* Features for the Calculations Table at the EMMA Dashboard Participant page. */
 .calculations-table th, td
 {
     border: 1px solid;
 }
 
+/* Used to define a 3 column page layout.*/
 .column {
     float: left;
     width: 33%;
   }
   
-  /* Clear floats after the columns */
-  .row:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
+/* Clear floats after the columns */
+.row:after {
+content: "";
+display: table;
+clear: both;
+}
