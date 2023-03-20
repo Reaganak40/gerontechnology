@@ -7,7 +7,15 @@
 
 {% set current_graph = participant.graphs['PE'] %}
 {% include 'chart.html' %}
+<br>
 
+{% set current_graph = participant.graphs['CE'] %}
+{% include 'chart.html' %}
+<br>
+
+{% set current_graph = participant.graphs['WE'] %}
+{% include 'chart.html' %}
+<br>
 
 <table class="calculations-table">
     <tr>

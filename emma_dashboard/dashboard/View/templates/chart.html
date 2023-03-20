@@ -1,36 +1,54 @@
-
-{{ current_graph.title }} <br>
-{{ current_graph.type }} <br>
-{{ current_graph.x_labels }} <br>
-{{ current_graph.datasets[0]['data'] }} <br>
-{{ current_graph.datasets[0]['label'] }}
-
-
 <div>
-  <canvas id="myChart" max-width="50px" max-height="50px" style="border:1px solid #000000;">
+  <canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:1px solid #000000;">
   </canvas>
 </div>
   
 <script>
-    const ctx = document.getElementById('myChart');
-  
+    
+    ctx = document.getElementById('{{ current_graph.id | safe }}');
+
+    var variable_datasets = [];
+
+    {% for dataset in current_graph.datasets %}
+    var dataset = {
+          label: "{{ dataset['label'] | safe }}",
+          data: {{ dataset['data'] | safe }},
+          borderColor: "{{ dataset['border_color'] }}",
+          borderWidth: 1
+    };
+    variable_datasets.push(dataset);
+    {% endfor %}
+
     new Chart(ctx, {
       type: '{{ current_graph.type }}',
       data: {
         labels: {{ current_graph.x_labels | safe }},
-        datasets: [{
-          label: "{{ current_graph.datasets[0]['label'] | safe }}",
-          data: {{ current_graph.datasets[0]['data'] | safe }},
-          borderColor: "{{ current_graph.datasets[0]['border_color'] }}",
-          borderWidth: 1
-        }]
+        datasets: variable_datasets
       },
       options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
+        responsive: false,
+        maintainAspectRatio: false,
+
+        plugins: {
+            title: {
+                display: true,
+                text: "{{ current_graph.title | safe }} ",
+                color: 'black',
+                font: {
+                  size: 18,
+                  family: 'Helvetica Neue'
+                }
+            },
+            legend: {
+                labels: {
+                    // This more specific font property overrides the global property
+                    font: {
+                        family: "Arial",
+                        size: 14
+                    }
+                }
+            }
         }
-      }
+    }
     });
 </script>
