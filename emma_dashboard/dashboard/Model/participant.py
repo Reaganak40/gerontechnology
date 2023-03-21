@@ -82,7 +82,7 @@ class Participant:
         self.graphs['WE'] = VariableGraph(
             chart_id      = 'WE_chart',
             title         = "Well-being Exercise",
-            graph_type    = "line",
+            graph_type    = "bar",
             df            = self.tables, 
             df_columns    = ['v_TotalWEWeeklyWELLX', 'v_WEGoal'], 
             scope         = 'weekly', 
