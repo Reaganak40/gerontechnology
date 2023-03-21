@@ -54,8 +54,8 @@ def emma_backend(args):
     # * Add calculation tables to database if requested
     if research:
         update_research(tables, cxn_engine, debug=dw.debug)
-    
-    update_database(tables, cxn_engine, debug=dw.debug)
+    if not no_database:
+        update_database(tables, cxn_engine, debug=dw.debug)
 
 
 if __name__ == "__main__":

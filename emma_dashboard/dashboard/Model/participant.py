@@ -64,7 +64,7 @@ class Participant:
             df            = self.tables, 
             df_columns    = ['v_TotalPEWeeklyPHEX', 'v_PEGoal'], 
             scope         = 'weekly', 
-            labels        = ['Weekly Hours of Activity', 'PE Goal'],
+            labels        = ['Weekly Activity', 'PE Goal'],
             border_color  = ['#0000FF', '#00FFFF']
             )
 
@@ -75,7 +75,7 @@ class Participant:
             df            = self.tables, 
             df_columns    = ['v_TotalCEWeeklyMEEX', 'v_CEGoal'], 
             scope         = 'weekly', 
-            labels        = ['Weekly Hours of Activity', 'CE Goal'],
+            labels        = ['Weekly Activity', 'CE Goal'],
             border_color  = ['#A52A2A', '#C19A6B']
             )
         
@@ -86,7 +86,7 @@ class Participant:
             df            = self.tables, 
             df_columns    = ['v_TotalWEWeeklyWELLX', 'v_WEGoal'], 
             scope         = 'weekly', 
-            labels        = ['Weekly Hours of Activity', 'WE Goal'],
+            labels        = ['Weekly Activity', 'WE Goal'],
             border_color  = ['#228B22', '#AFE1AF']
             )
         
