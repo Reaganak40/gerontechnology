@@ -10,7 +10,7 @@ import pandas as pd
 class VariableGraph:
     """ The VariableGraph class is really a helper class, with the use of jinja2, to define a chart.js graph in JavaScript.
     """
-    def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly', labels=[], border_color=[], num_pie_charts = -1):
+    def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly', labels=[], border_color=[], num_pie_charts = -1, pie_max = -1):
         """ Constructor for a VariableGraph object
 
         Args:
@@ -48,12 +48,23 @@ class VariableGraph:
 
             self.labels = labels
             self.border_color = border_color
+
+            if pie_max >= 0:
+                self.labels.append('left_over')
+                self.border_color.append('white')
+            
             for row_index in range(len(df)):
                 dataset = {}
                 dataset['data'] = []
                 dataset['title'] = "{}: Week {}, {}".format(self.title, int(df.iloc[row_index][0]), int(df.iloc[row_index][1]))
                 for index, column in enumerate(df_columns):
                         dataset['data'].append(df.iloc[row_index][column])
+                
+                if pie_max >= 0:
+                    total = sum(dataset['data'])
+                    left_over = max(pie_max - total, 0)
+                    dataset['data'].append(left_over)
+
                 self.datasets.append(dataset)
             
         else:
