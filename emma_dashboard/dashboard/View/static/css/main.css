@@ -58,14 +58,15 @@ clear: both;
 
 
 /* Slideshow container */
-.slideshow-container {
+.pie-container {
     position: relative;
-    background: #f1f1f1f1;
+    width:fit-content;
+    margin: auto;
   }
   
   /* Slides */
-  .slideshow-div {
-    padding: 20px;
+  .pie-div {
+    padding: 30px;
     text-align: center;
   }
   
@@ -101,7 +102,6 @@ clear: both;
   .dot-container {
     text-align: center;
     padding: 20px;
-    background: #ddd;
   }
   
   /* The dots/bullets/indicators */
@@ -118,7 +118,7 @@ clear: both;
   
   /* Add a background color to the active dot/circle */
   .active, .dot:hover {
-    background-color: #ff0000;
+    background-color: #000000;
   }
   
   /* Add an italic font style to all quotes */

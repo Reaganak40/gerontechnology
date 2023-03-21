@@ -82,12 +82,24 @@ class Participant:
         self.graphs['WE'] = VariableGraph(
             chart_id      = 'WE_chart',
             title         = "Well-being Exercise",
-            graph_type    = "bar",
+            graph_type    = "line",
             df            = self.tables, 
             df_columns    = ['v_TotalWEWeeklyWELLX', 'v_WEGoal'], 
             scope         = 'weekly', 
             labels        = ['Weekly Hours of Activity', 'WE Goal'],
             border_color  = ['#228B22', '#AFE1AF']
+            )
+        
+        self.graphs['h_goals'] = VariableGraph(
+            chart_id       = 'h_goals_chart',
+            title          = "Health Goals",
+            graph_type     = "pie",
+            df             = self.tables, 
+            df_columns     = ['v_PEGoal', 'v_CEGoal', 'v_WEGoal'], 
+            scope          = 'weekly', 
+            labels         = ['PE Goal', 'CE Goal', 'WE Goal'],
+            border_color   = ['#00FFFF', '#C19A6B', '#AFE1AF'],
+            num_pie_charts = 4
             )
         
         # ==========================================

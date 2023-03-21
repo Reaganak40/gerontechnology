@@ -1,61 +1,85 @@
-
-
 <!-- Slideshow container -->
-<div class="slideshow-container">
+<div class="pie-container">
 
   <!-- Full-width slides/quotes -->
-  <div class="slideshow-div">
-    <canvas id="myChart" width="300px" height="300px" style="border:1px solid #000000;">
+  <div class="pie-div">
+    <canvas id="myChart" width="300px" height="300px" style="border:0px solid #000000;">
     </canvas>
   </div>
 
   <!-- Next/prev buttons -->
-  <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-  <a class="next" onclick="plusSlides(1)">&#10095;</a>
+  <a class="prev" onclick="plusCharts(-1)">&#10094;</a>
+  <a class="next" onclick="plusCharts(1)">&#10095;</a>
+  <!-- Dots/bullets/indicators -->
+  <div class="dot-container">
+    <span class="dot" onclick="currentSlide(0)"></span>
+    <span class="dot" onclick="currentSlide(1)"></span>
+    <span class="dot" onclick="currentSlide(2)"></span>
+    <span class="dot" onclick="currentSlide(3)"></span>
+  
+  </div>
 </div>
 
-<!-- Dots/bullets/indicators -->
-<div class="dot-container">
-  <span class="dot" onclick="currentSlide(0)"></span>
-  <span class="dot" onclick="currentSlide(1)"></span>
-  <span class="dot" onclick="currentSlide(2)"></span>
-  <span class="dot" onclick="currentSlide(3)"></span>
-
-</div>
 <script>
+
+  var pie_variable_datasets = [];
+  var graph_titles = [];
+
+  var pv_dataset = [];
+  var title = "";
+  {% for dataset in current_graph.datasets %}
+  pv_dataset = {{ dataset['data'] | safe }};
+  title = "{{ dataset['title'] | safe }}";
+  pie_variable_datasets.push(pv_dataset);
+  graph_titles.push(title);
+  {% endfor %}
+  
   ctx = document.getElementById('myChart');
 
   pie_chart = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: ['Blue', 'Red', 'Green'],
+      labels: {{ current_graph.labels | safe }},
       datasets: [{
-        label: '# of Votes',
-        data: [12, 50, 30],
-        backgroundColor: ["#0074D9", "#FF4136", "#2ECC40"],
+        data: variable_datasets[0],
+        backgroundColor: {{ current_graph.border_color | safe }},
         borderWidth: 1
       }]
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false
+      maintainAspectRatio: false,
+
+      plugins: {
+            title: {
+                display: true,
+                text: graph_titles[0],
+                color: 'black',
+                font: {
+                  size: 14,
+                  family: 'Helvetica Neue'
+                }
+            }
+        }
     }
   });
 </script>
 
 <script>
-  var slideIndex = 0;
-  showSlides(slideIndex);
+  var chartIndex = pie_variable_datasets.length - 1;
+  showCharts(chartIndex);
 
-  function plusSlides(n) {
-    showSlides(slideIndex + n);
+
+
+  function plusCharts(n) {
+    showCharts(chartIndex + n);
   }
 
   function currentSlide(n) {
-    showSlides(n);
+    showCharts(n);
   }
 
-  function showSlides(n)
+  function showCharts(n)
   {
     
     var i;
@@ -63,23 +87,24 @@
 
     if (n >= dots.length)
     {
-      slideIndex = 0;
+      chartIndex = 0;
     }
     else if (n < 0)
     {
-      slideIndex = dots.length - 1;
+      chartIndex = dots.length - 1;
     }
     else
     {
-      slideIndex = n;
+      chartIndex = n;
     }
 
     for (i = 0; i < dots.length; i++) {
       dots[i].className = dots[i].className.replace(" active", "");
     }
-    dots[slideIndex].className += " active";
+    dots[chartIndex].className += " active";
 
-    pie_chart.data.datasets[0].data[0] = (slideIndex + 1) * 12;
+    pie_chart.data.datasets[0].data = pie_variable_datasets[chartIndex];
+    pie_chart.options.plugins.title.text = graph_titles[chartIndex];
     pie_chart.update(); 
   }
 
