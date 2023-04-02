@@ -46,24 +46,24 @@ class VariableGraph:
             if self.scope != 'weekly':
                 raise Exception("Daily scope for pie chart not possible.")
 
-            self.labels = labels
-            self.border_color = border_color
-
-            if pie_max >= 0:
-                self.labels.append('left_over')
-                self.border_color.append('white')
-            
             for row_index in range(len(df)):
                 dataset = {}
-                dataset['data'] = []
                 dataset['title'] = "{}: Week {}, {}".format(self.title, int(df.iloc[row_index][0]), int(df.iloc[row_index][1]))
+                
+                dataset['data'] = []
                 for index, column in enumerate(df_columns):
                         dataset['data'].append(df.iloc[row_index][column])
                 
+                dataset['labels'] = labels[:]
+                dataset['border_color'] = border_color[:]
                 if pie_max >= 0:
                     total = sum(dataset['data'])
                     left_over = max(pie_max - total, 0)
-                    dataset['data'].append(left_over)
+                    
+                    if left_over > 0:
+                        dataset['labels'].append('left_over')
+                        dataset['data'].append(left_over)
+                        dataset['border_color'].append('white')
 
                 self.datasets.append(dataset)
             

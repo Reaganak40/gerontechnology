@@ -91,16 +91,15 @@ class Participant:
             )
         
         self.graphs['h_goals'] = VariableGraph(
-            chart_id       = 'PE_pie_chart',
-            title          = "PE Goal",
+            chart_id       = 'h_goals_chart',
+            title          = "Health Goals",
             graph_type     = "pie",
             df             = self.tables, 
-            df_columns     = ['v_PEGoal'], 
+            df_columns     = ['v_PEGoal', 'v_CEGoal', 'v_WEGoal'], 
             scope          = 'weekly', 
-            labels         = ['PE Goal'],
-            border_color   = ['#00FFFF'],
-            num_pie_charts = 4,
-            pie_max =  1
+            labels         = ['PE Goal', 'CE Goal', 'WE Goal'],
+            border_color   = ['#00FFFF', '#C19A6B', '#AFE1AF'],
+            num_pie_charts = 4
             )
         
         # ==========================================

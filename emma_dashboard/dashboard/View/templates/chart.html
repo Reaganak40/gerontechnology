@@ -1,66 +1,7 @@
-<!--    
-# ================================================================
-#   Name:           chart html
-#   Description:    A reusable template to define graphs, 
-                    according to the VariableGraph python class,
-                    contained within Jinja2.
-                    
-    Note: Errors here are not errors, it is due to jinja2 insertions
-    that are fixed at runtime.
-# ================================================================
--->
-
-<div>
-  <canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:0px solid #000000;" margin="auto;">
-  </canvas>
-</div>
-  
-<script>
-    
-    ctx = document.getElementById('{{ current_graph.id | safe }}');
-
-    var variable_datasets = [];
-
-    {% for dataset in current_graph.datasets %}
-    var dataset = {
-          label: "{{ dataset['label'] | safe }}",
-          data: {{ dataset['data'] | safe }},
-          borderColor: "{{ dataset['border_color'] }}",
-          borderWidth: 1
-    };
-    variable_datasets.push(dataset);
-    {% endfor %}
-
-    new Chart(ctx, {
-      type: '{{ current_graph.type }}',
-      data: {
-        labels: {{ current_graph.x_labels | safe }},
-        datasets: variable_datasets
-      },
-      options: {
-        responsive: false,
-        maintainAspectRatio: false,
-
-        plugins: {
-            title: {
-                display: true,
-                text: "{{ current_graph.title | safe }} ",
-                color: 'black',
-                font: {
-                  size: 14,
-                  family: 'Helvetica Neue'
-                }
-            },
-            legend: {
-                labels: {
-                    // This more specific font property overrides the global property
-                    font: {
-                      size: 12,
-                      family: 'Helvetica Neue'
-                    }
-                }
-            }
-        }
-    }
-    });
-</script>
+{% if current_graph.type == "line" %}
+{% include 'line_chart.html' %}
+{% elif current_graph.type == "bar" %}
+{% include 'line_chart.html' %}
+{% elif current_graph.type == "pie" %}
+{% include 'pie_chart.html' %}
+{% endif %}

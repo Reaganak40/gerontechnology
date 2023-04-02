@@ -1,4 +1,5 @@
-<!-- Slideshow container -->
+<p id="demo"></p>
+
 <div class="pie-container">
 
   <!-- Full-width slides/quotes -->
@@ -23,15 +24,27 @@
 <script>
 
   var pie_variable_datasets = [];
+  var pie_dataset_labels = [];
+  var pie_dataset_b_colors = [];
   var graph_titles = [];
 
   var pv_dataset = [];
+  var pv_labels = [];
+  var pv_border_color = [];
   var title = "";
+
   {% for dataset in current_graph.datasets %}
+  
   pv_dataset = {{ dataset['data'] | safe }};
+  pv_labels = {{ dataset['labels'] | safe }};
+  pv_border_color = {{ dataset['border_color'] | safe }};
   title = "{{ dataset['title'] | safe }}";
+  
   pie_variable_datasets.push(pv_dataset);
+  pie_dataset_labels.push(pv_labels);
+  pie_dataset_b_colors.push(pv_border_color);
   graph_titles.push(title);
+  
   {% endfor %}
   
   ctx = document.getElementById('myChart');
@@ -39,10 +52,10 @@
   pie_chart = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: {{ current_graph.labels | safe }},
+      labels: pie_dataset_labels[0],
       datasets: [{
         data: variable_datasets[0],
-        backgroundColor: {{ current_graph.border_color | safe }},
+        backgroundColor: pie_dataset_b_colors[0],
         borderWidth: 1
       }]
     },
@@ -104,8 +117,12 @@
     dots[chartIndex].className += " active";
 
     pie_chart.data.datasets[0].data = pie_variable_datasets[chartIndex];
+    pie_chart.data.datasets[0].backgroundColor = pie_dataset_b_colors[chartIndex];
+    pie_chart.data.labels = pie_dataset_labels[chartIndex];
     pie_chart.options.plugins.title.text = graph_titles[chartIndex];
+    
     pie_chart.update(); 
+
   }
 
 </script>
