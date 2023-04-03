@@ -10,7 +10,7 @@ import pandas as pd
 class VariableGraph:
     """ The VariableGraph class is really a helper class, with the use of jinja2, to define a chart.js graph in JavaScript.
     """
-    def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly', labels=[], border_color=[], num_pie_charts = -1, pie_max = -1):
+    def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly', labels=[], border_color=[], num_charts = -1, pie_max = -1, progress_max=0):
         """ Constructor for a VariableGraph object
 
         Args:
@@ -30,21 +30,19 @@ class VariableGraph:
 
         # for each variable to be represented in the graph, construct a chart.js dataset.
         self.datasets = []
-        
-        if self.type == 'progress':
-            return
+
+        self.progress_max = progress_max
 
         if self.type == 'pie':
             
             # Determine how recent in weeks to get charts for.
-            if num_pie_charts < 0:
+            if num_charts < 0:
                 slice_size = len(df)
             else:
-                slice_size = min(len(df), num_pie_charts)
+                slice_size = min(len(df), num_charts)
             
             df = df[:slice_size]  
-            self.temp = len(df)
-            self.num_pie_charts = slice_size
+            self.num_charts = slice_size
 
             if self.scope != 'weekly':
                 raise Exception("Daily scope for pie chart not possible.")
@@ -69,8 +67,30 @@ class VariableGraph:
                         dataset['border_color'].append('white')
 
                 self.datasets.append(dataset)
+        elif self.type == 'progress':
+            # Determine how recent in weeks to get charts for.
+            if num_charts < 0:
+                slice_size = len(df)
+            else:
+                slice_size = min(len(df), num_charts)
             
+            df = df[:slice_size]  
+            self.num_charts = slice_size
+
+            for row_index in range(len(df)):
+                dataset = {}
+                dataset['title'] = "{}: Week {}, {}".format(self.title, int(df.iloc[row_index][0]), int(df.iloc[row_index][1]))
+                
+                dataset['data'] = []
+                for index, column in enumerate(df_columns):
+                        dataset['data'].append(df.iloc[row_index][column])
+                
+                dataset['labels'] = labels[:]
+                dataset['border_color'] = border_color[:]
+
+                self.datasets.append(dataset)
         else:
+            # line or bar graph
             if self.scope == 'weekly':
                 for index, column in enumerate(df_columns):
                     dataset = {}

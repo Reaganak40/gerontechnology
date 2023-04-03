@@ -93,13 +93,14 @@ class Participant:
         self.graphs['h_goals'] = VariableGraph(
             chart_id       = 'h_goals_chart',
             title          = "Health Goals",
-            graph_type     = "pie",
+            graph_type     = "progress",
             df             = self.tables, 
             df_columns     = ['v_PEGoal', 'v_CEGoal', 'v_WEGoal'], 
             scope          = 'weekly', 
             labels         = ['PE Goal', 'CE Goal', 'WE Goal'],
             border_color   = ['#00FFFF', '#C19A6B', '#AFE1AF'],
-            num_pie_charts = 4
+            num_charts = 1,
+            progress_max=1
             )
         
         # ==========================================
@@ -108,7 +109,7 @@ class Participant:
         self.graphs['SumTotalEvent'] = VariableGraph(
             chart_id      = 'SumTotalEvent_chart',
             title         = "Total Event Interactions",
-            graph_type    = "progress",
+            graph_type    = "line",
             df            = self.tables, 
             df_columns    = ['v_SumTotalEventInteractions'], 
             scope         = 'weekly', 

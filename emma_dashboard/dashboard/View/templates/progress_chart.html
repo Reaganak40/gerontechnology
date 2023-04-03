@@ -1,35 +1,66 @@
-<canvas id="myChart3" style="width:100%;max-width:700px"></canvas>
+<canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:0px solid #000000;" margin="auto;">
 
 <script>
+
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+  var progress_variable_datasets = [];
+  var progress_dataset_labels = [];
+  var progress_dataset_border_colors = [];
+  var progress_dataset_background_colors = [];
+
+  var progress_graph_titles = [];
+
+  var progress_dataset = [];
+  var progress_labels = [];
+  var progress_border_color = [];
+  var title = "";
+  var progress_background_color = [];
+
+  
+  {% for dataset in current_graph.datasets %}
+  
+  progress_dataset = {{ dataset['data'] | safe }};
+  progress_labels = {{ dataset['labels'] | safe }};
+  
+  progress_border_color = {{ dataset['border_color'] | safe }};
+  progress_background_color = [];
+
+  progress_border_color.forEach((colorHex, index) => {
+    var colorRGB = hexToRgb(colorHex);
+    progress_background_color.push(`rgba(${colorRGB.r}, ${colorRGB.g}, ${colorRGB.b}, 0.2)`);
+  });
+
+  title = "{{ dataset['title'] | safe }}";
+  
+  progress_variable_datasets.push(progress_dataset);
+  progress_dataset_labels.push(progress_labels);
+  progress_dataset_border_colors.push(progress_border_color);
+  progress_dataset_background_colors.push(progress_background_color);
+  
+  progress_graph_titles.push(title);
+  
+  {% endfor %}
+
 // setup 
 const data = {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      labels: progress_dataset_labels[0],
       datasets: [{
-        label: 'Weekly Sales',
-        data: [18, 12, 6, 9, 12, 3, 9],
-        borderColor: [
-          'rgba(255, 26, 104, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(0, 0, 0, 0.2)'
-        ],
-        backgroundColor: [
-          'rgba(255, 26, 104, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          'rgba(0, 0, 0, 1)'
-        ],
+        data: progress_variable_datasets[0],
+        borderColor: progress_dataset_background_colors[0],
+        backgroundColor: progress_dataset_border_colors[0],
         borderWidth: 0,
         borderSkipped: false,
         borderRadius: 5,
         barPercentage: 0.2,
-        categoryPercentage: 0.8
+        categoryPercentage: 0.8,
+        scaleLineColor: "rgba(0,0,0,0)" 
       }]
     };
 
@@ -49,7 +80,7 @@ const data = {
 
           //labelText
           const fontSizeLabel = 12;
-          ctx.font = `${fontSizeLabel}px sans-serif`;
+          ctx.font = `${fontSizeLabel}px Helvetica Neue`;
           ctx.fillStyle = 'rgba(102, 102, 102, 1)';
   
           ctx.textAlign = 'left';
@@ -58,7 +89,7 @@ const data = {
           
           //valueText
           const fontSizeDatapoint = 15;
-          ctx.font = `bolder ${fontSizeDatapoint}px sans-serif`;
+          ctx.font = `bolder ${fontSizeDatapoint}px Helvetica Neue`;
           ctx.fillStyle = 'rgba(102, 102, 102, 1)';
   
           ctx.textAlign = 'right';
@@ -81,28 +112,42 @@ const data = {
       options: {
         indexAxis : 'y',
         plugins: {
+          title: {
+                display: true,
+                text: progress_graph_titles[0],
+                color: 'black',
+                font: {
+                  size: 14,
+                  family: 'Helvetica Neue'
+                }
+            },
           legend: {
             display: false
           }
         },
         scales: {
+          
           x: {
+            min: 0,
+            max: {{ current_graph.progress_max | safe }},
             grid : {
               display: false,
-              drawBorder: false
+              drawBorder: false,
+              tickLength: 0
             },
             ticks: {
-              display: false
+              display: false,
             }
           },
           y: {
             beginAtZero: true,
             grid : {
               display: false,
-              drawBorder: false
+              drawBorder: false,
+              tickLength: 0
             },
             ticks: {
-              display: false
+              display: false,
             }
           }
         }
@@ -112,8 +157,8 @@ const data = {
 
     // render init block
     const myChart = new Chart(
-      document.getElementById('myChart3'),
-      config
+      document.getElementById('{{ current_graph.id | safe }}'),
+      config,
     );
 
 </script>
