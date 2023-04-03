@@ -10,7 +10,8 @@ import pandas as pd
 class VariableGraph:
     """ The VariableGraph class is really a helper class, with the use of jinja2, to define a chart.js graph in JavaScript.
     """
-    def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly', labels=[], border_color=[], num_charts = -1, pie_max = -1, progress_max=0):
+    def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly',
+                labels=[], border_color=[], num_charts = -1, pie_max = -1, progress_max=0, goal_line = None):
         """ Constructor for a VariableGraph object
 
         Args:
@@ -83,13 +84,14 @@ class VariableGraph:
                 
                 dataset['data'] = []
                 for index, column in enumerate(df_columns):
-                        dataset['data'].append(df.iloc[row_index][column])
+                        dataset['data'].append(round(df.iloc[row_index][column], 2))
                 
                 dataset['labels'] = labels[:]
                 dataset['border_color'] = border_color[:]
 
                 self.datasets.append(dataset)
         else:
+                    
             # line or bar graph
             if self.scope == 'weekly':
                 for index, column in enumerate(df_columns):
@@ -99,5 +101,10 @@ class VariableGraph:
                     dataset['border_color'] = border_color[index]
                     self.datasets.append(dataset)
                 self.x_labels = ["Week {}, {}".format(row[0], row[1]) for row in df[['week_number', 'year_number']].values.tolist()]
+            if goal_line is not None:
+                if str.lower(goal_line[0]) == 'static':
+                    self.goal_line = [goal_line[1]] * len(self.datasets[0]['data'])
+            else:
+                self.goal_line = None
                 
 

@@ -62,10 +62,11 @@ class Participant:
             title         = "Physical Exercise",
             graph_type    = "line",
             df            = self.tables, 
-            df_columns    = ['v_TotalPEWeeklyPHEX', 'v_PEGoal'], 
+            df_columns    = ['v_TotalPEWeeklyPHEX'], 
             scope         = 'weekly', 
-            labels        = ['Weekly Activity', 'PE Goal'],
-            border_color  = ['#0000FF', '#00FFFF']
+            labels        = ['Weekly Activity'],
+            border_color  = ['#0000FF'],
+            goal_line     = ('static', 150)
             )
 
         self.graphs['CE'] = VariableGraph(
@@ -73,21 +74,23 @@ class Participant:
             title         = "Cognitive Exercise",
             graph_type    = "line",
             df            = self.tables, 
-            df_columns    = ['v_TotalCEWeeklyMEEX', 'v_CEGoal'], 
+            df_columns    = ['v_TotalCEWeeklyMEEX'], 
             scope         = 'weekly', 
-            labels        = ['Weekly Activity', 'CE Goal'],
-            border_color  = ['#A52A2A', '#C19A6B']
+            labels        = ['Weekly Activity'],
+            border_color  = ['#A52A2A'],
+            goal_line     = ('static', 12)
             )
         
         self.graphs['WE'] = VariableGraph(
             chart_id      = 'WE_chart',
             title         = "Well-being Exercise",
-            graph_type    = "bar",
+            graph_type    = "line",
             df            = self.tables, 
-            df_columns    = ['v_TotalWEWeeklyWELLX', 'v_WEGoal'], 
+            df_columns    = ['v_TotalWEWeeklyWELLX'], 
             scope         = 'weekly', 
-            labels        = ['Weekly Activity', 'WE Goal'],
-            border_color  = ['#228B22', '#AFE1AF']
+            labels        = ['Weekly Activity'],
+            border_color  = ['#228B22'],
+            goal_line     = ('static', 3)
             )
         
         self.graphs['h_goals'] = VariableGraph(
