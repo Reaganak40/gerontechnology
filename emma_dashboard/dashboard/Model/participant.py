@@ -108,7 +108,7 @@ class Participant:
         self.graphs['SumTotalEvent'] = VariableGraph(
             chart_id      = 'SumTotalEvent_chart',
             title         = "Total Event Interactions",
-            graph_type    = "line",
+            graph_type    = "progress",
             df            = self.tables, 
             df_columns    = ['v_SumTotalEventInteractions'], 
             scope         = 'weekly', 

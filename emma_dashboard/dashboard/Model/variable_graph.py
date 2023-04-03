@@ -30,6 +30,9 @@ class VariableGraph:
 
         # for each variable to be represented in the graph, construct a chart.js dataset.
         self.datasets = []
+        
+        if self.type == 'progress':
+            return
 
         if self.type == 'pie':
             

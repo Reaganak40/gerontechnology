@@ -4,4 +4,6 @@
 {% include 'line_chart.html' %}
 {% elif current_graph.type == "pie" %}
 {% include 'pie_chart.html' %}
+{% elif current_graph.type == "progress" %}
+{% include 'progress_chart.html' %}
 {% endif %}
