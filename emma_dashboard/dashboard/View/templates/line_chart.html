@@ -10,10 +10,7 @@
 # ================================================================
 -->
 
-<div>
-  <canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:0px solid #000000;" margin="auto;">
-  </canvas>
-</div>
+<canvas id= {{ current_graph.id }}></canvas>
   
 <script>
     
@@ -50,8 +47,10 @@
         datasets: variable_datasets
       },
       options: {
-        responsive: false,
-        maintainAspectRatio: false,
+        y: {
+            beginAtZero: true
+          },
+          maintainAspectRatio: false,
 
         plugins: {
             title: {

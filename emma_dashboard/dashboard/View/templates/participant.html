@@ -11,6 +11,23 @@
 {% block content %}
 <h1 align="center"> -- {{ participant.name }} -- </h1>
 
+<div class="variable-header">
+    <h1>Participant Snapshot</h1>
+</div>
+<br>
+
+<div>
+    <div class="chart-card">
+        <div class="chart-box">
+            {% set current_graph = participant.graphs['totalCalenderInteractions'] %}
+            {% include 'chart.html' %}
+        </div>
+        <div class="chart-box">
+            {% set current_graph = participant.graphs['totalEventInteractions'] %}
+            {% include 'chart.html' %}
+        </div>
+    </div>
+</div>
 
 <div class="variable-header">
     <h1>Health Tracking Data</h1>
@@ -18,14 +35,24 @@
 
 <div class="row">
     <div class="column">
+        
+        <div class="chart-box" style="width:700px; height:350px">
         {% set current_graph = participant.graphs['PE'] %}
         {% include 'chart.html' %}
+        </div>
         <br>
+
+        <div class="chart-box" style="width:700px;height:350px">
         {% set current_graph = participant.graphs['CE'] %}
         {% include 'chart.html' %}
+        </div>
         <br>
+
+        <div class="chart-box" style="width:700px;height:350px">
         {% set current_graph = participant.graphs['WE'] %}
         {% include 'chart.html' %}
+        </div>
+
     </div>
     <div class="column">
         <br>
@@ -40,11 +67,6 @@
     <h1>General Use Data</h1>
     <h3>-- Today Page --</h3>
 </div>
-
-<br>
-{% set current_graph = participant.graphs['SumTotalEvent'] %}
-{% include 'chart.html' %}
-<br>
 
 <table class="calculations-table">
     <tr>

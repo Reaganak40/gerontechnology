@@ -34,16 +34,20 @@ class VariableGraph:
 
         self.progress_max = progress_max
 
+        # Determine how recent in weeks to get charts for.
+        if num_charts < 0:
+            slice_size = len(df)
+        else:
+            slice_size = min(len(df), num_charts)
+        
+        df = df[-slice_size:]  
+        self.num_charts = slice_size
+
+        # * ==================================
+        # *      -- CREATE PIE CHART --
+        # * ==================================
         if self.type == 'pie':
             
-            # Determine how recent in weeks to get charts for.
-            if num_charts < 0:
-                slice_size = len(df)
-            else:
-                slice_size = min(len(df), num_charts)
-            
-            df = df[:slice_size]  
-            self.num_charts = slice_size
 
             if self.scope != 'weekly':
                 raise Exception("Daily scope for pie chart not possible.")
@@ -68,19 +72,20 @@ class VariableGraph:
                         dataset['border_color'].append('white')
 
                 self.datasets.append(dataset)
+        
+        # * ==================================
+        # *    -- CREATE PROGRESS CHART --
+        # * ==================================
         elif self.type == 'progress':
-            # Determine how recent in weeks to get charts for.
-            if num_charts < 0:
-                slice_size = len(df)
-            else:
-                slice_size = min(len(df), num_charts)
-            
-            df = df[:slice_size]  
-            self.num_charts = slice_size
 
+            last_index = len(df) - 1
             for row_index in range(len(df)):
                 dataset = {}
                 dataset['title'] = "{}: Week {}, {}".format(self.title, int(df.iloc[row_index][0]), int(df.iloc[row_index][1]))
+
+                if row_index == last_index:
+                    dataset['title'] += ' (Latest)'
+                
                 
                 dataset['data'] = []
                 for index, column in enumerate(df_columns):
@@ -90,9 +95,12 @@ class VariableGraph:
                 dataset['border_color'] = border_color[:]
 
                 self.datasets.append(dataset)
+        
+        # * =====================================
+        # *    -- CREATE LINE OR BAR CHART --
+        # * =====================================
         else:
                     
-            # line or bar graph
             if self.scope == 'weekly':
                 for index, column in enumerate(df_columns):
                     dataset = {}

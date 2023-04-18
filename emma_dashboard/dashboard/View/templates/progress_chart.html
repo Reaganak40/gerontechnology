@@ -1,4 +1,24 @@
-<canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:0px solid #000000;" margin="auto;">
+
+  <div class="chart-container">
+
+    <!-- Full-width slides/quotes -->
+    <div class="chart-div">
+      <canvas id= {{ current_graph.id }} width="500px" height="200px" style="border:0px solid #000000;" margin="auto;">
+      </canvas>
+    </div>
+  
+    <!-- Next/prev buttons -->
+    <a class="prev" onclick="plusCharts(-1)">&#10094;</a>
+    <a class="next" onclick="plusCharts(1)">&#10095;</a>
+    <!-- Dots/bullets/indicators -->
+    <div class="dot-container">
+
+      {% for _ in current_graph.datasets %}
+        <span class="dot" onclick="currentSlide({{loop.index0}})"></span>
+      {% endfor %}
+    
+    </div>
+  </div>
 
 <script>
 
@@ -156,9 +176,54 @@ const data = {
     };
 
     // render init block
-    const myChart = new Chart(
+    progressChart = new Chart(
       document.getElementById('{{ current_graph.id | safe }}'),
       config,
     );
+
+</script>
+
+<script>
+  var chartIndex = progress_variable_datasets.length - 1;
+  showCharts(chartIndex);
+
+  function plusCharts(n) {
+    showCharts(chartIndex + n);
+  }
+
+  function currentSlide(n) {
+    showCharts(n);
+  }
+
+  function showCharts(n)
+  {
+    
+    var i;
+    var dots = document.getElementsByClassName("dot");
+
+    if (n >= dots.length)
+    {
+      chartIndex = 0;
+    }
+    else if (n < 0)
+    {
+      chartIndex = dots.length - 1;
+    }
+    else
+    {
+      chartIndex = n;
+    }
+
+    for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+    }
+    dots[chartIndex].className += " active";
+
+    progressChart.data.datasets[0].data = progress_variable_datasets[chartIndex];
+    progressChart.options.plugins.title.text = progress_graph_titles[chartIndex];
+    
+    progressChart.update(); 
+
+  }
 
 </script>

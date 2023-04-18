@@ -55,6 +55,31 @@ class Participant:
         # * GRAPH DEFINITIONS
         
         # ==========================================
+        # Snapshot Data
+        # ==========================================
+        self.graphs['totalCalenderInteractions'] = VariableGraph(
+            chart_id      = 'TCI_chart',
+            title         = "Total Calender Interactions",
+            graph_type    = "line",
+            df            = self.tables, 
+            df_columns    = ['v_SumTotalCalendarInteractions'], 
+            scope         = 'weekly', 
+            labels        = ['Daily Average Activity'],
+            border_color  = ['#0000FF'],
+            )
+        
+        self.graphs['totalEventInteractions'] = VariableGraph(
+            chart_id      = 'TEI_chart',
+            title         = "Total Event Interactions",
+            graph_type    = "line",
+            df            = self.tables, 
+            df_columns    = ['v_SumTotalEventInteractions'], 
+            scope         = 'weekly', 
+            labels        = ['Daily Average Activity'],
+            border_color  = ['#0000FF'],
+            )
+
+        # ==========================================
         # Health Tracking Data
         # ==========================================
         self.graphs['PE'] = VariableGraph(
@@ -102,8 +127,8 @@ class Participant:
             scope          = 'weekly', 
             labels         = ['PE Goal', 'CE Goal', 'WE Goal'],
             border_color   = ['#00FFFF', '#C19A6B', '#AFE1AF'],
-            num_charts = 1,
-            progress_max=1
+            num_charts = 4,
+            progress_max=1,
             )
         
         # ==========================================
