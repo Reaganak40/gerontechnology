@@ -49,6 +49,13 @@ CREATE TABLE IF NOT EXISTS Calculations
     v_CEGoal FLOAT,
     v_TotalWEWeeklyWELLX INT,
     v_WEGoal FLOAT,
+    v_DistinctUse_Monday INT,
+    v_DistinctUse_Tuesday INT,
+    v_DistinctUse_Wednesday INT,
+    v_DistinctUse_Thursday INT,
+    v_DistinctUse_Friday INT,
+    v_DistinctUse_Saturday INT,
+    v_DistinctUse_Sunday INT,
     
     PRIMARY KEY (participant_id, week_number, year_number),
     FOREIGN KEY (participant_id) REFERENCES Participants(participant_id)

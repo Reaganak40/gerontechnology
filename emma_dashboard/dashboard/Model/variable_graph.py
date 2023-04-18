@@ -5,6 +5,7 @@
 
 # * Modules
 import pandas as pd
+import datetime
 
 
 class VariableGraph:
@@ -109,6 +110,40 @@ class VariableGraph:
                     dataset['border_color'] = border_color[index]
                     self.datasets.append(dataset)
                 self.x_labels = ["Week {}, {}".format(row[0], row[1]) for row in df[['week_number', 'year_number']].values.tolist()]
+            
+            else:
+                
+                self.x_labels = []
+
+                for index, daily_var in enumerate(df_columns):
+                    dataset = {}
+                    dataset['data'] = []
+                    dataset['label'] = labels[index]
+                    dataset['border_color'] = border_color[index]
+
+                    # scope is daily
+                    daily_columns = []
+                    
+                    # create sql column names for daily variable
+                    daily_columns += [daily_var + '_' + day + 'day' for day in ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Satur']]
+
+                    # append all daily entries in chronological order
+                    for row_index in range(len(df)):
+                        for column in daily_columns:
+                            dataset['data'].append(df.iloc[row_index][column])
+                    
+                        week, year = df.iloc[row_index][['week_number', 'year_number']]
+                        
+
+
+
+
+
+                    
+
+
+            
+            
             if goal_line is not None:
                 if str.lower(goal_line[0]) == 'static':
                     self.goal_line = [goal_line[1]] * len(self.datasets[0]['data'])

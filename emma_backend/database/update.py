@@ -287,11 +287,4 @@ def add_participants_from_research(cxn_engine = None):
     add_participants_from_df(participants, cxn_engine)
 
 if __name__ == "__main__":
-    #update_from_csv(TEST_FILE, 14, 2022, allow_missing_values=True)
-    #update_schema(force_delete=True, debug=True)
-    #add_participants_from_research()
-    # if not ParticipantDataPath.exists():
-    #     raise Exception("path:", str(ParticipantDataPath), "does not exist")
-    # else:
-    #     add_participants_from_file(str(ParticipantDataPath.joinpath("Participant_Table.xlsx").absolute()))
-    pass
+    update_schema(debug=True)

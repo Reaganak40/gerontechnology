@@ -119,6 +119,34 @@
         {
             "name" : "v_WEGoal",
             "type" : "FLOAT"
+        },
+        {
+            "name" : "v_DistinctUse_Monday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_DistinctUse_Tuesday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_DistinctUse_Wednesday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_DistinctUse_Thursday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_DistinctUse_Friday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_DistinctUse_Saturday",
+            "type" : "INT"
+        },
+        {
+            "name" : "v_DistinctUse_Sunday",
+            "type" : "INT"
         }
     ]
 }
