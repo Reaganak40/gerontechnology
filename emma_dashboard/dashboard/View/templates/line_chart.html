@@ -40,7 +40,7 @@
 
     {% endif %}
 
-    new Chart(ctx, {
+    line_chart = new Chart(ctx, {
       type: '{{ current_graph.type }}',
       data: {
         labels: {{ current_graph.x_labels | safe }},
@@ -51,6 +51,8 @@
             beginAtZero: true
           },
           maintainAspectRatio: false,
+          responsive: true,
+
 
         plugins: {
             title: {
@@ -74,4 +76,5 @@
         }
     }
     });
+
 </script>

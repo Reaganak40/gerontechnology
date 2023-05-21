@@ -17,13 +17,9 @@
 <br>
 
 <div>
-    <div class="chart-card">
-        <div class="chart-box">
+    <div class="chartCard">
+        <div class="chartBox" style="border: solid #0000FF">
             {% set current_graph = participant.graphs['totalCalenderInteractions'] %}
-            {% include 'chart.html' %}
-        </div>
-        <div class="chart-box">
-            {% set current_graph = participant.graphs['totalEventInteractions'] %}
             {% include 'chart.html' %}
         </div>
     </div>

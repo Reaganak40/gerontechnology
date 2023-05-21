@@ -5,25 +5,22 @@
     Created by: Reagan Kelley
  =========================================================== */
 
- .chart-card {
+ .chartCard {
+  width: 100vw;
+  height: calc(35vw - 80px);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+.chartBox {
+  width: 500px;
+  height: 250px;
+  padding: 10px;
+  border: solid 3px rgba(54, 162, 235, 1);
+  background: white;
 }
 
-.chart-box
-{
-  width:50%;
-  padding: 20px;
-  min-height: 200px;
-  min-width: 300px;
-}
-
-
- /* Defines how all graphs by chart.js will look like. */
-canvas{
-    margin: 0 auto;
-}
 
 /* Big header that divides the EMMA variable sections for the Participant page. */
 .variable-header {

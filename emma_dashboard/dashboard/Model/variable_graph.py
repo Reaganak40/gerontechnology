@@ -133,12 +133,7 @@ class VariableGraph:
                             dataset['data'].append(df.iloc[row_index][column])
                     
                         week, year = df.iloc[row_index][['week_number', 'year_number']]
-                        
-
-
-
-
-
+                
                     
 
 
