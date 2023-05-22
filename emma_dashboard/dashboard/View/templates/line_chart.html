@@ -18,10 +18,29 @@
 
     var variable_datasets = [];
 
+    
+
     {% for dataset in current_graph.datasets %}
+
+      {% if current_graph.scope == 'daily' %}
+
+        var time_data = []
+
+        {% for _ in dataset['data'] %}
+          time_data.push({x: "{{ current_graph.x_labels[loop.index - 1] | safe }}", y: {{dataset['data'][loop.index - 1]}}  });
+        
+        {% endfor %}
+
+      {% endif %}
+
     var dataset = {
           label: "{{ dataset['label'] | safe }}",
-          data: {{ dataset['data'] | safe }},
+          
+          {% if current_graph.scope == 'daily' %}
+            data: time_data,
+          {% else %}
+            data: {{ dataset['data'] | safe }},
+          {% endif %}
           borderColor: "{{ dataset['border_color'] }}",
           borderWidth: 1
     };
@@ -47,11 +66,23 @@
         datasets: variable_datasets
       },
       options: {
-        y: {
-            beginAtZero: true
-          },
+       
           maintainAspectRatio: false,
           responsive: true,
+        
+        scales: {
+            {% if current_graph.scope == 'daily' %}
+              x: {
+                  type: 'time',
+                  time: {
+                      unit: 'day'
+                  }
+              },
+            {% endif %}
+            y: {
+            beginAtZero: true
+            }
+          },
 
 
         plugins: {

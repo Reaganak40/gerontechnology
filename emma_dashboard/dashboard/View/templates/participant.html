@@ -23,7 +23,7 @@
         </div>
 
         <div class="chartBox" style="border: solid #0000FF">
-            {% set current_graph = participant.graphs['totalEventInteractions'] %}
+            {% set current_graph = participant.graphs['distinctUse'] %}
             {% include 'chart.html' %}
         </div>
     </div>
@@ -58,7 +58,7 @@
     <h1>General Use Data</h1>
     <h3>-- Today Page --</h3>
 </div>
-<!-- 
+
 <table class="calculations-table">
     <tr>
         {% for col_name in participant.tables.columns %}
@@ -72,7 +72,7 @@
             {% endfor %}
         </tr>
     {% endfor %}
-</table> -->
+</table>
 
 
 

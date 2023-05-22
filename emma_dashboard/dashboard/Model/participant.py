@@ -78,6 +78,17 @@ class Participant:
             labels        = ['Daily Average Activity'],
             border_color  = ['#0000FF'],
             )
+        
+        self.graphs['distinctUse'] = VariableGraph(
+            chart_id      = 'distance_use_chart',
+            title         = "Distinct Use",
+            graph_type    = "line",
+            df            = self.tables, 
+            df_columns    = ['v_DistinctUse'], 
+            scope         = 'daily', 
+            labels        = ['Daily Distinct Use'],
+            border_color  = ['#0000FF'],
+            )
 
         # ==========================================
         # Health Tracking Data

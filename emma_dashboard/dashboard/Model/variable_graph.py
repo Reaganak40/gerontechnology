@@ -5,8 +5,9 @@
 
 # * Modules
 import pandas as pd
-import datetime
 
+from datetime import date
+import time
 
 class VariableGraph:
     """ The VariableGraph class is really a helper class, with the use of jinja2, to define a chart.js graph in JavaScript.
@@ -112,33 +113,39 @@ class VariableGraph:
                 self.x_labels = ["Week {}, {}".format(row[0], row[1]) for row in df[['week_number', 'year_number']].values.tolist()]
             
             else:
-                
-                self.x_labels = []
-
-                for index, daily_var in enumerate(df_columns):
-                    dataset = {}
-                    dataset['data'] = []
-                    dataset['label'] = labels[index]
-                    dataset['border_color'] = border_color[index]
-
-                    # scope is daily
-                    daily_columns = []
+                try:
+                    #scope is daily
                     
-                    # create sql column names for daily variable
-                    daily_columns += [daily_var + '_' + day + 'day' for day in ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Satur']]
+                    self.x_labels = []
+                    count = 0
+                    for index, daily_var in enumerate(df_columns):
+                        dataset = {}
+                        dataset['data'] = []
+                        dataset['label'] = labels[index]
+                        dataset['border_color'] = border_color[index]
 
-                    # append all daily entries in chronological order
-                    for row_index in range(len(df)):
-                        for column in daily_columns:
-                            dataset['data'].append(df.iloc[row_index][column])
-                    
-                        week, year = df.iloc[row_index][['week_number', 'year_number']]
-                
-                    
+                        # create sql column names for daily variable
+                        daily_columns = [daily_var + '_' + day + 'day' for day in ['Mon', 'Tues', 'Wednes', 'Thurs', 'Fri', 'Satur', 'Sun']]
 
+                        # append all daily entries in chronological order
+                        for row_index in range(len(df)):
+                            for column in daily_columns:
+                                dataset['data'].append(df.iloc[row_index][column])
+                            
+                        
+                            week, year = df.iloc[row_index][['week_number', 'year_number']]
+                            
+                            for day in range(1, 8):
+                                calender_date = date.fromisocalendar(int(year), int(week), day)
+                                self.x_labels.append(str(calender_date) + "T00:00:00")
+                                print(f"{count}: ",str(calender_date) + " 00:00:00")
+                                count += 1
+                                #print(calender_date, daily_columns[day-1], dataset['data'][-(8-day)])
+                        self.datasets.append(dataset)
 
-            
-            
+                except Exception as e:
+                    print(e)
+
             if goal_line is not None:
                 if str.lower(goal_line[0]) == 'static':
                     self.goal_line = [goal_line[1]] * len(self.datasets[0]['data'])
