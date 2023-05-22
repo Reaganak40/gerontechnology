@@ -14,7 +14,6 @@
 <div class="variable-header">
     <h1>Participant Snapshot</h1>
 </div>
-<br>
 
 <div>
     <div class="chartCard">
@@ -34,35 +33,26 @@
     <h1>Health Tracking Data</h1>
 </div>
 
-<div class="row">
-    <div class="column">
-        
-        <div class="chart-box" style="width:700px; height:350px">
+<div class="chartCard" style="height: calc(25vw - 80px);">
+    <div class="chartBox" style="width:30%; border: solid #0000FF">
         {% set current_graph = participant.graphs['PE'] %}
         {% include 'chart.html' %}
-        </div>
-        <br>
+    </div>
 
-        <div class="chart-box" style="width:700px;height:350px">
+    <div class="chartBox" style="width:30%; border: solid #A52A2A">
         {% set current_graph = participant.graphs['CE'] %}
         {% include 'chart.html' %}
-        </div>
-        <br>
+    </div>
 
-        <div class="chart-box" style="width:700px;height:350px">
+    <div class="chartBox" style="width:30%; border: solid #228B22">
         {% set current_graph = participant.graphs['WE'] %}
         {% include 'chart.html' %}
-        </div>
-
-    </div>
-    <div class="column">
-        <br>
-        {% set current_graph = participant.graphs['h_goals'] %}
-        {% include 'chart.html' %}
-        <br>
     </div>
 </div>
-<br><br>
+
+{% set current_graph = participant.graphs['h_goals'] %}
+{% include 'chart.html' %}
+
 
 <div class="variable-header">
     <h1>General Use Data</h1>
