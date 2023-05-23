@@ -27,9 +27,8 @@
         var time_data = []
 
         {% for _ in dataset['data'] %}
-          time_data.push({x: "{{ current_graph.x_labels[loop.index - 1] | safe }}", y: {{dataset['data'][loop.index - 1]}}  });
-        
-        {% endfor %}
+          time_data.push({x: new Date("{{current_graph.x_labels[loop.index - 1] | safe }}"), y: {{dataset['data'][loop.index - 1]}}  });
+          {% endfor %}
 
       {% endif %}
 
@@ -62,7 +61,9 @@
     line_chart = new Chart(ctx, {
       type: '{{ current_graph.type }}',
       data: {
+        {% if current_graph.scope != 'daily' %}
         labels: {{ current_graph.x_labels | safe }},
+        {% endif %}
         datasets: variable_datasets
       },
       options: {
@@ -72,12 +73,12 @@
         
         scales: {
             {% if current_graph.scope == 'daily' %}
-              x: {
-                  type: 'time',
-                  time: {
-                      unit: 'day'
-                  }
-              },
+            x: {
+              type: 'time',
+              time: {
+                unit: 'day'
+              }
+            },
             {% endif %}
             y: {
             beginAtZero: true
