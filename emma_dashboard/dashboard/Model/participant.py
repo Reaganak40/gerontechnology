@@ -81,13 +81,13 @@ class Participant:
         
         self.graphs['distinctUse'] = VariableGraph(
             chart_id      = 'distance_use_chart',
-            title         = "Distinct Use",
+            title         = "Daily Distinct Uses",
             graph_type    = "line",
             df            = self.tables, 
             df_columns    = ['v_DistinctUse'], 
             scope         = 'daily', 
             labels        = ['Daily Distinct Use'],
-            border_color  = ['#0000FF'],
+            border_color  = ['#ff00cc'],
             )
 
         # ==========================================
