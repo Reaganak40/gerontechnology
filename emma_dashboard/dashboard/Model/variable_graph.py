@@ -137,7 +137,7 @@ class VariableGraph:
                             
                             for day in range(1, 8):
                                 calender_date = date.fromisocalendar(int(year), int(week), day)
-                                self.x_labels.append(str(calender_date) + " 00:00:00 GMT+0800")
+                                self.x_labels.append(str(calender_date) + " 00:00:00")
                                 print(f"{count}: ",str(calender_date) + " 00:00:00")
                                 count += 1
                                 #print(calender_date, daily_columns[day-1], dataset['data'][-(8-day)])
