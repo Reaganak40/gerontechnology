@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import sys
 from pathlib import Path
+from random import randint
 
 replace_list =  'Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into' +\
                 'the book her sister was reading, but it had no pictures or conversations in it, “and what is the use of a book,” thought Alice “without' +\
@@ -58,12 +59,13 @@ replace_list =  'Alice was beginning to get very tired of sitting by her sister 
                 'finger very deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked “poison,” it is almost certain to disagree ' +\
                 'with you, sooner or later.However, this bottle was not marked “poison,” so Alice ventured to taste it, and finding it very nice, (it had, in fact, a sort of mixed flavour of ' +\
                 'cherry-tart, custard, pine-apple, roast turkey, toffee, and hot buttered toast,) she very soon finished it off."'
-
 replace_list = replace_list.split(' ')
-print(len(replace_list))
+
 
 def removePHI(filename, datatype, remove_strategy="replace"):
     INPUT_FILE = Path(os.path.realpath(os.path.dirname(__file__))).joinpath(filename).absolute()
+    MIN_REPLACE_LEN = 10
+    MAX_REPLACE_LEN = 50
     
     # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # * Making checks on input file
@@ -101,7 +103,61 @@ def removePHI(filename, datatype, remove_strategy="replace"):
     # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     if remove_strategy == "replace":
-        pass     
+        # replace: This strategy uses the replace list to add random sentences to the PHI cells, this will get rid of any data from it, including word and character count information
+        for i in range(len(df)):
+            for PHI_column in PHI_columns:
+                r_length = randint(MIN_REPLACE_LEN, MAX_REPLACE_LEN)
+                r_start = randint(0, len(replace_list)-r_length-1)
+                
+                replace_str = " ".join(replace_list[r_start:(r_start+r_length)])
+                df.at[i, PHI_column] = replace_str
+    elif remove_strategy == "random-shift-encryption":
+        # random-shift-encryption: This strategy does a one-way encryption with character-by-character random caesar-cipher, this will preserve both word and character count information 
+        for i in range(len(df)):
+            for PHI_column in PHI_columns:
+                PHI_str = str(df.iloc[i][PHI_column])
+                encrypted_str = ""
+                
+                for c in PHI_str:
+                    
+                    # replace any number with a random char
+                    if c >= '0' and c <= '9':
+                        c = 'A' + randint(0, 26)
+                        
+                    # shift the char between uppercase and lowercase letters
+                    if (c >= 'A' and c <= 'Z') or (c >= 'a' and c <= 'z'):
+                        shift = randint(-25, 25)
+                        
+                        if shift <= 0:
+                            if c >= 'a' and ord(c) - ord('a') < abs(shift):
+                                encrypted_str += chr(ord('Z') + (shift + (ord(c) - ord('a'))))
+                            elif c <= 'Z' and ord(c) - ord('A') < abs(shift):
+                                encrypted_str += chr(ord('z') + (shift + (ord(c) - ord('A'))))
+                            else:
+                                encrypted_str += chr(ord(c) + shift)
+                        else:
+                            if c >= 'a' and ord('z') - ord(c) < shift:
+                                encrypted_str += chr(ord('A') + (shift - (ord('z') - ord(c))))
+                            elif c <= 'Z' and ord('Z') - ord(c) < shift:
+                                encrypted_str += chr(ord('a') + (shift - (ord('Z') - ord(c))))
+                            else:
+                                
+                                encrypted_str += chr(ord(c) + shift)
+                    else:
+                        # don't encrypt for spaces or special characters
+                        encrypted_str += c
+                        
+                # since keeping the string and character account are important, this ensures that that data is preserved
+                assert(len(PHI_str) == len(encrypted_str))
+                assert(len(PHI_str.split(' ')) == len(encrypted_str.split(' ')))
+                df.at[i, PHI_column] = encrypted_str
+                        
+                        
+    else:
+        err_msg = f"{remove_strategy} is not a supported removePHI strategy"
+        raise AttributeError(err_msg)
+    
+    df.to_excel('./' + INPUT_FILE.name.split('.')[0] + '_NoPHI.xlsx')
     
 
 def main(args):
@@ -126,7 +182,7 @@ def main(args):
         err_msg = f"removePHI argument --type '{datatype}' not supported." 
         raise Exception(err_msg)
     
-    removePHI(filename, datatype)
+    removePHI(filename, datatype, remove_strategy="random-shift-encryption")
     
 
 if __name__ == '__main__':
