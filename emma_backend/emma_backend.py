@@ -10,6 +10,8 @@ from database.update import update_from_dataframe
 from research.calculation_parser import populate_research_tables
 
 def print_help_screen():
+    """Prints a manual instructing the user how to use this script.
+    """
     print("=====================================================================================")
     print(colored("--help :: How to Use EMMA Backend [Data Wrangling & More]", "yellow"))
     print("=====================================================================================")
@@ -41,6 +43,13 @@ def print_help_screen():
     
     
 def update_database(calculation_tables, cxn_engine = None, debug : bool = False):
+    """After a data-wrangling session, used the tables to update a backend database.
+
+    Args:
+        calculation_tables (list[list[tuple, pd.DataFrame]]): A list of weekly calculation tables with a tuple to represent the date for that table
+        cxn_engine (mysql.connector.MySQLConnection): A valid connection to the database.
+        debug (bool, optional): When true, prints processes to the screen. Defaults to False.
+    """
     if (debug):
         print(colored("\nAdding data to the database:", "blue"))
 
@@ -59,6 +68,11 @@ def update_research(calculation_tables, cxn_engine = None, debug : bool = False)
 
 
 def emma_backend(args):
+    """'main' function for EMMA backend processes.
+
+    Args:
+        args list[str]: List of provided command line arguments
+    """
     
     if "--help" in args:
         print_help_screen()

@@ -38,8 +38,8 @@ except:
 
 class DataWrangling:
 
-    # Last Edit on 12/7/2022 by Reagan Kelley
-    # Initial implementation
+    # Last Edit on 5/27/2023 by Reagan Kelley
+    # Added comments
     def __init__(self, args : list[str]):
         # TODO: Provide absolute and relative path functionality
         
@@ -331,14 +331,19 @@ class DataWrangling:
             element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens, source=source).items()
         elif(dataset_type == DatasetType.EVENTS):
             element_count_list = self.get_events_counts(df, sum, count, filter_by, healthTrackType, completed=completed, day_of_week=day_of_week).items()
-
+        
         if(dataset_type == None):
             if(defined_variable_x is not None):
+                X_used = False
                 for participant_id, variables in participants_dict.items():
                     X = variables.get(defined_variable_x) # get existing value for a variable
 
                     if(X is not None):
+                        X_used = True
                         participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : X}) # set variable x to an already defined variable
+                if not X_used:
+                    if self.debug:
+                        print(colored(f"EMMA Data-Wrangling Warning: [{variable_name}] used defined_variable_x: [{defined_variable_x}], which does not seem to be defined in the current scope. Was [{variable_name}] defined before [{defined_variable_x}]?", "yellow"))
             else:
                 raise Exception("No dataset given but also no defined variables given either.")
         else:
@@ -499,6 +504,7 @@ class DataWrangling:
             filename = "Week {}, {}".format(date[0], date[1])  # The Week and Year of the next dataframe that will be used to calculate variables.
             events_df = self.data[DatasetType.EVENTS].weekly_dfs.get((date[0], date[1]))
             
+            # only create the next calculation table if interactions and events hold data for that week
             if(events_df is not None):
                 used_weeks.append(date)
                 if(self.debug):
