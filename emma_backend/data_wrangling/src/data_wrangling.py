@@ -8,9 +8,9 @@
 from colorama import just_fix_windows_console
 import os
 import pandas as pd
+from pathlib import Path
 import sys
 from termcolor import colored
-from pathlib import Path
 from typing import Callable
 
 
@@ -43,12 +43,17 @@ class DataWrangling:
     def __init__(self, args : list[str]):
         # TODO: Provide absolute and relative path functionality
         
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Find the input / output directories for this
+        # * data wrangling session.
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         self.INPUT_DIR : Path = Path(os.path.realpath(os.path.dirname(__file__))).parent.absolute()
-        self.INPUT_DIR = self.INPUT_DIR.joinpath("data")
         
+        self.INPUT_DIR = self.INPUT_DIR.joinpath("data")
         if not self.INPUT_DIR.exists():
             raise FileNotFoundError(colored("[Data Wrangling Error]\nThere must be a 'data' directory in the parent directory of this script.\nIn this directory: {}".format(self.INPUT_DIR.parent.absolute()), "yellow"))
         self.INPUT_DIR = self.INPUT_DIR.joinpath("input")
+
         if not self.INPUT_DIR.exists():
            raise FileNotFoundError(colored("[Data Wrangling Error]\nThere must be an 'input' directory in that data directory.\nLocation: {}".format(self.INPUT_DIR.parent.absolute()), "yellow"))
 
@@ -56,6 +61,9 @@ class DataWrangling:
         if not self.OUTPUT_DIR.exists():
             Path.mkdir(self.OUTPUT_DIR)
 
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Initialize all member variables
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         self.__init_token_dict()
         self.data : dict[str, Dataset] = {}
         self.__read_args(args)
