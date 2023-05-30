@@ -927,7 +927,8 @@
         {
             "name" : "TotalUserNoteInteractions",
             "defined-variable-x" : "SumUserNoteInteractions",
-            "function" : ["x", "x"]
+            "defined-variable-y" : "SumViewUserNoteInteractions",
+            "function" : ["x", "x+y"]
         },
         {
             "name" : "TotalUserNoteInteractions_Av",
