@@ -307,8 +307,7 @@ class DataWrangling:
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def create_variable(self, participants_dict : dict, df, dataset_type : int, variable_name : str, variable_func : Callable, elementIDs : list[int] = None, day_of_week=-1, distinct=False, tokens=None,
-    source=None, type=None, sum = None, count = None, filter_by = None, healthTrackType=None, completed=False, defined_variable_x = None) -> dict:
+    def create_variable(self, **kwargs) -> dict:
         """ Creates a new variable and calculates it, storing the results for each participant in a dictionary.
 
         Args:
@@ -326,13 +325,39 @@ class DataWrangling:
              Dict: An updated dictionary containing the calculated variable for all participants in the dataset, interactions_df
         """
         
-        # Each is a pair (participantID, count)
-        if(dataset_type == DatasetType.INTERACTIONS):
-            element_count_list = self.get_interaction_counts(df, elementIDs, day_of_week=day_of_week, distinct=distinct, tokens=tokens, source=source).items()
-        elif(dataset_type == DatasetType.EVENTS):
-            element_count_list = self.get_events_counts(df, sum, count, filter_by, healthTrackType, completed=completed, day_of_week=day_of_week).items()
+    #     participants_dict : dict, df, dataset_type : int, variable_name : str, variable_func : Callable, elementIDs : list[int] = None, day_of_week=-1, distinct=False, tokens=None,
+    # source=None, type=None, sum = None, count = None, filter_by = None, healthTrackType=None, completed=False, defined_variable_x = None
+
+        # these are defined from kwargs for code cleanliness
+        variable_name = kwargs['variable_name']
+        participants_dict = kwargs['participants_dict']
+        variable_func = kwargs['variable_func']
         
-        if(dataset_type == None):
+        # Each is a pair (participantID, count)
+        if(kwargs['dataset_type'] == DatasetType.INTERACTIONS):
+            element_count_list = self.get_interaction_counts(
+                kwargs['df'], 
+                kwargs['elementIDs'], 
+                day_of_week = kwargs['day_of_week'], 
+                distinct = kwargs['distinct'], 
+                tokens = kwargs['tokens'],
+                source = kwargs['source']
+                ).items()
+        elif(kwargs['dataset_type'] == DatasetType.EVENTS):
+            element_count_list = self.get_events_counts(
+                kwargs['df'],
+                kwargs['sum'],
+                kwargs['count'],
+                kwargs['filter_by'],
+                kwargs['healthTrackType'],
+                completed = kwargs['completed'],
+                day_of_week = kwargs['day_of_week']
+                ).items()
+        
+        
+        if(kwargs['dataset_type'] == None):
+            defined_variable_x = kwargs['defined_variable_x']
+            
             if(defined_variable_x is not None):
                 
                 if defined_variable_x not in self.variables.keys():
@@ -340,6 +365,7 @@ class DataWrangling:
                     raise NameError(err_msg)
                 
                 X_used = False
+                
                 for participant_id, variables in participants_dict.items():
                     X = variables.get(defined_variable_x) # get existing value for a variable
 
@@ -394,11 +420,11 @@ class DataWrangling:
                 type = properties.type
                 source = properties.source
                 participants = self.create_variable(
-                    participants,                           # this participants dict will be updated
-                    interactions_df,                        # the dataset used in this variable
-                    dataset_type,                           # what type of dataset this variable needs
-                    name,                                   # the name of the variable
-                    function,                               # the lambda function to do on every aggregate call
+                    participants_dict = participants,       # this participants dict will be updated
+                    df=interactions_df,                     # the dataset used in this variable
+                    dataset_type=dataset_type,              # what type of dataset this variable needs
+                    variable_name=name,                     # the name of the variable
+                    variable_func=function,                 # the lambda function to do on every aggregate call
                     elementIDs = elementIDs,                # elementIDs used
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
                     distinct=distinct,                      # only count distinct uses
@@ -416,11 +442,11 @@ class DataWrangling:
                 filter_by = properties.filter_by
 
                 participants = self.create_variable(
-                    participants,                           # this participants dict will be updated
-                    events_df,                              # the dataset used in this variable
-                    dataset_type,                           # what type of dataset this variable needs
-                    name,                                   # the name of the variable
-                    function,                               # the lambda function to do on every aggregate call
+                    participants_dict=participants,         # this participants dict will be updated
+                    df=events_df,                           # the dataset used in this variable
+                    dataset_type=dataset_type,              # what type of dataset this variable needs
+                    variable_name=name,                     # the name of the variable
+                    variable_func=function,                 # the lambda function to do on every aggregate call
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
                     sum=sum,                                # the column to sum by participantIDs
                     count = count,                          # the column to count by ParticipantIDs
@@ -431,11 +457,11 @@ class DataWrangling:
                 )
             else:
                 participants = self.create_variable(
-                    participants,                           # this participants dict will be updated
-                    None,                                   # the dataset used in this variable, when None used other defined variables
-                    None,                                   # what type of dataset this variable needs
-                    name,                                   # the name of the variable
-                    function,                               # the lambda function, in this case includes predefined variables
+                    participants_dict=participants,         # this participants dict will be updated
+                    df=None,                                # the dataset used in this variable, when None used other defined variables
+                    dataset_type=None,                      # what type of dataset this variable needs
+                    variable_name=name,                     # the name of the variable
+                    variable_func=function,                 # the lambda function, in this case includes predefined variables
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
                     defined_variable_x=defined_variable_x   # when not None, provided a definition for X for the function.
                 )
