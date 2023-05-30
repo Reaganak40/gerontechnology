@@ -45,8 +45,8 @@ class Variable:
         self.day_of_week = day_of_week
 
         self.defined_variable_x = variable_definition.get("defined-variable-x", None)
-        # TODO: Add functionality for multiple predefined variables
-
+        self.defined_variable_y = variable_definition.get("defined-variable-y", None)
+        
 # Last Edit on 12/16/2022 by Reagan Kelley
 # Initial Implementation
 def variable_factory(variable_definition : dict):
