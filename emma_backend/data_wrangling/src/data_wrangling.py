@@ -334,6 +334,11 @@ class DataWrangling:
         
         if(dataset_type == None):
             if(defined_variable_x is not None):
+                
+                if defined_variable_x not in self.variables.keys():
+                    err_msg = colored(f'EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_x, [{defined_variable_x}], which is not defined variable.', "red")
+                    raise NameError(err_msg)
+                
                 X_used = False
                 for participant_id, variables in participants_dict.items():
                     X = variables.get(defined_variable_x) # get existing value for a variable
@@ -342,8 +347,11 @@ class DataWrangling:
                         X_used = True
                         participants_dict[participant_id][variable_name] = eval(variable_func[1], {variable_func[0] : X}) # set variable x to an already defined variable
                 if not X_used:
+                    if list(self.variables.keys()).index(variable_name) < list(self.variables.keys()).index(defined_variable_x):
+                        err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_x: [{defined_variable_x}], but this variable is not defined in the current scope.", "red")
+                        raise Exception(err_msg)
                     if self.debug:
-                        print(colored(f"EMMA Data-Wrangling Warning: [{variable_name}] used defined_variable_x: [{defined_variable_x}], which does not seem to be defined in the current scope. Was [{variable_name}] defined before [{defined_variable_x}]?", "yellow"))
+                        print(colored(f"EMMA Data-Wrangling Warning: [{variable_name}] used defined_variable_x: [{defined_variable_x}], but did not find any such defined variable in its participants.", "yellow"))
             else:
                 raise Exception("No dataset given but also no defined variables given either.")
         else:

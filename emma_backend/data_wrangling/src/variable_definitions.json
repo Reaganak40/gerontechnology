@@ -1,9 +1,23 @@
 {
     "Variables" : [
         {
+            "name" : "CalenderUse_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [9],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
             "name" : "CalenderUse",
             "dataset" : "Interactions",
             "elementIDs" : [9],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumTotalCalendarInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [9, 18, 19, 20],
             "scope" : "weekly",
             "function" : ["x", "x/7"]
         },
@@ -11,8 +25,8 @@
             "name" : "SumTotalCalendarInteractions",
             "dataset" : "Interactions",
             "elementIDs" : [9, 18, 19, 20],
-            "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "scope" : "daily",
+            "function" : ["x", "x"]
         },
         {
             "name" : "CalendaringGoal",
@@ -30,22 +44,37 @@
             "distinct" : true
         },
         {
-            "name" : "SumTotalEventInteractions",
+            "name" : "TodayPageUse_Av",
             "dataset" : "Interactions",
-            "elementIDs" : [13, 103, 104, 379, 380, 381, 384],
+            "elementIDs" : [8, 13, 14, 379, 380, 381, 384],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "distinct" : true
+        },
+        {
+            "name" : "SumTotalEventInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [13, 14, 82, 103, 104, 379, 380, 381, 384],
             "scope" : "weekly",
             "function" : ["x", "x/7"]
         },
         {
+            "name" : "SumTotalEventInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [13, 14, 82, 103, 104, 379, 380, 381, 384],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
             "name" : "TodayPageGoal",
             "dataset" : "Interactions",
-            "elementIDs" : [13, 103, 104, 379, 380, 381, 384],
+            "elementIDs" : [8, 13, 14, 379, 380, 381, 384],
             "scope" : "daily",
             "function" : ["x", "x/3"],
             "distinct" : true
         },
         {
-            "name" : "SumTotalLTGNoteInteractions",
+            "name" : "SumTotalLTGNoteInteractions_Av",
             "dataset" : "Interactions",
             "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["LTG"],
@@ -53,16 +82,46 @@
             "function" : ["x", "x/7"]
         },
         {
-            "name" : "LTGGoal",
+            "name" : "SumTotalLTGNoteInteractions",
             "dataset" : "Interactions",
-            "elementIDs" : [24, 220, 322],
+            "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["LTG"],
-            "scope" : "weekly",
+            "scope" : "daily",
             "function" : ["x", "x"]
         },
         {
             "name" : "LTGFolderUse",
-            "defined-variable-x" : "LTGGoal",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["LTG"],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "distinct" : true
+        },
+        {
+            "name" : "LTGFolderUse_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["LTG"],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "distinct" : true
+        },
+        {
+            "name" : "LTGGoal",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["LTG"],
+            "scope" :"weekly",
+            "distinct" : true,
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumTotalFZNoteInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 64, 65, 220],
+            "tokens" : ["FZ"],
+            "scope" : "weekly",
             "function" : ["x", "x/7"]
         },
         {
@@ -70,21 +129,35 @@
             "dataset" : "Interactions",
             "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["FZ"],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "FZFolderUse",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["FZ"],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "distinct" : true
+        },
+        {
+            "name" : "FZFolderUse_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 220, 322],
+            "tokens" : ["FZ"],
             "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "function" : ["x", "x/7"],
+            "distinct" : true
         },
         {
             "name" : "FZGoal",
             "dataset" : "Interactions",
             "elementIDs" : [24, 220, 322],
             "tokens" : ["FZ"],
-            "scope" : "weekly",
+            "scope" :"weekly",
+            "distinct" : true,
             "function" : ["x", "x"]
-        },
-        {
-            "name" : "FZFolderUse",
-            "defined-variable-x" : "FZGoal",
-            "function" : ["x", "x/7"]
         },
         {
             "name" : "TotalPEWeeklyPHEX",
@@ -96,7 +169,21 @@
             "function" : ["x", "x"]
         },
         {
+            "name" : "TotalPEDailyPHEX",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["phex"],
+            "completed" : true,
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
             "name" : "PEGoal",
+            "defined-variable-x" : "TotalPEWeeklyPHEX",
+            "function" : ["x", "x/150"]
+        },
+        {
+            "name" : "PEGoal_DoD",
             "defined-variable-x" : "TotalPEWeeklyPHEX",
             "function" : ["x", "x/150"]
         },
@@ -107,6 +194,15 @@
             "healthTrackType" : ["meex"],
             "completed" : true,
             "scope" : "weekly",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "TotalCEDailyMEEX",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["meex"],
+            "completed" : true,
+            "scope" : "daily",
             "function" : ["x", "x"]
         },
         {
@@ -124,6 +220,15 @@
             "function" : ["x", "x"]
         },
         {
+            "name" : "TotalWEDailyWELLX",
+            "dataset" : "Events",
+            "sum" : "healthTrackData",
+            "healthTrackType" : ["WELLX"],
+            "completed" : true,
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
             "name" : "WEGoal",
             "defined-variable-x" : "TotalWEWeeklyWELLX",
             "function" : ["x", "x/3"]
@@ -137,88 +242,754 @@
             "scope" : "daily"
         },
         {
-            "name" : "DistinctUseTotal",
+            "name" : "DistinctUse_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "function" : ["x", "x/7"],
+            "distinct" : true,
+            "scope" : "weekly"
+        },
+        {
+            "name" : "TotalTaps",
             "dataset" : "Interactions",
             "elementIDs" : [],
             "function" : ["x", "x"],
-            "distinct" : true
+            "scope" :"daily"
         },
         {
-            "name" : "DistinctUseAverage",
-            "defined-variable-x" : "DistinctUseTotal",
-            "function" : ["x", "x/7"]
-        },
-        {
-            "name" : "TotalTapsAverage",
+            "name" : "TotalTaps_Av",
             "dataset" : "Interactions",
             "elementIDs" : [],
             "function" : ["x", "x/7"]
         },
         {
-            "name": "TodayPageAverage",
+            "name" : "InteractionsSource_App",
+            "dataset":"Interactions",
+            "elementIDs": [],
+            "source": "app",
+            "function":["x","x"],
+            "scope":"daily"
+        },
+        {
+            "name" : "InteractionsSource_App_Av",
+            "dataset":"Interactions",
+            "elementIDs": [],
+            "source": "app",
+            "function":["x","x/7"],
+            "scope":"weekly"
+        },
+        {
+            "name" : "InteractionsSource_Web",
+            "dataset":"Interactions",
+            "elementIDs": [],
+            "source": "web",
+            "function":["x","x"],
+            "scope":"daily"
+        },
+        {
+            "name" : "InteractionsSource_Web_Av",
+            "dataset":"Interactions",
+            "elementIDs": [],
+            "source": "web",
+            "function":["x","x/7"],
+            "scope":"weekly"
+        },
+        {
+            "name": "TodayPage",
+            "dataset": "Interactions",
+            "elementIDs": [8],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "TodayPage_Av",
             "dataset": "Interactions",
             "elementIDs": [8],
             "function": ["x", "x/7"]
         },
         {
-            "name": "CalendarPageAverage",
+            "name": "CalendarPage",
+            "dataset": "Interactions",
+            "elementIDs": [9],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "CalendarPage_Av",
             "dataset": "Interactions",
             "elementIDs": [9],
             "function": ["x", "x/7"]
         },
         {
-            "name": "HealthPageAverage",
+            "name": "HealthPage",
+            "dataset": "Interactions",
+            "elementIDs": [201],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "HealthPage_Av",
             "dataset": "Interactions",
             "elementIDs": [201],
             "function": ["x", "x/7"]
         },
         {
-            "name": "NotesPageAverage",
+            "name": "NotesPage",
+            "dataset": "Interactions",
+            "elementIDs": [11],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "NotesPage_Av",
             "dataset": "Interactions",
             "elementIDs": [11],
             "function": ["x", "x/7"]
         },
         {
-            "name": "HelpPageAverage",
+            "name": "HelpPage",
+            "dataset": "Interactions",
+            "elementIDs": [12],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "HelpPage_Av",
             "dataset": "Interactions",
             "elementIDs": [12],
             "function": ["x", "x/7"]
         },
         {
-            "name": "CreateEventAverage",
+            "name": "CreateEvent",
+            "dataset": "Interactions",
+            "elementIDs": [13],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "CreateEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [13],
             "function": ["x", "x/7"]
         },
         {
-            "name": "ViewEventAverage",
+            "name": "ViewEvent",
+            "dataset": "Interactions",
+            "elementIDs": [379,384,14],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "ViewEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [379,384,14],
             "function": ["x", "x/7"]
         },
         {
-            "name": "EditEventAverage",
+            "name": "EditEvent",
+            "dataset": "Interactions",
+            "elementIDs": [104],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "EditEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [104],
             "function": ["x", "x/7"]
         },
         {
-            "name": "DeleteEventAverage",
+            "name": "DeleteEvent",
+            "dataset": "Interactions",
+            "elementIDs": [82],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "DeleteEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [82],
             "function": ["x", "x/7"]
         },
         {
-            "name": "CompleteEventAverage",
+            "name": "CompleteEvent",
+            "dataset": "Interactions",
+            "elementIDs": [380,381],
+            "function": ["x", "x"],
+            "scope":"daily"
+        },
+        {
+            "name": "CompleteEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [380,381],
             "function": ["x", "x/7"]
         },
         {
-            "name": "SumEventInteractionsAverage",
-            "dataset": "Interactions",
-            "elementIDs": [13, 379, 384, 14, 104, 82, 380, 381],
+            "name" : "CalenderMonthPrior_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [18],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "CalenderMonthPrior",
+            "dataset" : "Interactions",
+            "elementIDs" : [18],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "CalenderMonthNext_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [19],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "CalenderMonthNext",
+            "dataset" : "Interactions",
+            "elementIDs" : [19],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "CalenderDateSelect_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [20],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "CalenderDateSelect",
+            "dataset" : "Interactions",
+            "elementIDs" : [20],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumGraphInteractions_HT_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumGraphInteractions_HT",
+            "dataset" : "Interactions",
+            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumGraphInteractions_HT_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumGraphInteractions_HT",
+            "dataset" : "Interactions",
+            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumGraphInteractions_PE_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [257, 294],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumGraphInteractions_PE",
+            "dataset" : "Interactions",
+            "elementIDs" : [257, 294],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumGraphInteractions_CE_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [260, 283],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumGraphInteractions_CE",
+            "dataset" : "Interactions",
+            "elementIDs" : [260, 283],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumGraphInteractions_WE_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [259, 301],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumGraphInteractions_WE",
+            "dataset" : "Interactions",
+            "elementIDs" : [259, 301],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "EnterData_PE_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [292],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "EnterData_PE",
+            "dataset" : "Interactions",
+            "elementIDs" : [292],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "EnterData_CE_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [281],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "EnterData_CE",
+            "dataset" : "Interactions",
+            "elementIDs" : [281],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "EnterData_WE_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [299],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "EnterData_WE",
+            "dataset" : "Interactions",
+            "elementIDs" : [299],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name": "SumEventActions_NonSched",
+            "dataset":"Events",
+            "filter_by": [["noSpecifiedTime", 1]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "SumEventActions_NonSched_Av",
+            "dataset":"Events",
+            "filter_by": [["noSpecifiedTime", 1]],
+            "scope":"weekly",
+            "count": "action",
             "function": ["x", "x/7"]
+        },
+        {
+            "name": "SumEventActions_Sched",
+            "dataset":"Events",
+            "filter_by": [["noSpecifiedTime", 0]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "SumEventActions_Sched_Av",
+            "dataset":"Events",
+            "filter_by": [["noSpecifiedTime", 0]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_Priority",
+            "dataset":"Events",
+            "filter_by": [["priority", 1]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_Priority_Av",
+            "dataset":"Events",
+            "filter_by": [["priority", 1]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_Recurring_daily",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "daily"]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_Recurring_daily_Av",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "daily"]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_Recurring_weekly",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "weekly"]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_Recurring_weekly_Av",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "weekly"]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_Recurring_monthly",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency","monthly"]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_Recurring_monthly_Av",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "monthly"]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_Recurring_yearly",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "yearly"]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_Recurring_yearly_Av",
+            "dataset":"Events",
+            "filter_by": [["recurringFrequency", "yearly"]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1]],
+            "scope":"daily",
+            "count": "action",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1]],
+            "scope":"weekly",
+            "count": "action",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_Create",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "create"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_Create_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "create"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_Edit",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "edit"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_Edit_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "edit"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_Delete",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "delete"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_Delete_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "delete"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_Complete",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "complete"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_Complete_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["action", "complete"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_NonSched",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["noSpecifiedTime", 1]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_NonSched_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["noSpecifiedTime", 1]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_Sched",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["noSpecifiedTime", 0]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_Sched_Av",
+            "dataset":"Events",
+            "filter_by": [["isHealthTrack", 1], ["noSpecifiedTime", 0]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_PE",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "phex"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_PE_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "phex"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_CE",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "meex"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_CE_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "meex"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "EventActions_HT_WE",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "wellx"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "EventActions_HT_WE_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "wellx"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "HiddenEvents_Count",
+            "dataset":"Events",
+            "filter_by": [["action", "create"], ["recurringHide", 1]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "HiddenEvents_Count_Av",
+            "dataset":"Events",
+            "filter_by": [["action", "create"], ["recurringHide", 1]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "ReminderEvents_Count",
+            "dataset":"Interactions",
+            "elementIDs" : [338, 339, 340, 341, 342],
+            "scope":"daily",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "ReminderEvents_Count_Av",
+            "dataset":"Interactions",
+            "elementIDs" : [338, 339, 340, 341, 342],
+            "scope":"weekly",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name" : "SumTotalWBJInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [314, 324, 321, 383, 316],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumTotalWBJInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [314, 324, 321, 383, 316],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumUserNoteInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 25, 65, 302, 64],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumUserNoteInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [24, 25, 65, 302, 64],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "SumViewUserNoteInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [322, 220],
+            "filter_by": [["Token", "User Created Folder"]],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "SumViewUserNoteInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [322, 220],
+            "filter_by": [["Token", "User Created Folder"]],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "TotalUserNoteInteractions",
+            "defined-variable-x" : "SumUserNoteInteractions",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "TotalUserNoteInteractions_Av",
+            "defined-variable-x" : "TotalUserNoteInteractions",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "Notes_SortBy_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "Notes_SortBy",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "Notes_Search_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "Notes_Search",
+            "dataset" : "Interactions",
+            "elementIDs" : [],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "UseHelp_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [12, 42],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "UseHelp",
+            "dataset" : "Interactions",
+            "elementIDs" : [12, 42],
+            "scope" : "daily",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "HelpInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [12, 31, 232, 233, 231, 36, 234, 33, 37, 235, 308, 30],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"]
+        },
+        {
+            "name" : "HelpInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [12, 31, 232, 233, 231, 36, 234, 33, 37, 235, 308, 30],
+            "scope" : "daily",
+            "function" : ["x", "x"]
         }
+
     ]
 }
