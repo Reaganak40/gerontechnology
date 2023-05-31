@@ -5,9 +5,10 @@
 """
 
 # * Modules
+import copy
 import json
 import os
-
+from termcolor import colored
 # Local Imports
 from dataset import DatasetType
 
@@ -46,6 +47,29 @@ class Variable:
 
         self.defined_variable_x = variable_definition.get("defined-variable-x", None)
         self.defined_variable_y = variable_definition.get("defined-variable-y", None)
+    
+    def convert_to_daily(self, x_is_daily=False, y_is_daily=False):
+        if self.day_of_week != -1:
+            raise Exception("Unable to convert to daily when scope is not weekly. (day of week = {})".format(self.day_of_week))
+        
+        res = []
+        day_of_week = 0
+        for day in ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]:
+            day_variable = copy.deepcopy(self)
+            
+            day_variable.day_of_week = day_of_week
+            day_variable.name += '-' + day
+            if x_is_daily:
+                day_variable.defined_variable_x += '-' + day   
+            if y_is_daily:
+                day_variable.defined_variable_y += '-' + day            
+            
+            res.append(day_variable)
+            day_of_week += 1
+        
+        return res
+        
+        
         
 # Last Edit on 12/16/2022 by Reagan Kelley
 # Initial Implementation
@@ -78,8 +102,8 @@ def variable_factory(variable_definition : dict):
 
     return res
 
-# Last Edit on 12/16/2022 by Reagan Kelley
-# Initial Implementation
+# Last Edit on 5/31/2023 by Reagan Kelley
+# Create implicit calculation to determine scope of reference variables (defined-variable calculations)
 def create_variable_dictionary(filename):
     """Reads through a json file which contains variable definitions for EMMA calculations.
 
@@ -98,6 +122,43 @@ def create_variable_dictionary(filename):
         for vd in variable_defs:
             variable_s = variable_factory(vd)
             for variable in variable_s:
+                
+                # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                # * Check to see if this is a defined-variable calculation
+                # * and if so justify its scope.
+                # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                if variable.day_of_week == -1:
+
+                    x_is_daily = False
+                    if (variable.defined_variable_x is not None):
+                        # if defined_variable_x is a daily variable, get its day of the week variants
+                        if variable.defined_variable_x not in variables.keys():
+                            # no weekly or daily version of this variable name found, must be a mis-definition.
+                            if variable.defined_variable_x + '-Monday' not in variables.keys():
+                                from pprint import pprint
+                                pprint(list(variables.keys()))
+                                err_msg = colored(f'EMMA Data-Wrangling Error: [{variable.name}] uses defined_variable_x, [{variable.defined_variable_x}], which is not a defined variable.', "red")
+                                raise NameError(err_msg)
+                            
+                            x_is_daily = True
+
+                    y_is_daily = False
+                    if (variable.defined_variable_y is not None):
+                        # if defined_variable_x is a daily variable, get its day of the week variants
+                        if variable.defined_variable_y not in variables.keys():
+                            # no weekly or daily version of this variable name found, must be a mis-definition.
+                            if variable.defined_variable_y + '-Monday' not in variables.keys():
+                                    err_msg = colored(f'EMMA Data-Wrangling Error: [{variable.name}] uses defined_variable_y, [{variable.defined_variable_y}], which is not a defined variable.', "red")
+                                    raise NameError(err_msg)
+                            
+                            y_is_daily = True
+                    
+                    if x_is_daily or y_is_daily:
+                        day_versions = variable.convert_to_daily(x_is_daily, y_is_daily)
+                        for day_variable in day_versions:
+                            variables[day_variable.name] = day_variable
+                        continue
+                                
                 variables[variable.name] = variable
     return variables
 
