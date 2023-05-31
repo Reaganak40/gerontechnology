@@ -348,7 +348,144 @@ class DataWrangling:
                 err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}]'s eval argument uses ['{word.strip()}'] which is not allowed.", "red")
                 raise SyntaxError(err_msg)
         return eval_args
+    
+    def get_count_from_predefined(self, **kwargs):
+
+        participants_dict = kwargs['participants_dict']
+        eval_args = kwargs['eval_args']
+        variable_name = kwargs['variable_name']
+        variable_func = kwargs['variable_func']
+        is_daily_variable = False
+        
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Build a list of x-variables that are already defined.
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if eval_args['x']:
+            # if defined_variable_x is a daily variable, get its day of the week variants
+            if kwargs['defined_variable_x'] in self.variables.keys():
+                variable_x_list = [kwargs['defined_variable_x']]
+            else:
+                # no weekly or daily version of this variable name found, must be a mis-definition.
+                if kwargs['defined_variable_x'] + '-Monday' not in self.variables.keys():
+                        err_msg = colored(f'EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_x, [{kwargs["defined_variable_x"] + "-Monday"}], which is not a defined variable.', "red")
+                        raise NameError(err_msg)
                 
+                variable_x_list = [kwargs['defined_variable_x'] + '-' + day for day in ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]
+                is_daily_variable = True
+        else:
+            variable_x_list = []
+            
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Build a list of y-variables that are already defined.
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if eval_args['y']:
+            # if defined_variable_x is a daily variable, get its day of the week variants
+            if kwargs['defined_variable_y'] in self.variables.keys():
+                variable_y_list = [kwargs['defined_variable_y']]
+            else:
+                # no weekly or daily version of this variable name found, must be a mis-definition.
+                if kwargs['defined_variable_y'] + '-Monday' not in self.variables.keys():
+                        err_msg = colored(f'EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_y, [{kwargs["defined_variable_y"] + "-Monday"}], which is not a defined variable.', "red")
+                        raise NameError(err_msg)
+                
+                variable_y_list = [kwargs['defined_variable_y'] + '-' + day for day in ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]
+                is_daily_variable = True
+        else:
+            variable_y_list = []
+        
+        # ensure that the variable_x_list is rhe bigger of the two variable lists.
+        if (len(variable_y_list) > len(variable_x_list)) and len(variable_x_list) != 0:
+            temp_list = variable_x_list
+            variable_x_list = variable_y_list
+            variable_y_list = temp_list
+        
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Use the list of x and y variables to create the new
+        # * variable(s).
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+        if(len(variable_x_list) != 0):
+            defined_variable_used = False
+            for participant_id, variables in participants_dict.items():
+                # ? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                # ? There are 5 possibilities/cases:
+                # ? Case 1: Only x is defined; x is a weekly variable                              => Ignore variable y in the eval. 
+                # ?                                                                                   Create 1 variable.
+                # ? Case 2: Only x is defined; x is a daily variable                               => Ignore variable y in the eval.
+                # ?                                                                                   Create 7 variables for each day of the week.
+                # ? Case 3: x and y are defined; x and y are both weekly variables                 => Use both variables,
+                # ?                                                                                   Create 1 variable.
+                # ? Case 4: x and y are defined; x and y are both daily variables                  => Use both variables. 
+                # ?                                                                                   Create 7 variables where the day of the week matches.
+                # ? Case 5: x and y are defined; x is a daily variable and y is a weekly variable  => Use both variables. Create 7 variables for each day
+                # ? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                
+                if not is_daily_variable:
+                    X = variables.get(variable_x_list[0]) # get existing value for a variable
+                    
+                    if X is None:
+                        continue
+                    
+                    if eval_args['y']:
+                        # Case 3:
+                        Y = variables.get(variable_y_list[0])
+                        if Y is None:
+                            continue
+                    else:
+                        # Case 1:
+                        Y = 0
+                    
+                    defined_variable_used = True
+                    participants_dict[participant_id][variable_name] = eval(variable_func[1], {"__builtins__": {}}, {'x' : X, 'y' : Y})
+                
+                else:
+                    for day_of_week, daily_variable_name in enumerate([variable_name + '-' + day for day in 
+                                                ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]):
+                        
+                        # get value for X
+                        defined_variable_x = variable_x_list[day_of_week]
+                        X = variables.get(defined_variable_x) # get existing value for a variable
+                        if X is None:
+                            continue
+                        
+                        # get value for Y
+                        if eval_args['y']:
+                            if (len(variable_y_list) == 1):
+                                # Case 5:
+                                Y = variables.get(variable_y_list[0])
+                            else:
+                                # Case 4
+                                defined_variable_y = variable_y_list[day_of_week]
+                                Y=variables.get(defined_variable_y)
+                            
+                            # since y is needed in the calculation, if it is not found, skip.
+                            if Y is None:
+                                continue
+                        else:
+                            # Case 2:
+                            Y = 0
+
+                        defined_variable_used = True
+                        participants_dict[participant_id][daily_variable_name] = eval(variable_func[1], {"__builtins__": {}}, {'x' : X, 'y' : Y})
+
+            # after going through all participants, if no defined-variables were found, this should be concerning and a flag thrown.
+            if not defined_variable_used:
+                if list(self.variables.keys()).index(variable_name) < list(self.variables.keys()).index(variable_x_list[0]):
+                    err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_x: [{kwargs['defined_variable_x']}], but this variable is not defined in the current scope.", "red")
+                    raise Exception(err_msg)
+                
+                # ! This should not happen, undiagnosed error. 
+                if self.debug:
+                    print(colored(f"EMMA Data-Wrangling Warning: [{variable_name}] used defined_variable_x: [{kwargs['defined_variable_x']}], but did not find any such defined variable in its participants.", "yellow"))
+        
+        # raise Exception if defined variable's x and y are not defined properly
+        elif(len(variable_y_list) != 0):
+            err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_y: [{kwargs['defined_variable_y']}], but no defined_variable-x given. (must provide an x is y is defined.)", "red")
+            raise Exception(err_msg)
+        else:
+            err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] has no dataset given but also no defined variables given either.", "red")
+            raise Exception(err_msg)
+        
+        return participants_dict
             
 
     # Last Edit on 12/7/2022 by Reagan Kelley
@@ -418,73 +555,15 @@ class DataWrangling:
         # *              to foster more complicated calculations. 
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if(kwargs['dataset_type'] == None):
+            participants_dict = self.get_count_from_predefined(
+                participants_dict=participants_dict,
+                eval_args=eval_args,
+                variable_func=variable_func,
+                variable_name=variable_name,
+                defined_variable_x=kwargs['defined_variable_x'],
+                defined_variable_y=kwargs['defined_variable_y']
+            )
             
-            # build a list of x variables to use
-            if eval_args['x']:
-                # if defined_variable_x is a daily variable, get its day of the week variants
-                if kwargs['defined_variable_x'] in self.variables.keys():
-                    variable_x_list = [kwargs['defined_variable_x']]
-                else:
-                    # no weekly or daily version of this variable name found, must be a mis-definition.
-                    if kwargs['defined_variable_x'] + '-Monday' not in self.variables.keys():
-                            err_msg = colored(f'EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_x, [{kwargs["defined_variable_x"] + "-Monday"}], which is not a defined variable.', "red")
-                            raise NameError(err_msg)
-                    
-                    variable_x_list = [kwargs['defined_variable_x'] + '-' + day for day in ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]
-            else:
-                variable_x_list = []
-                
-            # build a list of y variables to use
-            if eval_args['y']:
-                # if defined_variable_x is a daily variable, get its day of the week variants
-                if kwargs['defined_variable_y'] in self.variables.keys():
-                    variable_y_list = [kwargs['defined_variable_y']]
-                else:
-                    # no weekly or daily version of this variable name found, must be a mis-definition.
-                    if kwargs['defined_variable_y'] + '-Monday' not in self.variables.keys():
-                            err_msg = colored(f'EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_y, [{kwargs["defined_variable_y"] + "-Monday"}], which is not a defined variable.', "red")
-                            raise NameError(err_msg)
-                    
-                    variable_y_list = [kwargs['defined_variable_y'] + '-' + day for day in ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]
-            else:
-                variable_y_list = []
-                
-            if(len(variable_x_list) != 0):
-                defined_variable_used = False
-                for participant_id, variables in participants_dict.items():
-                    
-                    for defined_variable_x in variable_x_list:
-                        X = variables.get(defined_variable_x) # get existing value for a variable
-                        
-                        if(X is not None):
-                            defined_variable_used = True
-                            
-                            # use defined-variable-y with defined-variable-x
-                            if (len(variable_y_list) == 1):
-                                Y = variables.get(variable_y_list[0])
-                            elif(len(variable_y_list) > 1):
-                                defined_variable_y = kwargs['defined_variable_y'] + '-' + defined_variable_x.split('-')[-1]
-                                Y=variables.get(defined_variable_y, 0)
-                                print(f'using {defined_variable_x} and {defined_variable_y}')
-                            else:
-                                Y = 0
-                            participants_dict[participant_id][variable_name] = eval(variable_func[1], {"__builtins__": {}}, {'x' : X, 'y' : Y})
-
-                if not defined_variable_used:
-                    if list(self.variables.keys()).index(variable_name) < list(self.variables.keys()).index(defined_variable_x):
-                        err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_x: [{defined_variable_x}], but this variable is not defined in the current scope.", "red")
-                        raise Exception(err_msg)
-                    if self.debug:
-                        print(colored(f"EMMA Data-Wrangling Warning: [{variable_name}] used defined_variable_x: [{defined_variable_x}], but did not find any such defined variable in its participants.", "yellow"))
-            
-            # raise Exception if defined variable's x and y are not defined properly
-            elif(len(variable_y_list) != 0):
-                err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_y: [{defined_variable_y}], but no defined_variable-x given. (must provide an x is y is defined.)", "red")
-                raise Exception(err_msg)
-            else:
-                err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] has no dataset given but also no defined variables given either.", "red")
-                raise Exception(err_msg)
-        
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # * If condition 1 or 2, use the variable_func to do a more
         # * complicated calculation with the aggregated results.
