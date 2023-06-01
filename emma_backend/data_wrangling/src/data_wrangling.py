@@ -45,6 +45,14 @@ class DataWrangling:
     def __init__(self, args : list[str]):
         # TODO: Provide absolute and relative path functionality
         
+        self.variables : dict[str, Variable] = create_variable_dictionary("variable_definitions.json")
+        self.variableNames : list[str] = []
+        for key in self.variables.keys():
+            self.variableNames.append(key)
+            
+        if "--print_variables" in args:
+            self.print_variable_definitions()
+            quit()
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # * Find the input / output directories for this
         # * data wrangling session.
@@ -69,11 +77,7 @@ class DataWrangling:
         self.__init_token_dict()
         self.data : dict[str, Dataset] = {}
         self.__read_args(args)
-        self.variables : dict[str, Variable] = create_variable_dictionary("variable_definitions.json")
 
-        self.variableNames : list[str] = []
-        for key in self.variables.keys():
-            self.variableNames.append(key)
         
     # Last Edit on 12/13/2022 by Reagan Kelley
     # Added Event args and verify-integrity
