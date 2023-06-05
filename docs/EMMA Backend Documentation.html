@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="keywords" content="">
+    
+    <title>EMMA Gerontechnology Docs</title>
+    <style>
+        body {
+          background-color: rgb(30, 105, 130);
+        }
+
+        h1 {
+            color: rgb(204, 192, 24);
+            text-align: center;
+        }
+
+        h2 {
+        color: rgb(255, 255, 255);
+        text-align: left;
+        margin: 25px 50px 75px;
+        padding-left: 50px;
+        }
+
+        h4 {
+            color: rgb(255, 255, 255);
+            text-align: left;
+            margin: 25px 50px 75px;
+            padding-left: 50px;
+            }
+
+        p{
+            color: rgb(255, 255, 255);
+            margin: 25px 50px 0px;
+        }
+
+        img {
+            display: block;
+            margin-left: 50px;
+            margin-right: auto;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+    </style>
+    
+</head>
+
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<body>
+    <!-- Sidebar -->
+<div class="w3-sidebar w3-light-grey w3-bar-block" style="width:25%">
+    <h3 class="w3-bar-item">Table of Contents</h3>
+    <a href="#introduction" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130);">Introduction</a>
+    <a href="#run-data-wrangling" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130);">How to Run EMMA Data Wrangling Python Code</a>
+    <a href="#data-wrangling-setup" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Setup</a>
+    <a href="#data-wrangling-arguments" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Command-line Arguments</a>
+
+</div>
+  
+<div style="margin-left:25%">
+    
+    <div class="w3-container">
+    <h1 id="introduction">Welcome to the EMMA Back-End Documentation!</h1>
+    </div>
+    
+    <p  style="text-indent: 30px;">This page contains all you may need to know about how the EMMA back-end software. This documentation provides details about how to run it, debug it,
+        and traverse its source code. If you are looking for something specific, feel free to use the navigation bar to directly go to one of the sections in this document. </p>
+    
+    <p>You can access all code for this project through the GitHub Repository: <a href="https://github.com/Reaganak40/gerontechnology" target="_blank" style="color:rgb(204, 192, 24);">Click Here</a></p>
+
+    <h1 id="run-data-wrangling">How to Run EMMA Data Wrangling Python Code</h1>
+    <h2 id="data-wrangling-setup">Setup</h2>
+    <p style="text-indent: 30px;">1.	Install Python3</p>
+    <p style="text-indent: 30px;">2.	Install Pip</p>
+    <p style="text-indent: 30px;">3.	Open a console window in the [.../emma_backend] directory </p>
+    <p style="text-indent: 30px;">4.	Run, pip install -r requirements.txt, to get all python packages to run code </p>
+    <p style="text-indent: 30px;">5.	Run python emma_backend.py with command line arguments </p>
+    
+    <h2>Run EMMA Back-End Script</h2>
+    <p style="text-indent: 30px;">The python script, <i>emma_backend.py</i>, is home base for running all data wrangling needs for EMMA. If you want the script to do specific actions,
+        it will require configuring its command-line arguments/parameters. </p>
+
+    <img src="./images/emma_backend_run.png" alt="emma_backend.py example" width="604.5" height="357">
+
+    <p id="data-wrangling-arguments">Command-line arguments typically follow this convention: [--argument] [parameter], where argument specifies a feature in the program, and the parameter is the value you provide
+        for that argument. For string arguments that have spaces in them, use quotation marks (i.e ""). Argument definitions are provided below:</p>
+
+    <h4 style="color:rgb(133, 3, 3);"><b>REQUIRED</b></h4>
+    <p> <b>[--interactions] [relative/path/to/interaction/table]</b> :: This is the excel file containing unprocessed interaction data from the EMMA app. The path provided to the
+    excel file is relative, from the input directory which is located at [.../emma_backend/data/input]. If the interaction table is in this directory, you can just provide the name of the excel file.</p>
+
+    <p> <b>[--events] [relative/path/to/event/table]</b> :: This is the excel file containing unprocessed events data from the EMMA app. The path provided to this
+    excel file is  also relative, from the input directory. If the event table is in this directory, you can just provide the name of the excel file.</p>
+
+    <h4 style="color:rgb(6, 66, 6);"><b>OPTIONAL</b></h4>
+    <p> <b>[--research] [1 or 0]</b> :: When 1, will output results to the research/data directory, separating tables by study and cohort. If 0, the output calculation tables
+        will instead be sent to [.../emma_backend/data/output]. Defaults to 0.</p>
+
+
+    <p> <b>[--no_database] [1 or 0]</b> :: When 1, will use the research participants folder, located at [.../emma_backend/research/participants],
+    for participant demographics instead of a back-end database. Defaults to 0.</p>
+
+    <p> <b>[--debug] [1 or 0]</b> :: When 1, Prints processes to console throughout the runtime of application. Defaults to 0.</p>
+
+    <p> <b>[--print_variables]</b> :: When this argument is provided, no data-wrangling is run. Instead, the program loads in and compiles the JSON variable definitions, 
+        and print their interpreted definitions to the screen.</p>
+
+    <p> <b>[--help]</b> :: When this argument is provided, no process is run, but the help manual is printed to the console.</p>
+    
+
+</div>
+</body>
+
+</html>

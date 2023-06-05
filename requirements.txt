@@ -7,3 +7,6 @@ mysql
 mysql-connector-python
 termcolor
 openpyxl
+colorama
+termcolor
+datetime
