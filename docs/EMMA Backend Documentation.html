@@ -63,6 +63,11 @@
     <a href="#run-data-wrangling" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130);">How to Run EMMA Data Wrangling Python Code</a>
     <a href="#data-wrangling-setup" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Setup</a>
     <a href="#data-wrangling-arguments" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Command-line Arguments</a>
+    <a href="#emma-variables" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130);">EMMA Variable Cheat Sheet</a>
+    <a href="#emma-variables-universal" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Universal Attributes</a>
+    <a href="#emma-variables-interactions" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Interactions Attributes</a>
+
+
 
 </div>
   
@@ -116,6 +121,93 @@
 
     <p> <b>[--help]</b> :: When this argument is provided, no process is run, but the help manual is printed to the console.</p>
     
+        <br>
+    <h1 id="emma-variables">EMMA Variables Cheat Sheet</h1>
+
+    <p style="text-indent: 30px;">This section is meant to provide a clear guide to define research variables for the data-wrangling application. Research variables are defined in the
+        JSON variable definitions file located at [.../emma_backend/data_wrangling/src]. These variables follow a rigid structure and syntax so that the program and interpret and calculate
+        these variables quickly. 
+    </p>
+
+    <img src="./images/variable_idea.png" alt="variable definition workflow" width="828" height="210">
+
+    <p style="text-indent: 30px;">Since the variable definitions key uses JSON, which is an attribute-notation markup language, we need to use the correct configuration and formatting.
+        Before any data-wrangling is done, the program will read this JSON file for current and new variable definitions. More specifically, the program will be looking for a
+        <i>Variables</i> attribute which will contain a list of variable definitions. If the file doesn't have this initial setup, the program will not run. An example of the proper setup is shown below.
+    </p>
+    <img src="./images/JSON_variable_definition_format.png" alt="variable definition format"  width="513" height="338">
+
+    <h2>Variable Types and Attributes</h2>
+
+    <p style="text-indent: 30px;">Every variable definition will be an element in this variable list. Subsequently, each variable will contain its own set of attributes to define and
+        extrapolate the context of what to calculate. Some variable attributes are universal and must be used in each new definition, while others are dataset-specific, and should thus
+        only be provided when the context demands it. All variable attributes and their contexts will be explained below.
+    </p>
+
+    <p style="text-indent: 30px;">There are three types of variables: interaction, events, and reference variables. Interaction variables calculate data from the Interactions table, while
+        event variables calculate data from the Events table. Reference variables do not calculate new data from these tables but uses already calculated variables to do further calculations.
+        Reference variables can use a defined-variable-x and a defined-variable-y which can reference any variable from any table, or even other reference variables.
+    </p>
+
+    <h2 id="emma-variables-universal">Universal Attributes</h2>
+
+    <p style="text-indent: 30px;">These are attributes that all definitions can and should use. All variables MUST include a <i>name</i>, and a <i>dataset</i>
+        UNLESS the new variable is using values from an already defined variable. The variable MUST also include a <i>function</i> attribute.
+        Some attributes can be omitted, and their default values are provided below.
+    </p>
+
+    <h4 style="color:rgb(133, 3, 3);"><b>REQUIRED</b></h4>
+    
+    <p> <b>["name"] [attribute type: str]</b> :: The name of the new variable.
+    </p>
+
+    <p> <b>["dataset"] [attribute type: str]</b> :: The name of the dataset that this variable will look for data. The attribute must either be "Interactions" or "Events",
+        There cannot be more than one dataset.
+    </p>
+
+    <p style="padding-left: 30px;"><b>NOTE:</b> The dataset attribute is only required for interaction and event variables. Reference variables do not and should not use
+        the dataset attribute but the defined-variable attributes instead. If you want to define a variable to combine data from datasets, it is advised that you should
+        first define an interactions variable, an events variable, and then define a reference variable that uses predefined attributes.
+    </p>
+    
+    <p> <b>["defined-variable-x"] [attribute type: str]</b> :: This is a name of an already defined variable that should be used for the function attribute's x, rather
+        than the aggregation of data from a dataset. If defined-variable-x references a daily variable, do not provide its week day; the program will do this
+        automatically.
+    </p>
+
+    <p> <b>["defined-variable-y"] [attribute type: str]</b> :: This is a name of an already defined variable that should be used for the function attribute's y, rather
+        than the aggregation of data from a dataset. If defined-variable-y references a daily variable, do not provide its week day; the program will do this
+        automatically. Defined-variable-y should only be used if defined-variable-x is used. If y is provided without an x, and error will be
+    </p>
+
+    <p> <b>["function"] [attribute type: list[str]]</b> :: The function attribute defines what to calculate after aggregation. This attribute is a list with exactly
+        two elements. At index 0, provide the variables that this function will use. Only x and y variables are allowed, so first index should look like
+        "x", or "x,y". At index 1, provide the function to do with this variable(s), example: "x/7". In this example we are telling the problem, given an x, divide it by 7.
+        Unless predefined variables are defined, "x" is always the aggregated variables. 
+    </p>
+
+    <h4 style="color:rgb(6, 66, 6);"><b>OPTIONAL</b></h4>
+
+    <p> <b>["scope"] [attribute type: str]</b> :: A variable's scope can either be "daily" or "weekly". The scope defines the range where data is aggregated. If weekly,
+        data will be aggregated from the beginning of Sunday to Saturday. If daily, this variable will turn into 7 variables, each with the provided variable name and its
+        respective day of the week appended to the end. Each daily variable will aggregate data only from its day. Defaults to "weekly".
+    </p>
+    <p style="padding-left: 30px;"><b>NOTE:</b> Reference variables do not use the scope variable at all. Instead, the scope is interpreted based on the scope of its
+        defined variables. Reference variables will have weekly scope if its defined variables have weekly scope, but if defined-variable-x and/or defined-variable-y
+        have a daily scope, the reference variable will be daily, and 7 reference variables will be created.
+    </p>
+
+    <h2 id="emma-variables-interactions">Interactions Attributes</h2>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 
 </div>
 </body>
