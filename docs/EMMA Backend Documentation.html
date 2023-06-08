@@ -66,6 +66,8 @@
     <a href="#emma-variables" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130);">EMMA Variable Cheat Sheet</a>
     <a href="#emma-variables-universal" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Universal Attributes</a>
     <a href="#emma-variables-interactions" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Interactions Attributes</a>
+    <a href="#emma-variables-events" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Events Attributes</a>
+    <a href="#emma-variables-examples" class="w3-bar-item w3-button" style="color: rgb(30, 105, 130); text-indent: 30px;">Examples</a>
 
 
 
@@ -86,9 +88,10 @@
     <h2 id="data-wrangling-setup">Setup</h2>
     <p style="text-indent: 30px;">1.	Install Python3</p>
     <p style="text-indent: 30px;">2.	Install Pip</p>
-    <p style="text-indent: 30px;">3.	Open a console window in the [.../emma_backend] directory </p>
-    <p style="text-indent: 30px;">4.	Run, pip install -r requirements.txt, to get all python packages to run code </p>
-    <p style="text-indent: 30px;">5.	Run python emma_backend.py with command line arguments </p>
+    <p style="text-indent: 30px;">3.	Clone the repository to your local computer (or access it through a server)</p>
+    <p style="text-indent: 30px;">4.	Open a console window in the [.../emma_backend] directory </p>
+    <p style="text-indent: 30px;">5.	Run, pip install -r requirements.txt, to get all python packages to run code </p>
+    <p style="text-indent: 30px;">6.	Run python emma_backend.py with command line arguments </p>
     
     <h2>Run EMMA Back-End Script</h2>
     <p style="text-indent: 30px;">The python script, <i>emma_backend.py</i>, is home base for running all data wrangling needs for EMMA. If you want the script to do specific actions,
@@ -146,7 +149,7 @@
 
     <p style="text-indent: 30px;">There are three types of variables: interaction, events, and reference variables. Interaction variables calculate data from the Interactions table, while
         event variables calculate data from the Events table. Reference variables do not calculate new data from these tables but uses already calculated variables to do further calculations.
-        Reference variables can use a defined-variable-x and a defined-variable-y which can reference any variable from any table, or even other reference variables.
+        Reference variables can use a defined-variable-x and a defined-variable-y which can reference any variable from any table, even other reference variables.
     </p>
 
     <h2 id="emma-variables-universal">Universal Attributes</h2>
@@ -158,10 +161,10 @@
 
     <h4 style="color:rgb(133, 3, 3);"><b>REQUIRED</b></h4>
     
-    <p> <b>["name"] [attribute type: str]</b> :: The name of the new variable.
+    <p> <b>["name"] [attribute type: str]</b> :: the name of the new variable.
     </p>
 
-    <p> <b>["dataset"] [attribute type: str]</b> :: The name of the dataset that this variable will look for data. The attribute must either be "Interactions" or "Events",
+    <p> <b>["dataset"] [attribute type: str]</b> :: the name of the dataset that this variable will look for data. The attribute must either be "Interactions" or "Events",
         There cannot be more than one dataset.
     </p>
 
@@ -170,25 +173,25 @@
         first define an interactions variable, an events variable, and then define a reference variable that uses predefined attributes.
     </p>
     
-    <p> <b>["defined-variable-x"] [attribute type: str]</b> :: This is a name of an already defined variable that should be used for the function attribute's x, rather
+    <p> <b>["defined-variable-x"] [attribute type: str]</b> :: this is a name of an already defined variable that should be used for the function attribute's x, rather
         than the aggregation of data from a dataset. If defined-variable-x references a daily variable, do not provide its week day; the program will do this
         automatically.
     </p>
 
-    <p> <b>["defined-variable-y"] [attribute type: str]</b> :: This is a name of an already defined variable that should be used for the function attribute's y, rather
+    <p> <b>["defined-variable-y"] [attribute type: str]</b> :: this is a name of an already defined variable that should be used for the function attribute's y, rather
         than the aggregation of data from a dataset. If defined-variable-y references a daily variable, do not provide its week day; the program will do this
-        automatically. Defined-variable-y should only be used if defined-variable-x is used. If y is provided without an x, and error will be
+        automatically. Defined-variable-y should only be used if defined-variable-x is used. If y is provided without an x, an error will be thrown.
     </p>
 
-    <p> <b>["function"] [attribute type: list[str]]</b> :: The function attribute defines what to calculate after aggregation. This attribute is a list with exactly
+    <p> <b>["function"] [attribute type: list[str]]</b> :: the function attribute defines what to calculate after aggregation. This attribute is a list with exactly
         two elements. At index 0, provide the variables that this function will use. Only x and y variables are allowed, so first index should look like
         "x", or "x,y". At index 1, provide the function to do with this variable(s), example: "x/7". In this example we are telling the problem, given an x, divide it by 7.
-        Unless predefined variables are defined, "x" is always the aggregated variables. 
+        Unless predefined variables are defined, "x" is always the sum or count of rows. 
     </p>
 
     <h4 style="color:rgb(6, 66, 6);"><b>OPTIONAL</b></h4>
 
-    <p> <b>["scope"] [attribute type: str]</b> :: A variable's scope can either be "daily" or "weekly". The scope defines the range where data is aggregated. If weekly,
+    <p> <b>["scope"] [attribute type: str]</b> :: a variable's scope can either be "daily" or "weekly". The scope defines the range where data is aggregated. If weekly,
         data will be aggregated from the beginning of Sunday to Saturday. If daily, this variable will turn into 7 variables, each with the provided variable name and its
         respective day of the week appended to the end. Each daily variable will aggregate data only from its day. Defaults to "weekly".
     </p>
@@ -197,7 +200,106 @@
         have a daily scope, the reference variable will be daily, and 7 reference variables will be created.
     </p>
 
+    <br>
     <h2 id="emma-variables-interactions">Interactions Attributes</h2>
+
+    <p style="text-indent: 30px;">These are attributes that variables using the interactions dataset should use. When using interaction datasets always include
+        elementIDs. The rest can be omitted and have default values.
+    </p>
+
+    <p> <b>["elementIDs"] [attribute type: list[int]]</b> :: a list of the elementIDs to be counted per user. When the list is empty, will count all elementIDs.
+    </p>
+
+    <p> <b>["distinct"] [attribute type: bool]</b> :: boolean value that when true, the program will only count distinct uses. Defaults to false.
+    </p>
+
+    <p> <b>["tokens"] [attribute type: list[str]]</b> :: a list of tokens to filter uses by. When this is omitted, there is no token filtering.
+    </p>
+
+    <p> <b>["type"] [attribute type: str]</b> :: a string to filter the rows of the interaction table by with values in the type column. When this is omitted, there is
+        no filtering by type.
+    </p>
+
+    <p> <b>["source"] [attribute type: str]</b> :: a string name of the source by which this interaction came from ("web" or "app"). When this is omitted, there is
+        no filtering by source.
+    </p>
+
+    <br>
+    <h2 id="emma-variables-events">Events Attributes</h2>
+
+    <p>These are attributes that the variables using the events dataset should use. </p>
+
+    <p> <b>["sum"] [attribute type: str]</b> :: this is the name of the column to summate values from.
+    </p>
+
+    <p> <b>["count"] [attribute type: str]</b> :: this is the name of the column to count row entries from. <b>(sum and count cannot be defined in the same definition).</b>
+    </p>
+
+    <p> <b>["healthTrackType"] [attribute type: list[str]]</b> :: a list of types in the <i>healthTrackType</i> column to filter by.
+    </p>
+
+    <p> <b>["completed"] [attribute type: bool]</b> :: boolean value that when true, the program will only count completed events,
+        using the value in the <i>completed</i> column. Defaults to false.
+    </p>
+
+    <p> <b>["filter_by"] [attribute type: list[list[str, <i>varies</i>]]]</b> :: a list of pairs to filter the sum or count by. Each element in the filter_by list will look
+        like [“column_name”, row_value]. The row_value can be a: integer, string, a boolean, or a list of integers. 
+    </p>
+
+    <h2 id="emma-variables-examples">Examples</h2>
+
+    <img src="./images/interactions_example.png" alt="interactions variable definition example 1">
+    <p>CalenderUse uses the Interactions dataset, counting all occurrences of elementID [9]. This variable uses a daily scope, which means this will create 7 variables as output for
+        each weekly calculation table. The function ["x", "x"] means to only count the occurrences and nothing further.
+    </p>
+
+    <img src="./images/interactions_example2.png" alt="interactions variable definition example 2">
+    <p>
+        TodayPageGoal uses the Interactions dataset, counting all occurrences of elementIDs [8, 13, 14, 379, 380, 381, 384]. This variable uses a daily scope, which means 
+        this will create 7 variables as output for each weekly calculation table. The variable uses the distinct attribute, which is set to true. This means that the variable
+        will only look at interactions separated by at least 5 minutes. Finally, the function attribute defined as ["x", "x/3"], means that after counting all the elementIDs
+        for each participant, it will divide that total by 3. 
+    </p>
+
+    <img src="./images/events_example.png" alt="events variable definition example 1">
+    <p>
+        TotalPEWeeklyPHEX uses the Events dataset, which requires different attributes than the Interactions dataset. The sum attribute defined as "healthTrackData", means
+        to sum up all the values for each participant in the <i>healthTrackData</i> column. However, we have some attributes that are used to filter these results before
+        summing the values. "healthTrackType" : ["phex"] means that we will only count rows with the "phex" tag. We use the completed attribute as true to further filter
+        the results to only have rows with the completed value equal to 1. The scope of this variable is weekly so it will look at all the rows throughout the week in its
+        calculation. The function attribute ["x", "x"], means that after the sum is calculated per participant, to do nothing further.
+    </p>
+
+    <img src="./images/events_example2.png" alt="events variable definition example 2">
+    <p>
+        EventActions_Priority_Av uses the Events dataset with a weekly scope. It filters the rows with the filter_by attribute to only include rows where the priority
+        column in those rows is equal to 1. It uses the count attribute instead of the sum attribute, so it will count the row occurrences for each participant after
+        the filter_by step. The function attribute ["x", "x/7"] means that after counting all the rows, divide that result by 7. Since the scope of this variable is
+        weekly and the function divides this value by 7, this variable is calculating an average through the week.
+    </p>
+
+    <img src="./images/reference_example.png" alt="reference variable definition example 1">
+    <p>
+        WEGoal is a reference variable, since it does not use the dataset attribute but instead the defined-variable-x attribute. The defined-variable-x attribute points
+        to the TotalWEWeeklyWELLX variable. This means it will use the values calculated by this variable for new calculations. The function attribute
+        is defined as ["x", "x/3"], which means that for each row in the TotalWEWeeklyWELLX column in the calculation table, it will use the value and divide it by 3 for this variable's
+        final calculation. Since TotalWEWeeklyWELLX was a weekly scope, WEGoal is also a weekly scope and only 1 variable will be created in the calculation table.
+    </p>
+
+    <img src="./images/reference_example2.png" alt="reference variable definition example 2">
+    <p>
+        TotalUserNoteInteractions is a reference variable that uses two references in its calculations. It uses the defined-variable-x to declare a reference to SumUserNoteInteractions,
+        and defined-variable-y to reference SumViewUserNoteInteractions. These two variables will be known as x and y in the function attribute respectively. The function attribute,
+        ["x,y", "x+y"], formally declares x and y, and then says for each row in the calculation table, add x and y. In this case, it will add the row calculation of SumUserNoteInteractions
+        with SumViewUserNoteInteractions. The scope of this variable is daily, since while SumUserNoteInteractions_Av is weekly, SumViewUserNoteInteractions is daily so this
+        new variable will take the daily scope as higher precedence. So, this reference variable will have 7 columns in its calculation table referencing each day of the week.
+    </p>
+
+
+
+
+
+
 
 <br>
 <br>
