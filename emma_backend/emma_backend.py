@@ -39,6 +39,11 @@ def print_help_screen():
     print(colored("[--debug] [1 or 0]", "yellow"), end=' ')
     print("==> When 1, Prints processes to console throughout the")
     print("                       application. Defaults to 0.")
+    print(colored("[--print_variables]", "yellow"), end=' ')
+    print("==> When this argument is provided, no data-wrangling is run. ")
+    print("                        Instead, the program loads in and compiles the JSON variable")
+    print("                        definitions, and print their interpreted definitions")
+    print("                        to the screen")
     
     
     
@@ -57,7 +62,11 @@ def update_database(calculation_tables, cxn_engine = None, debug : bool = False)
     
     # table : ((week, year), dataframe)
     for table in calculation_tables:
-        update_from_dataframe(table[1].copy(), table[0][0], table[0][1], cxn_engine, allow_missing_values=False, check_participants_exist=True)
+        update_from_dataframe(table[1].copy(), table[0][0], table[0][1], cxn_engine,
+                              allow_missing_values=True,      # will add NaN values to columns in the database not in this calculation table 
+                              add_undefined_values=True,      # will create new columns in the calculation table if it finds a new variable
+                              check_participants_exist=True,  # will add participants to the Participant table if they do not currently exist.
+                              debug=debug)
         if (debug):
             print("* (Week {}, {}) data added to back-end database.".format(table[0][0], table[0][1]))
 

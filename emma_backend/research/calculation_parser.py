@@ -4,6 +4,8 @@ import glob
 import numpy as np
 from pathlib import Path
 from sqlalchemy import create_engine, text
+from colorama import just_fix_windows_console
+from termcolor import colored
 
 def get_all_participants(cxn_engine = None):
     """Returns a dataframe of all participants who belong to a weekly calculation table, as well
@@ -59,6 +61,10 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
     """
     participants : pd.DataFrame = get_all_participants(cxn_engine)
     
+    if len(participants) == 0:
+        err_msg = colored("EMMA Data-wrangling Error: Research tables requested, but no participant demographics loaded.", "red")
+        raise Exception(err_msg) 
+    
     if (debug):
         print("* {} participants found in {}".format(len(participants), "participant table(s)" if cxn_engine is None else "database"))
     
@@ -78,7 +84,7 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
         # ! Note: If no one in an active study participates, no table will be created for that study
         for study in study_options:
             study_participants = participants[participants['study'] == study]
-            cohort_options = study_participants['cohort'].unique()
+            cohort_options = [int(x) for x in study_participants['cohort'].unique()]
 
             # * Step 3. For this week's calculation table, look through the cohorts for the studies active this week
             for cohort in cohort_options:

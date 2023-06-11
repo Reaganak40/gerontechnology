@@ -12,6 +12,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy import exc as sa_exc
 import sys
 from pathlib import Path
+from colorama import just_fix_windows_console
+from termcolor import colored
 
 # Local Imports
 try:
@@ -89,7 +91,7 @@ def update_from_csv(filename: str, week, year, allow_missing_values=False, check
 
 # Last Edit on 3/6/2023 by Reagan Kelley
 # Updates add participant according to new participant table schema
-def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_engine = None, allow_missing_values=False, check_participants_exist=True):
+def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_engine = None, allow_missing_values=False, check_participants_exist=True, add_undefined_values=False, debug=False):
     """ Updates the calculation table of the database with entries from a dataframe.
 
     Args:
@@ -110,20 +112,30 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
 
     exec_result = cxn_engine.connect().execute(text("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'Calculations'"))
 
-    # The variables defined in the SQL table use in the dashboard
+    # The variables defined in the SQL table
     database_defined_variables = list(filter(lambda x: x != "participant_id" and x != 'week_number' and x != 'year_number', [result[0] for result in exec_result.fetchall()]))
 
     # the following list comprehension provides all variables needed by the SQL table not present in the calculations table
     # undefined_variables = [(SQL Name)]
-    undefined_variables : list(str) = [x for x in database_defined_variables if x not in [x[0] for x in variables]]
+    missing_variables : list(str) = [x for x in database_defined_variables if x not in [x[0] for x in variables]]
 
     # this is all the variables in the calculation table that need to be removed for database entry
-    bad_variables : list(str) = [x[0] for x in variables if x[0] not in database_defined_variables]
+    undefined_variables : list(str) = [x for x in variables if x[0] not in database_defined_variables]
 
-    if(not allow_missing_values):
-        if (len(undefined_variables) > 0):
-            raise Exception("Cannot proceed, these variables are not present in the calculation table: {}".format(undefined_variables))
+    if (len(missing_variables) > 0):
+        if not allow_missing_values:
+            err_msg = colored("EMMA Data-Wrangling Error: [Flag: !allow_missing_values]. Cannot proceed, these variables are not present in the calculation table: {}".format(missing_variables), "red")
+            raise Exception(err_msg)
 
+    if (len(undefined_variables) > 0):
+        if not add_undefined_values:
+            err_msg = colored("EMMA Data-Wrangling Error: [Flag: !add_undefined_values]. Cannot proceed, these variables are not defined in the database: {}".format(undefined_variables), "red")
+            raise Exception(err_msg)
+        
+        # add missing variables to the database schema
+        # Create a list of tuples to define new calculation table columns [(name_of_column, type)]
+        update_schema([(x[0], str(calculations_table[x[1]].dtypes)) for x in undefined_variables], debug=debug)
+            
     variable_translations : dict(str, str) = dict((y, x) for x, y in variables)
 
     if(check_participants_exist):
@@ -135,11 +147,10 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
     calculations_table['week_number'] = [week] * calculations_table.shape[0]
     calculations_table['year_number'] = [year] * calculations_table.shape[0]
 
-    for uv in undefined_variables:
-        calculations_table[uv] = [np.nan] * calculations_table.shape[0]
+    # resolve missing values from database by giving those columns NAN values
+    for mv in missing_variables:
+        calculations_table[mv] = [np.nan] * calculations_table.shape[0]
 
-    # remove bad variables from calculation table
-    calculations_table.drop(bad_variables, axis=1, inplace=True)
 
     calculations_table.to_sql('calculations', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
 
@@ -163,97 +174,34 @@ def add_undefined_participants(calculations_table, cxn_engine):
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial Implementation
-def get_dashboard_variables():
-    """Gets the dashboard variables defined in dashboard_variables.json
-
-    Returns:
-        List(dict): A list of dictionaries that is [{"name":str, "type":str}]
-    """
-    with open("dashboard_variables.json") as json_file:
-        data = json.load(json_file)
-        return data['Variables']
-
-# Last Edit on 12/30/2022 by Reagan Kelley
-# Initial Implementation
-def update_schema_file():
-    """ Updates the schema sql file that is referenced by create_db()
-    """
-    variable_schema = get_dashboard_variables()
-    variables = ""
-
-    for variable in variable_schema:
-        variables += "{} {},\n    ".format(variable["name"], variable["type"])
-
-    sql_schema = """\
--- EMMA Variables SCHEMA
--- Last Modified By: Reagan Kelley
-
-CREATE TABLE IF NOT EXISTS Participants
-(
-    participant_id INTEGER,
-    participant_name varchar(256),
-    study varchar(10),
-    cohort int,
-    active int,
-
-    PRIMARY KEY (participant_id)
-);
-
-CREATE TABLE IF NOT EXISTS Calculations
-(
-    participant_id INTEGER,
-    week_number INTEGER,
-    year_number INTEGER,
-
-    -- Variables Used in the Calculations Table
-    """ + f"{variables}" + """
-    PRIMARY KEY (participant_id, week_number, year_number),
-    FOREIGN KEY (participant_id) REFERENCES Participants(participant_id)
-);
-    """
-
-    with open("EMMA_variables_schema.sql", "w") as fd:
-        fd.write(sql_schema)
-
-# Last Edit on 12/30/2022 by Reagan Kelley
-# Initial Implementation
-def update_schema(force_delete=False, debug=False):
+def update_schema(new_calculation_variables, debug=False):
     """ Updates the database calculations table columns given
-        updates from the dashboard variables json file.
+        with new columns to add to the table schema.
 
     Args:
         force_delete (bool, optional): When true, will drop columns from the calculation table
         if those columns are no longer defined in dashboard variables. Defaults to False, to avoid accidental deletions.
     """
-    update_schema_file()
-
-    variables = get_dashboard_variables()
-    variable_names = [d["name"] for d in variables]
     cxn = connect_to_db("emma_backend", user="root", password="root", create=True)
 
     cursor = cxn.cursor()
 
-    cursor.execute("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'Calculations'")
-    results = [result[0] for result in cursor.fetchall()]
-
-    # exclude any column names that are not variables
-    already_defined_variables = list(filter(lambda x: x != "participant_id" and x != 'week_number' and x != 'year_number', results))
-    
-    extra_variables = [x for x in variables if x["name"] not in already_defined_variables]
-    variables_to_drop = [x for x in already_defined_variables if x not in variable_names]
-
-    if(debug):
-        print("Variables added: {}".format(extra_variables))
-        print("Variables removed: {}".format(variables_to_drop))
-
-    for variable in extra_variables:
-        sql_str = "ALTER TABLE Calculations Add {} {};".format(variable["name"], variable["type"])
+    type_dict = {'float64' : 'FLOAT', 'int64' : 'INT'}
+    for var_name, var_type in new_calculation_variables:
+        
+        try:
+            var_type = type_dict[var_type]
+        except:
+            err_msg = colored(f"EMMA Data-Wrangling Error: {var_type} is not a known variable type for update_schema.", "red")
+            raise Exception(err_msg)
+        
+        sql_str = "ALTER TABLE Calculations Add {} {};".format(var_name, var_type)
         cursor.execute(sql_str)
-    if(force_delete):
-        for variable in variables_to_drop:
-            sql_str = "ALTER TABLE Calculations DROP COLUMN {};".format(variable)
-            cursor.execute(sql_str)
+            
     
+    if(debug):
+        print(f"* Updated Calculation table schema: {len(new_calculation_variables)} new variables added.")
+        
     cxn.commit()
 
 def add_participants_from_file(absolute_path : str, cxn_engine = None):

@@ -51,7 +51,6 @@ def executeScriptsFromFile(filename : str, cxn : mysql.connector.MySQLConnection
     cxn.commit()
 
 def create_and_fill():
-    update_schema_file()
     create_db()
     add_participants_from_research()
 
