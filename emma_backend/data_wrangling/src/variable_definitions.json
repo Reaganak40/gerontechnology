@@ -370,7 +370,7 @@
             "name": "CreateEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [13],
-            "function": ["x", "x/7"]
+            "function": ["x", "x/7"],
         },
         {
             "name": "ViewEvent",

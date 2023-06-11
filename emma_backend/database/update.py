@@ -148,8 +148,7 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
     calculations_table['year_number'] = [year] * calculations_table.shape[0]
 
     # resolve missing values from database by giving those columns NAN values
-    for mv in missing_variables:
-        calculations_table[mv] = [np.nan] * calculations_table.shape[0]
+    calculations_table = calculations_table.reindex(columns = calculations_table.columns.tolist() + missing_variables)
 
 
     calculations_table.to_sql('calculations', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
