@@ -21,8 +21,19 @@ class Variable:
         Args:
             variable_definition (dict): Holds the variable definition attributes such as the name and the elementIDs used.
         """
+        
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get universal attributes
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         self.name = variable_definition["name"]
-        self.lambda_function = variable_definition["function"]
+        try:
+            self.lambda_function = variable_definition["function"]
+        except:
+            err_msg = colored(f'EMMA Data-Wrangling Error: Variable definition [{self.name}] missing function attribute.', "red")
+            raise NameError(err_msg)
+        self.day_of_week = day_of_week
+        
+        self.study = variable_definition.get("study", None)
         
         if variable_definition.get("dataset") == None:
             self.dataset_type = None
@@ -31,22 +42,58 @@ class Variable:
         elif variable_definition["dataset"] == "Events":
             self.dataset_type = DatasetType.EVENTS
 
-        self.tokens = variable_definition.get("tokens", None)
-        self.distinct = variable_definition.get("distinct", False)
-        self.elementIDs = variable_definition.get("elementIDs", None)
-        self.type = variable_definition.get("type", None)
-        self.source = variable_definition.get("source", None)
         
-        self.sum = variable_definition.get("sum", None)
-        self.count = variable_definition.get("count", None)
-        self.filter_by = variable_definition.get("filter_by", None)
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get interactions attributes if Interactions Variable
+        # * Make none for attributes otherwise to avoid contamination
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if self.dataset_type == DatasetType.INTERACTIONS:
+            self.tokens = variable_definition.get("tokens", None)
+            self.distinct = variable_definition.get("distinct", False)
+            
+            try:
+                self.elementIDs = variable_definition["elementIDs"]
+            except:
+                err_msg = colored(f'EMMA Data-Wrangling Error: Variable definition [{self.name}] uses the interactions table but does not provide an elementIDs attribute'+\
+                    '(make list empty if you wish to look at all elementIDs).', "red")
+                raise ValueError(err_msg)
+                
+            self.type = variable_definition.get("type", None)
+            self.source = variable_definition.get("source", None)
+        else:
+            self.tokens     = None
+            self.distinct   = None
+            self.elementIDs = None
+            self.type       = None
+            self.source     = None
+        
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get Events attributes if Events Variable
+        # * Make none for attributes otherwise to avoid contamination
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if self.dataset_type == DatasetType.EVENTS:
+            self.sum = variable_definition.get("sum", None)
+            self.count = variable_definition.get("count", None)
+            self.filter_by = variable_definition.get("filter_by", None)
+            self.healthTrackType = variable_definition.get("healthTrackType", None)
+            self.completed = variable_definition.get("completed", False)
+        else:
+            self.sum             = None
+            self.count           = None
+            self.filter_by       = None 
+            self.healthTrackType = None
+            self.completed       = None
 
-        self.healthTrackType = variable_definition.get("healthTrackType", None)
-        self.completed = variable_definition.get("completed", False)
-        self.day_of_week = day_of_week
-
-        self.defined_variable_x = variable_definition.get("defined-variable-x", None)
-        self.defined_variable_y = variable_definition.get("defined-variable-y", None)
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get reference attributes if reference Variable
+        # * Make none for attributes otherwise to avoid contamination
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if self.dataset_type == None:
+            self.defined_variable_x = variable_definition.get("defined-variable-x", None)
+            self.defined_variable_y = variable_definition.get("defined-variable-y", None)
+        else:
+            self.defined_variable_x = None
+            self.defined_variable_y = None      
     
     def convert_to_daily(self, x_is_daily=False, y_is_daily=False):
         if self.day_of_week != -1:
@@ -87,7 +134,11 @@ def variable_factory(variable_definition : dict):
     """
     res : list[Variable] = []
 
-    name = variable_definition["name"]
+    try:
+        name = variable_definition["name"]
+    except:
+        err_msg = colored(f'EMMA Data-Wrangling Error: Variable definition missing name attribute.', "red")
+        raise NameError(err_msg)
     
     # if daily, provide 7 variables with the day in their definition name.
     if(variable_definition.get("scope") == "daily"): 
@@ -135,8 +186,6 @@ def create_variable_dictionary(filename):
                         if variable.defined_variable_x not in variables.keys():
                             # no weekly or daily version of this variable name found, must be a mis-definition.
                             if variable.defined_variable_x + '-Monday' not in variables.keys():
-                                from pprint import pprint
-                                pprint(list(variables.keys()))
                                 err_msg = colored(f'EMMA Data-Wrangling Error: [{variable.name}] uses defined_variable_x, [{variable.defined_variable_x}], which is not a defined variable.', "red")
                                 raise NameError(err_msg)
                             

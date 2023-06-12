@@ -15,7 +15,6 @@ from termcolor import colored
 from typing import Callable
 
 
-
 # Local Imports
 try:
     from dataset import DatasetType, Dataset
@@ -142,24 +141,74 @@ class DataWrangling:
         self.emma_token['FZ']  = '180B85CE-E425-46CA-B4E5-F09933601773'
 
     def print_variable_definitions(self):
+        v_count = 0
         for name, variable in self.variables.items():
             print(colored(f"{name}:", "blue"), end=' ')
             
+            if variable.study == None:
+                study = ['universal variable']
+            else:
+                study = variable.study
+            
             if variable.dataset_type == DatasetType.INTERACTIONS:
                 print("[Interactions Variable]")
+                print(colored("\tStudy:", "light_blue"), study)
                 print(f"\telement IDs: {variable.elementIDs}")
                 print(f"\tdistinct:    {variable.distinct}")
             
             elif variable.dataset_type == DatasetType.EVENTS:
                 print("[Events Variable]")
+                print("Study:", study)
                 print(f"\tsum:       {variable.sum}")
                 print(f"\tcount:     {variable.count}")
                 print(f"\tfilter by: {variable.filter_by}")
             else:
                 print("[Reference Variable]")
+                print("Study:", study)
                 print(f"\tdefined-variable-x: {variable.defined_variable_x}")
                 print(f"\tdefined-variable-y: {variable.defined_variable_y}")
                 print(f"\tfunction: given [{variable.lambda_function[0]}], perform [{variable.lambda_function[1]}]")
+            
+            v_count += 1
+        
+        study = self.get_study_list()
+        print("\n**********************************")
+        print("        -- Statistics --")
+        print(" Variable Count:", v_count)
+        
+        for name, vars in study.items():
+            print(f' # of "{name}" variables: {len(vars)}')
+        print("**********************************")
+        
+        
+    
+    def get_study_list(self):
+        """Uses the current variable definitions to provide a segregated list of variable names separated according to their intended study.
+
+        Raises:
+            NameError: Raised when a variable tries to use the universal study name. "universal" is used for variables that are not assigned to any study.
+
+        Returns:
+            list[tuple]: Where each element tuple[0] is the name of the study, and tuple[1] is the list of variables for that study.
+        """
+        res = {}
+        res['universal'] = []
+        
+        for name in self.variableNames:
+            variable = self.variables[name]
+            if variable.study is None:
+                res['universal'].append(name)
+            else:
+                for study_name in variable.study:
+                    if study_name == 'universal':
+                        err_msg = colored(f'EMMA Data-Wrangling Error: Variable [{name}] in study attribute uses name: "universal", which is not allowed.', "red")
+                        raise NameError(err_msg)
+                    
+                    if res.get(study_name) is None:
+                        res[study_name] = [name]
+                    else:
+                        res.append(name)
+        return res
     
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
@@ -208,7 +257,6 @@ class DataWrangling:
             df = Utils.filter_to_day_of_week(df, day_of_week)
         
         # create a SQL string to filter DataFrame to only include rows with the desired interaction elementIDs
-
         if len(elementIDs) > 0:
             query_string += "("
             for i in range(len(elementIDs)):

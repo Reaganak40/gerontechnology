@@ -9,6 +9,10 @@ from database.sql_shell import connect_to_db
 from database.update import update_from_dataframe
 from research.calculation_parser import populate_research_tables
 
+# ? VSCode Extensions Used:
+# ?     - Better Comments
+# ?     - autoDocstring
+
 def print_help_screen():
     """Prints a manual instructing the user how to use this script.
     """
@@ -70,10 +74,18 @@ def update_database(calculation_tables, cxn_engine = None, debug : bool = False)
         if (debug):
             print("* (Week {}, {}) data added to back-end database.".format(table[0][0], table[0][1]))
 
-def update_research(calculation_tables, cxn_engine = None, debug : bool = False):
+def update_research(calculation_tables, study_list = None, cxn_engine = None, debug : bool = False):
+    """ Updates the research data folder with calculation tables sorted by their study and cohorts.
+
+    Args:
+        calculation_tables (list[list[tuple, pd.DataFrame]]): A list of weekly calculation tables with a tuple to represent the date for that table
+        study_list (dict[str, list], optional): Each element contains the study name and a list of variables this study uses. Defaults to None.
+        cxn_engine (mySQL Connection, optional): A current connection to some database. Defaults to None.
+        debug (bool, optional): When true, prints processes to the screen. Defaults to False.
+    """
     if (debug):
         print(colored("\nCreating parsed calculation tables for research studies:", "blue"))
-    populate_research_tables(calculation_tables, cxn_engine, debug=debug)
+    populate_research_tables(calculation_tables, study_list, cxn_engine, debug=debug)
 
 
 def emma_backend(args):
@@ -112,8 +124,9 @@ def emma_backend(args):
 
     # * Add calculation tables to database if requested
     if research:
-        update_research(tables, cxn_engine, debug=dw.debug)
+        update_research(tables, dw.get_study_list(), cxn_engine, debug=dw.debug)
     
+    # * Update database if connected to it
     if not no_database:
         update_database(tables, cxn_engine, debug=dw.debug)
 

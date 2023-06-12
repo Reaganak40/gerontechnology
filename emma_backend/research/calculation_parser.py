@@ -50,11 +50,12 @@ def get_all_participants(cxn_engine = None):
     df = pd.DataFrame(cxn_engine.connect().execute(text('SELECT * FROM PARTICIPANTS')))
     return df.replace(to_replace='None', value=np.nan).dropna()
 
-def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]] , cxn_engine = None, debug : bool = False):
+def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd.DataFrame]], study_list = None, cxn_engine = None, debug : bool = False):
     """Gets participant data (their study and cohort) to create calculation tables for each respective study and cohort.
 
     Args:
-        calculation_tables (list[tuple[tuple[str, str], pd.DataFrame]]): The weekly calculation tables and dates for those tables. 
+        calculation_tables (list[tuple[tuple[str, str], pd.DataFrame]]): The weekly calculation tables and dates for those tables.
+        study_list (dict[str, list], optional): Each element contains the study name and a list of variables this study uses. Defaults to None.
         cxn_engine (mySQL Connection, optional): If not None, will get the participant data from the database, otherwise will use
         the participant directory and its participant excel files. Defaults to None.
         debug (bool, optional): When true, debug information is printed to the console. Defaults to False.
@@ -102,7 +103,12 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
                     # Update the calculation tables to include omitted participants
                     calculation_tables[index] = (date, pd.concat([calculation_tables[index][1], ct2], ignore_index=True))
 
-                # * Step 5. Output calculation table to a csv
+                # * Step 5. Remove variable columns that do not belong to this study
+                keep_columns = study_list['universal'] + study_list.get(study, []) + ['participantId']
+                remove_columns = [x for x in parsed_table.columns if x not in keep_columns]
+                parsed_table = parsed_table.drop(columns=remove_columns)
+                    
+                # * Step 6. Output calculation table to a csv
                 output_dir = data_dir.joinpath(study).joinpath("Cohort {}".format(cohort))
                 
                 if not output_dir.exists():

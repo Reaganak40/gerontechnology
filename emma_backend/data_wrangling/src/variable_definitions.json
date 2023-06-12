@@ -180,12 +180,15 @@
         {
             "name" : "PEGoal",
             "defined-variable-x" : "TotalPEWeeklyPHEX",
-            "function" : ["x", "x/150"]
+            "function" : ["x", "x/150"],
+            "study" : ["BB"]
+
         },
         {
             "name" : "PEGoal_DoD",
             "defined-variable-x" : "TotalPEWeeklyPHEX",
-            "function" : ["x", "x/150"]
+            "function" : ["x", "x/150"],
+            "study" : ["DoD"]
         },
         {
             "name" : "TotalCEWeeklyMEEX",
@@ -370,7 +373,7 @@
             "name": "CreateEvent_Av",
             "dataset": "Interactions",
             "elementIDs": [13],
-            "function": ["x", "x/7"],
+            "function": ["x", "x/7"]
         },
         {
             "name": "ViewEvent",
