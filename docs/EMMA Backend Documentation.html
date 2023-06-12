@@ -200,6 +200,11 @@
         have a daily scope, the reference variable will be daily, and 7 reference variables will be created.
     </p>
 
+    <p> <b>["study"] [attribute type: list[str]]</b> :: the study attribute is a list of studies this variable is calculated for. This reduces the size of research tables
+        per study to not include extra unnecessary variables. If the study attribute is omitted, the program will assume this variable is "universal" and will include it in
+        all studies.
+    </p>
+
     <br>
     <h2 id="emma-variables-interactions">Interactions Attributes</h2>
 
