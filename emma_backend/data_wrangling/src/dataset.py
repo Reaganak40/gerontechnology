@@ -63,11 +63,12 @@ class Dataset:
                 # gets the entire dataset from the provided infile.
                 interactions_raw = pd.read_excel(self.infile)
                 
+                # * validate that this table contains all the needed interaction columns
                 needed_columns = ['interactionid','participantid','elementid','timestamp_local','interaction','token','type','source']
                 lc_columns = [str.lower(x) for x in interactions_raw.columns]
                 for nd in needed_columns:
                     if nd not in lc_columns:
-                        err_msg = colored(f"[Data Wrangling Error]\nThe provided file interactions file does not contain the required '{nd}' column.")
+                        err_msg = colored(f"[Data Wrangling Error]\nThe provided file interactions file does not contain the required '{nd}' column.", 'red')
                         raise Exception(err_msg)
 
                 # Get the date range in the dataset -> will be used to create weekly dataframes
@@ -87,6 +88,19 @@ class Dataset:
                 # gets the entire dataset from the provided infile.
                 events_raw = pd.read_excel(self.infile)
                 
+                # * validate that this table contains all the needed events columns
+                needed_columns = ['eventid', 'participantid', 'eventtoken', 'action', 'timestamp_local', 'timestamp_utcoffset', 'eventtype', 
+                                  'eventdate', 'nospecifiedtime', 'starttime', 'endtime', 'priority', 'reminderprior', 'reminderpriorsixth',
+                                  'reminderpriorquarter', 'reminderpriorhalf', 'reminderpriorwhole', 'reminderatevent', 'completed', 'recurring',
+                                  'recurringstartdate', 'recurringenddate', 'recurringfrequency', 'recurringsunday', 'recurringmonday',
+                                  'recurringtuesday', 'recurringwednesday', 'recurringthursday', 'recurringfriday', 'recurringsaturday',
+                                  'recurringhide', 'ishealthtrack', 'healthtrackgoal', 'healthtrackdata', 'healthtracktype']
+                lc_columns = [str.lower(x) for x in events_raw.columns]
+                for nd in needed_columns:
+                    if nd not in lc_columns:
+                        err_msg = colored(f"[Data Wrangling Error]\nThe provided file events file does not contain the required '{nd}' column.", 'red')
+                        raise Exception(err_msg)
+                
                 # Get the date range in the dataset -> will be used to create weekly dataframes
                 start_date = events_raw['timestamp_local'].min()  # the earliest entry in the dataset
                 end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
@@ -98,3 +112,5 @@ class Dataset:
                     self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df_in_weekly_range        
                     start_date = end_parsec
                     end_parsec = Utils.next_sunday(start_date)
+                    
+                    
