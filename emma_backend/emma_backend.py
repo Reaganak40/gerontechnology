@@ -1,6 +1,6 @@
 
-import sys
 from colorama import just_fix_windows_console
+import sys
 from termcolor import colored
 
 from data_wrangling.src.data_wrangling import DataWrangling

@@ -70,8 +70,8 @@ class Dataset:
 
                 # separate entries by weekly ranges (sunday to saturday)
                 while(start_date < end_date):
-                    df = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
-                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
+                    df_in_weekly_range = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
+                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df_in_weekly_range        
                     start_date = end_parsec
                     end_parsec = Utils.next_sunday(start_date)
 
@@ -87,7 +87,7 @@ class Dataset:
 
                 # separate entries by weekly ranges (sunday to saturday)
                 while(start_date < end_date):
-                    df = events_raw.loc[(events_raw["timestamp_local"] >= start_date) & (events_raw["timestamp_local"] < end_parsec)]
-                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df        
+                    df_in_weekly_range = events_raw.loc[(events_raw["timestamp_local"] >= start_date) & (events_raw["timestamp_local"] < end_parsec)]
+                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df_in_weekly_range        
                     start_date = end_parsec
                     end_parsec = Utils.next_sunday(start_date)

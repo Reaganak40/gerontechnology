@@ -488,9 +488,6 @@ class DataWrangling:
              Dict: An updated dictionary containing the calculated variable for all participants in the dataset, interactions_df
         """
         
-    #     participants_dict : dict, df, dataset_type : int, variable_name : str, variable_func : Callable, elementIDs : list[int] = None, day_of_week=-1, distinct=False, tokens=None,
-    # source=None, type=None, sum = None, count = None, filter_by = None, healthTrackType=None, completed=False, defined_variable_x = None
-
         # these are defined from kwargs for code cleanliness
         variable_name = kwargs['variable_name']
         participants_dict = kwargs['participants_dict']

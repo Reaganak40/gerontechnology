@@ -1,11 +1,17 @@
-import pandas as pd
-import os
+from colorama import just_fix_windows_console
+from datetime import datetime, timedelta
 import glob
 import numpy as np
+import os
+import pandas as pd
 from pathlib import Path
 from sqlalchemy import create_engine, text
-from colorama import just_fix_windows_console
 from termcolor import colored
+
+def week_year_to_calender_date(week, year):
+    start = datetime.strptime(f"{year}-W{int(week)-1}-0", "%Y-W%W-%w").date()
+    end = datetime.strptime(f"{year}-W{int(week)}-6", "%Y-W%W-%w").date()
+    return start, end
 
 def get_all_participants(cxn_engine = None):
     """Returns a dataframe of all participants who belong to a weekly calculation table, as well
@@ -113,10 +119,11 @@ def populate_research_tables(calculation_tables : list[tuple[tuple[str, str], pd
                 
                 if not output_dir.exists():
                     output_dir.mkdir(parents=True)
-                output_dir = output_dir.joinpath("Week {}, {} - Study {}, Cohort {}.csv".format(date[0], date[1], study, cohort))
+                start, end = week_year_to_calender_date(date[0], date[1])
+                output_dir = output_dir.joinpath("{} to {}, Study {}, Cohort {}.csv".format(start, end, study, cohort))
                 parsed_table.sort_values(by=['participantId'], inplace=True)
                 parsed_table.to_csv(output_dir, index=False)
                 
                 if (debug):
-                     print("* Calculation table created for [Study: {}, Cohort: {}] for (Week {}, {})".format(study, cohort, date[0], date[1]))
+                    print("* Calculation table created for [Study: {}, Cohort: {}] for ({} to {})".format(study, cohort, start, end))
         

@@ -5,7 +5,7 @@
 """
 
 # * Modules
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import pandas as pd
 
 class Utils:
@@ -32,7 +32,7 @@ class Utils:
 
         Args:
             df (DataFrame): The dataframe that will be filtered, should be limited to a day worth of entries.
-            sec_gap (int, optional): The amount of seconds required for a distinct use. Defaults to 300.
+            sec_gap (int, optional): The amount of seconds required for a distinct use. Defaults to 300 (5 minutes).
 
         Returns:
             _type_: _description_
@@ -73,3 +73,8 @@ class Utils:
         start_date = end_date - timedelta(days=1)
         new_df = df.loc[(df["timestamp_local"] >= start_date) & (df["timestamp_local"] < end_date)]
         return new_df
+    
+    def week_year_to_calender_date(week, year):
+        sunday_date = date.fromisocalendar(year, week, 0)
+        print(f'{week}, {year} ==> {sunday_date}')
+        quit()
