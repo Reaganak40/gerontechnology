@@ -993,6 +993,17 @@
             "elementIDs" : [12, 31, 232, 233, 231, 36, 234, 33, 37, 235, 308, 30],
             "scope" : "daily",
             "function" : ["x", "x"]
+        },
+
+        
+
+        {
+            "name" : "EntriesCharacterCount",
+            "dataset" : "Entries",
+            "scope" : "weekly",
+            "text_column" : ["title"],
+            "text_action" : "character_count",
+            "function" : ["x", "x"]
         }
 
     ]

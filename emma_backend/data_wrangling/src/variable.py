@@ -41,6 +41,11 @@ class Variable:
             self.dataset_type = DatasetType.INTERACTIONS
         elif variable_definition["dataset"] == "Events":
             self.dataset_type = DatasetType.EVENTS
+        elif variable_definition["dataset"] == "Entries":
+            self.dataset_type = DatasetType.ENTRIES
+        else:
+            err_msg = colored(f'EMMA Data-Wrangling Error: Variable definition [{self.name}] using unknown dataset "{variable_definition["dataset"]}".', "red")
+            raise NameError(err_msg)
 
         
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

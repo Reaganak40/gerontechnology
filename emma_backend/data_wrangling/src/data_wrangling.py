@@ -52,6 +52,7 @@ class DataWrangling:
         if "--print_variables" in args:
             self.print_variable_definitions()
             quit()
+        
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # * Find the input / output directories for this
         # * data wrangling session.
@@ -74,7 +75,7 @@ class DataWrangling:
         # * Initialize all member variables
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         self.__init_token_dict()
-        self.data : dict[str, Dataset] = {}
+        self.data : dict[int, Dataset] = {}
         self.__read_args(args)
 
         
@@ -106,22 +107,42 @@ class DataWrangling:
         except:
             self.debug = False
         
-        # * Interactions Dataset Options (--interactions) => Defaults to None (this is bad)
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get interactions dataset argument
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Interactions Dataset Options (--interactions) => Defaults to None (this is bad)
         try:
             interactions_infile_index = args.index("--interactions") + 1   # the argument after --interactions will be the file that gets read
         except ValueError:
-            print(colored("[Data Wrangling Error]\nNo interactions file provided. Use --interactions 'filename'", "yellow"))
-            quit()
+            err_msg = colored("[Data Wrangling Error]\nNo interactions file provided. Use --interactions 'filename'", "yellow")
+            raise Exception(err_msg)
+        
         self.data[DatasetType.INTERACTIONS] = Dataset(DatasetType.INTERACTIONS, self.INPUT_DIR.joinpath(args[interactions_infile_index]))
 
         
-        # * Events Dataset Options (--events) => Defaults to None (this is bad)
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get events dataset argument
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Events Dataset Options (--events) => Defaults to None (this is bad)
         try:
             events_infile_index = args.index("--events") + 1              # the argument after --events will be the file that gets read
         except ValueError:
-            print(colored("[Data Wrangling Error]\nNo Events file provided. Use --events 'filename'", "yellow"))
-            quit()
+            err_msg = colored("[Data Wrangling Error]\nNo Events file provided. Use --events 'filename'", "yellow")
+            raise Exception(err_msg)
+        
         self.data[DatasetType.EVENTS] = Dataset(DatasetType.EVENTS, self.INPUT_DIR.joinpath(args[events_infile_index]))
+        
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get entries dataset argument
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Entries Dataset Options (--entries) => Defaults to None (this is bad)
+        try:
+            entries_infile_index = args.index("--entries") + 1   # the argument after --interactions will be the file that gets read
+        except ValueError:
+            err_msg = colored("[Data Wrangling Error]\nNo entries file provided. Use --entries 'filename'", "yellow")
+            raise Exception(err_msg)
+        
+        self.data[DatasetType.ENTRIES] = Dataset(DatasetType.ENTRIES, self.INPUT_DIR.joinpath(args[entries_infile_index]))
 
         # * Verify Integrity Options (--verify-integrity) => Defaults to False
         try:
@@ -645,9 +666,6 @@ class DataWrangling:
         
         return participants
 
-        
-    # Last Edit on 12/13/2022 by Reagan Kelley
-    # Refactored to allow for event datasets
     def read_data(self):
         """Given a csv file, converts a dataset of interactions spanning many weeks into many datasets by week.
 
@@ -656,36 +674,23 @@ class DataWrangling:
 
         Returns:
             Dict: Dictionary of interaction DataFrames. Key = StartDate, Value=DataFrame
-        """
-        # * ====================================================================
-        # * Get interactions data
-        # * ====================================================================
-        if self.debug:
-            print(colored("\nReading Interactions from Dataset...", 'blue'))
+        """ 
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get weekly dataframes from each dataset
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        for dataset_name, dataset_type in [('Interactions', DatasetType.INTERACTIONS), ('Events', DatasetType.EVENTS), ('Entries', DatasetType.ENTRIES)]:
+            if self.debug:
+                print(colored(f"\nReading {dataset_name} from Dataset...", 'blue'))
 
-        if self.data[DatasetType.INTERACTIONS] == None:
-            raise Exception("Interactions infile is None")
+            if self.data[dataset_type] == None:
+                raise Exception(f"{dataset_name} infile is None")
 
-        # Get weekly dfs for interactions
-        self.data[DatasetType.INTERACTIONS].read_file()
+            # Get weekly dfs for entries
+            self.data[dataset_type].read_file()
 
-        if self.debug:
-            print("* Results: {} weeks of data gathered.".format(len(self.data[DatasetType.INTERACTIONS].weekly_dfs)))
-
-        # * ====================================================================
-        # * Get events data
-        # * ====================================================================
-        if self.debug:
-            print(colored("\nReading Events from Dataset...", 'blue'))
-
-        if self.data[DatasetType.EVENTS] == None:
-            raise Exception("Events infile is None")
-
-        # Get weekly dfs for interactions
-        self.data[DatasetType.EVENTS].read_file()
-
-        if self.debug:
-            print("* Results: {} weeks of data gathered.".format(len(self.data[DatasetType.EVENTS].weekly_dfs)))
+            if self.debug:
+                print("* Results: {} weeks of data gathered.".format(len(self.data[dataset_type].weekly_dfs)))
+            
 
 
     # Last Edit on 12/13/2022 by Reagan Kelley

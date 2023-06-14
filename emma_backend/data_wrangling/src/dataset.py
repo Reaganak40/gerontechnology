@@ -14,6 +14,7 @@ from utils import Utils
 class DatasetType():
     INTERACTIONS = 0
     EVENTS = 1
+    ENTRIES = 2
     
     # Last Edit on 12/13/2022 by Reagan Kelley
     # Initial Implementation
@@ -26,7 +27,16 @@ class DatasetType():
         Returns:
             Bool: True if this int enum is defined, false otherwise.
         """
-        return True if val == DatasetType.INTERACTIONS or val == DatasetType.EVENTS else False
+        return True if val == DatasetType.INTERACTIONS or val == DatasetType.EVENTS or val == DatasetType.ENTRIES else False
+    
+    def NameOfType(val):
+        if val == DatasetType.INTERACTIONS:
+            return "Interactions"
+        if val == DatasetType.EVENTS:
+            return "Events"
+        if val == DatasetType.ENTRIES:
+            return "Entries"
+        return None
 
 class Dataset:
         # Last Edit on 12/13/2022 by Reagan Kelley
@@ -45,6 +55,7 @@ class Dataset:
                 raise Exception("Invalid dataset_type argument. {}".format(dataset_type))
             
             self.type = dataset_type    # the type of data in this Dataset -> Events or interactions
+            self.name = DatasetType.NameOfType(self.type)
             self.infile = infile        # The filepath to the read file
 
             if not self.infile.exists():
@@ -52,65 +63,52 @@ class Dataset:
 
             self.weekly_dfs : dict[tuple, pd.DataFrame] = {}        # This will eventually contain parsed datasets from the original dataset, but separated by weekly segments.
 
-        # Last Edit on 12/13/2022 by Reagan Kelley
-        # Initial Implementation
         def read_file(self):
             """ Reads the provided infile and takes that dataset and parses it into weekly segments. Results are in weekly_dfs.
             """
             
-            # * Read Interactions Excel File and transform to weekly dataframes (weekly_dfs)
+            # gets the entire dataset from the provided infile.
+            raw_df = pd.read_excel(self.infile)
+            lc_columns = [str.lower(x) for x in raw_df.columns]
+            
+            # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # * Validate columns according to the dataset type
+            # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if self.type == DatasetType.INTERACTIONS:
-                # gets the entire dataset from the provided infile.
-                interactions_raw = pd.read_excel(self.infile)
-                
-                # * validate that this table contains all the needed interaction columns
                 needed_columns = ['interactionid','participantid','elementid','timestamp_local','interaction','token','type','source']
-                lc_columns = [str.lower(x) for x in interactions_raw.columns]
-                for nd in needed_columns:
-                    if nd not in lc_columns:
-                        err_msg = colored(f"[Data Wrangling Error]\nThe provided file interactions file does not contain the required '{nd}' column.", 'red')
-                        raise Exception(err_msg)
 
-                # Get the date range in the dataset -> will be used to create weekly dataframes
-                start_date = interactions_raw['timestamp_local'].min()  # the earliest entry in the dataset
-                end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
-                end_date = interactions_raw['timestamp_local'].max()    # the latest entry in the dataset
-
-                # separate entries by weekly ranges (sunday to saturday)
-                while(start_date < end_date):
-                    df_in_weekly_range = interactions_raw.loc[(interactions_raw["timestamp_local"] >= start_date) & (interactions_raw["timestamp_local"] < end_parsec)]
-                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df_in_weekly_range        
-                    start_date = end_parsec
-                    end_parsec = Utils.next_sunday(start_date)
-
-            # * Read Events Excel File and transform to weekly dataframes (weekly_dfs)
             elif self.type == DatasetType.EVENTS:
-                # gets the entire dataset from the provided infile.
-                events_raw = pd.read_excel(self.infile)
-                
-                # * validate that this table contains all the needed events columns
                 needed_columns = ['eventid', 'participantid', 'eventtoken', 'action', 'timestamp_local', 'timestamp_utcoffset', 'eventtype', 
                                   'eventdate', 'nospecifiedtime', 'starttime', 'endtime', 'priority', 'reminderprior', 'reminderpriorsixth',
                                   'reminderpriorquarter', 'reminderpriorhalf', 'reminderpriorwhole', 'reminderatevent', 'completed', 'recurring',
                                   'recurringstartdate', 'recurringenddate', 'recurringfrequency', 'recurringsunday', 'recurringmonday',
                                   'recurringtuesday', 'recurringwednesday', 'recurringthursday', 'recurringfriday', 'recurringsaturday',
                                   'recurringhide', 'ishealthtrack', 'healthtrackgoal', 'healthtrackdata', 'healthtracktype']
-                lc_columns = [str.lower(x) for x in events_raw.columns]
-                for nd in needed_columns:
-                    if nd not in lc_columns:
-                        err_msg = colored(f"[Data Wrangling Error]\nThe provided file events file does not contain the required '{nd}' column.", 'red')
-                        raise Exception(err_msg)
-                
-                # Get the date range in the dataset -> will be used to create weekly dataframes
-                start_date = events_raw['timestamp_local'].min()  # the earliest entry in the dataset
-                end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
-                end_date = events_raw['timestamp_local'].max()    # the latest entry in the dataset
+            
+            elif self.type == DatasetType.ENTRIES:
+                needed_columns = ['entryid', 'participantid', 'timestamp_local', 'timestamp_utcoffset', 'entrytoken', 'entrytype', 'action',
+                                  'title', 'content', 'imagesaved', 'folderentryid', 'frequency', 'templateid', 'foldersetid', 'isstatic', 'foldertoken']
+            
+            for nd in needed_columns:
+                if nd not in lc_columns:
+                    err_msg = colored(f"[Data Wrangling Error]\nThe provided {self.name} file does not contain the required '{nd}' column.", 'red')
+                    raise Exception(err_msg)
+            
+            # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # * Read excel file and transform to 
+            # * weekly dataframes (weekly_dfs)
+            # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            # Get the date range in the dataset -> will be used to create weekly dataframes
+            start_date = raw_df['timestamp_local'].min()  # the earliest entry in the dataset
+            end_parsec = Utils.next_sunday(start_date)              # the beginning of the next week
+            end_date = raw_df['timestamp_local'].max()    # the latest entry in the dataset
 
-                # separate entries by weekly ranges (sunday to saturday)
-                while(start_date < end_date):
-                    df_in_weekly_range = events_raw.loc[(events_raw["timestamp_local"] >= start_date) & (events_raw["timestamp_local"] < end_parsec)]
-                    self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df_in_weekly_range        
-                    start_date = end_parsec
-                    end_parsec = Utils.next_sunday(start_date)
-                    
-                    
+            # separate entries by weekly ranges (sunday to saturday)
+            while(start_date < end_date):
+                df_in_weekly_range = raw_df.loc[(raw_df["timestamp_local"] >= start_date) & (raw_df["timestamp_local"] < end_parsec)]
+                self.weekly_dfs[(start_date.strftime("%U"), start_date.strftime("%Y"))] = df_in_weekly_range        
+                start_date = end_parsec
+                end_parsec = Utils.next_sunday(start_date)
+                
+
