@@ -62,6 +62,13 @@ class Dataset:
             if self.type == DatasetType.INTERACTIONS:
                 # gets the entire dataset from the provided infile.
                 interactions_raw = pd.read_excel(self.infile)
+                
+                needed_columns = ['interactionid','participantid','elementid','timestamp_local','interaction','token','type','source']
+                lc_columns = [str.lower(x) for x in interactions_raw.columns]
+                for nd in needed_columns:
+                    if nd not in lc_columns:
+                        err_msg = colored(f"[Data Wrangling Error]\nThe provided file interactions file does not contain the required '{nd}' column.")
+                        raise Exception(err_msg)
 
                 # Get the date range in the dataset -> will be used to create weekly dataframes
                 start_date = interactions_raw['timestamp_local'].min()  # the earliest entry in the dataset

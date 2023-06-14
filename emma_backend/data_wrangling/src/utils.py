@@ -73,8 +73,3 @@ class Utils:
         start_date = end_date - timedelta(days=1)
         new_df = df.loc[(df["timestamp_local"] >= start_date) & (df["timestamp_local"] < end_date)]
         return new_df
-    
-    def week_year_to_calender_date(week, year):
-        sunday_date = date.fromisocalendar(year, week, 0)
-        print(f'{week}, {year} ==> {sunday_date}')
-        quit()
