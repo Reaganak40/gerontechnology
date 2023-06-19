@@ -30,8 +30,15 @@
         {
             this.StudyCheckListBox = new System.Windows.Forms.CheckedListBox();
             this.StudyLabel = new System.Windows.Forms.Label();
-            this.CohortCheckListBox = new System.Windows.Forms.CheckedListBox();
             this.CohortLabel = new System.Windows.Forms.Label();
+            this.CurrentCalculationTableView = new System.Windows.Forms.DataGridView();
+            this.CohortSelectionView = new System.Windows.Forms.DataGridView();
+            this.CheckCohortColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.StudyOptionColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CohortSelectionColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ViewCalculationTableButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.CurrentCalculationTableView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CohortSelectionView)).BeginInit();
             this.SuspendLayout();
             // 
             // StudyCheckListBox
@@ -53,15 +60,6 @@
             this.StudyLabel.TabIndex = 1;
             this.StudyLabel.Text = "Study";
             // 
-            // CohortCheckListBox
-            // 
-            this.CohortCheckListBox.CheckOnClick = true;
-            this.CohortCheckListBox.FormattingEnabled = true;
-            this.CohortCheckListBox.Location = new System.Drawing.Point(234, 48);
-            this.CohortCheckListBox.Name = "CohortCheckListBox";
-            this.CohortCheckListBox.Size = new System.Drawing.Size(283, 158);
-            this.CohortCheckListBox.TabIndex = 2;
-            // 
             // CohortLabel
             // 
             this.CohortLabel.AutoSize = true;
@@ -71,17 +69,90 @@
             this.CohortLabel.TabIndex = 3;
             this.CohortLabel.Text = "Cohort";
             // 
+            // CurrentCalculationTableView
+            // 
+            this.CurrentCalculationTableView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.CurrentCalculationTableView.Location = new System.Drawing.Point(557, 12);
+            this.CurrentCalculationTableView.Name = "CurrentCalculationTableView";
+            this.CurrentCalculationTableView.RowHeadersWidth = 51;
+            this.CurrentCalculationTableView.RowTemplate.Height = 29;
+            this.CurrentCalculationTableView.Size = new System.Drawing.Size(991, 698);
+            this.CurrentCalculationTableView.TabIndex = 4;
+            // 
+            // CohortSelectionView
+            // 
+            this.CohortSelectionView.AllowUserToAddRows = false;
+            this.CohortSelectionView.AllowUserToDeleteRows = false;
+            this.CohortSelectionView.AllowUserToResizeColumns = false;
+            this.CohortSelectionView.AllowUserToResizeRows = false;
+            this.CohortSelectionView.ColumnHeadersHeight = 29;
+            this.CohortSelectionView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.CohortSelectionView.ColumnHeadersVisible = false;
+            this.CohortSelectionView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.CheckCohortColumn,
+            this.StudyOptionColumn,
+            this.CohortSelectionColumn});
+            this.CohortSelectionView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
+            this.CohortSelectionView.Location = new System.Drawing.Point(234, 48);
+            this.CohortSelectionView.MultiSelect = false;
+            this.CohortSelectionView.Name = "CohortSelectionView";
+            this.CohortSelectionView.RowHeadersVisible = false;
+            this.CohortSelectionView.RowHeadersWidth = 51;
+            this.CohortSelectionView.RowTemplate.Height = 29;
+            this.CohortSelectionView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.CohortSelectionView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.CohortSelectionView.Size = new System.Drawing.Size(300, 158);
+            this.CohortSelectionView.TabIndex = 5;
+            this.CohortSelectionView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.CohortSelectionView_CellClick);
+            this.CohortSelectionView.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.CohortSelectionView_CellMouseUp);
+            // 
+            // CheckCohortColumn
+            // 
+            this.CheckCohortColumn.HeaderText = "";
+            this.CheckCohortColumn.MinimumWidth = 6;
+            this.CheckCohortColumn.Name = "CheckCohortColumn";
+            this.CheckCohortColumn.Width = 50;
+            // 
+            // StudyOptionColumn
+            // 
+            this.StudyOptionColumn.HeaderText = "Study";
+            this.StudyOptionColumn.MinimumWidth = 6;
+            this.StudyOptionColumn.Name = "StudyOptionColumn";
+            this.StudyOptionColumn.Width = 125;
+            // 
+            // CohortSelectionColumn
+            // 
+            this.CohortSelectionColumn.HeaderText = "Cohort #";
+            this.CohortSelectionColumn.MinimumWidth = 6;
+            this.CohortSelectionColumn.Name = "CohortSelectionColumn";
+            this.CohortSelectionColumn.Width = 125;
+            // 
+            // ViewCalculationTableButton
+            // 
+            this.ViewCalculationTableButton.Enabled = false;
+            this.ViewCalculationTableButton.Location = new System.Drawing.Point(31, 228);
+            this.ViewCalculationTableButton.Name = "ViewCalculationTableButton";
+            this.ViewCalculationTableButton.Size = new System.Drawing.Size(503, 29);
+            this.ViewCalculationTableButton.TabIndex = 6;
+            this.ViewCalculationTableButton.Text = "View Calculation Table";
+            this.ViewCalculationTableButton.UseVisualStyleBackColor = true;
+            this.ViewCalculationTableButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ViewCalculationTableButton_MouseClick);
+            // 
             // QueryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(550, 500);
+            this.ClientSize = new System.Drawing.Size(1560, 722);
+            this.Controls.Add(this.ViewCalculationTableButton);
+            this.Controls.Add(this.CohortSelectionView);
+            this.Controls.Add(this.CurrentCalculationTableView);
             this.Controls.Add(this.CohortLabel);
-            this.Controls.Add(this.CohortCheckListBox);
             this.Controls.Add(this.StudyLabel);
             this.Controls.Add(this.StudyCheckListBox);
             this.Name = "QueryForm";
             this.Text = "Research Query";
+            ((System.ComponentModel.ISupportInitialize)(this.CurrentCalculationTableView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CohortSelectionView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -91,7 +162,12 @@
 
         private CheckedListBox StudyCheckListBox;
         private Label StudyLabel;
-        private CheckedListBox CohortCheckListBox;
         private Label CohortLabel;
+        private DataGridView CurrentCalculationTableView;
+        private DataGridView CohortSelectionView;
+        private DataGridViewCheckBoxColumn CheckCohortColumn;
+        private DataGridViewTextBoxColumn StudyOptionColumn;
+        private DataGridViewTextBoxColumn CohortSelectionColumn;
+        private Button ViewCalculationTableButton;
     }
 }

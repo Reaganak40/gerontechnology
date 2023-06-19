@@ -43,14 +43,29 @@ namespace ResearchQuery
             return this.database.Studies;
         }
 
-        public string[] GetCohorts(string[] selected_studies)
+        /// <summary>
+        /// Gets all cohorts from the selected studies.
+        /// </summary>
+        /// <param name="selected_studies">A list of valid studies to query the database with.</param>
+        /// <returns>A formatted list of strings containing the study-cohort results.</returns>
+        public KeyValuePair<string, int>[] GetCohorts(string[] selected_studies)
         {
             if (this.database == null)
             {
-                return new string[0];
+                return new KeyValuePair<string, int>[0];
             }
 
-            return this.database.GetCohortsFrom(selected_studies);
+            return this.database.UpdateSelectedCohorts(selected_studies);
+        }
+
+        public void UpdateCalculationTable(DataGridView calculation_table, KeyValuePair<string, int>[] cohorts)
+        {
+            if (this.database == null)
+            {
+                return;
+            }
+
+            calculation_table.DataSource = this.database.GetCalculationTable(cohorts);
         }
     }
 }

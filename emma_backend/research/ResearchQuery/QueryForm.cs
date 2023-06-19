@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Windows.Forms;
+
 namespace ResearchQuery
 {
     /// <summary>
@@ -20,6 +25,15 @@ namespace ResearchQuery
 
             // get all studies in the EMMA Backend database.
             this.InitializeStudyListBox();
+
+            // enable double-buffering for calculation table display
+            this.CurrentCalculationTableView.GetType()?.
+                GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)?.
+                SetValue(this.CurrentCalculationTableView, true, null);
+
+            // apply these optiosn from improved performance
+            this.CurrentCalculationTableView.RowHeadersVisible = false;
+            this.CurrentCalculationTableView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
         }
 
         private void InitializeStudyListBox()
@@ -40,7 +54,7 @@ namespace ResearchQuery
                 int index = 0;
 
                 // clear cohort options and if nothing is selected leave it cleared
-                this.CohortCheckListBox.Items.Clear();
+                this.CohortSelectionView.Rows.Clear();
                 if (selected_studies.Length == 0)
                 {
                     return;
@@ -53,12 +67,73 @@ namespace ResearchQuery
                 }
 
                 // update the cohort checklist
-                string[] cohorts = this.controller.GetCohorts(selected_studies);
-                foreach (string cohort in cohorts)
+                this.ResetCohortSelections(this.controller.GetCohorts(selected_studies));
+            }
+        }
+
+        private void ResetCohortSelections(KeyValuePair<string, int>[] study_cohort_pairs)
+        {
+            int index = 0;
+            foreach (KeyValuePair<string, int> study_cohort_pair in study_cohort_pairs)
+            {
+                index = this.CohortSelectionView.Rows.Add();
+                this.CohortSelectionView.Rows[index].Cells["StudyOptionColumn"].Value = study_cohort_pair.Key;
+                this.CohortSelectionView.Rows[index].Cells["StudyOptionColumn"].ReadOnly = true;
+
+                this.CohortSelectionView.Rows[index].Cells["CohortSelectionColumn"].Value = study_cohort_pair.Value;
+                this.CohortSelectionView.Rows[index].Cells["CohortSelectionColumn"].ReadOnly = true;
+            }
+
+            this.CohortSelectionView.ClearSelection();
+        }
+
+        private void CohortSelectionView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // updates checkbox if click a row, or the checkbox directly.
+            if (e.RowIndex >= 0)
+            {
+                if (e.ColumnIndex > 0)
                 {
-                    this.CohortCheckListBox.Items.Add(cohort);
+                    var check = this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value;
+                    if (check is null)
+                    {
+                        this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = true;
+                    }
+                    else
+                    {
+                        if ((bool)check)
+                        {
+                            this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = false;
+                        }
+                        else
+                        {
+                            this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = true;
+                        }
+                    }
                 }
             }
+        }
+
+        private void CohortSelectionView_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            List<KeyValuePair<string, int>> selected_cohorts = new List<KeyValuePair<string, int>>();
+            foreach (DataGridViewRow cohort_row in ((DataGridView)sender).Rows)
+            {
+                if (Convert.ToBoolean(cohort_row.Cells["CheckCohortColumn"].Value))
+                {
+                    string study = (string)cohort_row.Cells["StudyOptionColumn"].Value;
+                    int cohort = (int)cohort_row.Cells["CohortSelectionColumn"].Value;
+
+                    selected_cohorts.Add(new KeyValuePair<string, int>(study, cohort));
+                }
+            }
+
+            this.controller.UpdateCalculationTable(this.CurrentCalculationTableView, selected_cohorts.ToArray());
+        }
+
+        private void ViewCalculationTableButton_MouseClick(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }

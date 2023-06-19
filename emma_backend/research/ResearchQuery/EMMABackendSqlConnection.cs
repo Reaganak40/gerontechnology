@@ -17,7 +17,9 @@ namespace ResearchQuery
         private MySqlDataReader reader;
 
         private string myConnectionString;
-        private List<string> studies;
+
+        private List<string> studies; // studies available from the database
+        private List<KeyValuePair<string, int>> cohorts; // cohorts from selected studies
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EMMABackendSqlConnection`1"/> class.
@@ -43,6 +45,8 @@ namespace ResearchQuery
             this.connection.Close();
 
             this.studies = new List<string>();
+            this.cohorts = new List<KeyValuePair<string, int>>();
+
             this.GetStudies();
         }
 
@@ -57,7 +61,20 @@ namespace ResearchQuery
             }
         }
 
-        public string[] GetCohortsFrom(string[] selected_studies)
+        public DataTable GetCalculationTable(KeyValuePair<string, int>[] cohorts)
+        {
+            StringBuilder sql_str = new StringBuilder("SELECT * FROM CALCULATIONS");
+
+            return this.ExecuteQuery(sql_str.ToString());
+        }
+
+        /// <summary>
+        /// Updates the cohorts based on the selected studies.
+        /// </summary>
+        /// <param name="selected_studies">The studies the user has selected to find cohorts.</param>
+        /// <returns>A list of formatting strings according to study-cohort pairs.</returns>
+        /// <exception cref="NoNullAllowedException">Thrown if data gathered in null.</exception>
+        public KeyValuePair<string, int>[] UpdateSelectedCohorts(string[] selected_studies)
         {
             // Create and execute sql string
             StringBuilder selection_str;
@@ -79,46 +96,34 @@ namespace ResearchQuery
                 selection_str = new StringBuilder(string.Empty);
             }
 
-            DataTable query_results = this.ExecuteCommand($"SELECT DISTINCT study, cohort FROM Participants {selection_str.ToString()}");
+            DataTable query_results = this.ExecuteQuery($"SELECT DISTINCT study, cohort FROM Participants {selection_str.ToString()} ORDER BY study");
 
             // Create cohort string rows for returned results
-            string[] cohorts = new string[query_results.Rows.Count];
-            int index = 0;
+            this.cohorts = new List<KeyValuePair<string, int>>();
 
             foreach (DataRow row in query_results.Rows)
             {
-                StringBuilder sb = new StringBuilder();
-
                 object study = row["study"];
-                if (study.GetType() != typeof(DBNull))
+                if (study.GetType() != typeof(string))
                 {
-                    int padding = -10 + ((string)study).Length;
-                    sb.Append(string.Format($"{{0,{padding}}}", (string)study) + " :: Cohort");
-                }
-                else
-                {
-                    throw new NoNullAllowedException();
+                    throw new NotSupportedException("Row value for study should not be of type: " + study.GetType().ToString());
                 }
 
                 object cohort = row["cohort"];
-                if (cohort.GetType() != typeof(DBNull))
+                if (cohort.GetType() != typeof(int))
                 {
-                    sb.Append((int)cohort);
-                }
-                else
-                {
-                    throw new NoNullAllowedException();
+                    throw new NotSupportedException("Row value for cohort should not be of type: " + study.GetType().ToString());
                 }
 
-                cohorts[index++] = sb.ToString();
+                this.cohorts.Add(new KeyValuePair<string, int>((string)study, (int)cohort));
             }
 
-            return cohorts;
+            return this.cohorts.ToArray();
         }
 
         private void GetStudies()
         {
-            DataTable query_results = this.ExecuteCommand("SELECT DISTINCT(study) FROM Participants");
+            DataTable query_results = this.ExecuteQuery("SELECT DISTINCT(study) FROM Participants ORDER BY study");
 
             int index = 0;
             foreach (DataRow row in query_results.Rows)
@@ -134,7 +139,7 @@ namespace ResearchQuery
         }
 
 
-        private DataTable ExecuteCommand(string sql_str)
+        private DataTable ExecuteQuery(string sql_str)
         {
             DataTable sqlTable = new DataTable();
 
