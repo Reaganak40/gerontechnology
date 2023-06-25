@@ -37,6 +37,8 @@
             this.StudyOptionColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CohortSelectionColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ViewCalculationTableButton = new System.Windows.Forms.Button();
+            this.DailyVariableCheckbox = new System.Windows.Forms.CheckBox();
+            this.WeeklyVariablesCheckbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentCalculationTableView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CohortSelectionView)).BeginInit();
             this.SuspendLayout();
@@ -130,7 +132,7 @@
             // ViewCalculationTableButton
             // 
             this.ViewCalculationTableButton.Enabled = false;
-            this.ViewCalculationTableButton.Location = new System.Drawing.Point(31, 228);
+            this.ViewCalculationTableButton.Location = new System.Drawing.Point(31, 272);
             this.ViewCalculationTableButton.Name = "ViewCalculationTableButton";
             this.ViewCalculationTableButton.Size = new System.Drawing.Size(503, 29);
             this.ViewCalculationTableButton.TabIndex = 6;
@@ -138,11 +140,37 @@
             this.ViewCalculationTableButton.UseVisualStyleBackColor = true;
             this.ViewCalculationTableButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ViewCalculationTableButton_MouseClick);
             // 
+            // DailyVariableCheckbox
+            // 
+            this.DailyVariableCheckbox.AutoSize = true;
+            this.DailyVariableCheckbox.Checked = true;
+            this.DailyVariableCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.DailyVariableCheckbox.Location = new System.Drawing.Point(31, 212);
+            this.DailyVariableCheckbox.Name = "DailyVariableCheckbox";
+            this.DailyVariableCheckbox.Size = new System.Drawing.Size(129, 24);
+            this.DailyVariableCheckbox.TabIndex = 7;
+            this.DailyVariableCheckbox.Text = "Daily Variables";
+            this.DailyVariableCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // WeeklyVariablesCheckbox
+            // 
+            this.WeeklyVariablesCheckbox.AutoSize = true;
+            this.WeeklyVariablesCheckbox.Checked = true;
+            this.WeeklyVariablesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(31, 242);
+            this.WeeklyVariablesCheckbox.Name = "WeeklyVariablesCheckbox";
+            this.WeeklyVariablesCheckbox.Size = new System.Drawing.Size(142, 24);
+            this.WeeklyVariablesCheckbox.TabIndex = 8;
+            this.WeeklyVariablesCheckbox.Text = "Weekly Variables";
+            this.WeeklyVariablesCheckbox.UseVisualStyleBackColor = true;
+            // 
             // QueryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1560, 722);
+            this.Controls.Add(this.WeeklyVariablesCheckbox);
+            this.Controls.Add(this.DailyVariableCheckbox);
             this.Controls.Add(this.ViewCalculationTableButton);
             this.Controls.Add(this.CohortSelectionView);
             this.Controls.Add(this.CurrentCalculationTableView);
@@ -169,5 +197,7 @@
         private DataGridViewTextBoxColumn StudyOptionColumn;
         private DataGridViewTextBoxColumn CohortSelectionColumn;
         private Button ViewCalculationTableButton;
+        private CheckBox DailyVariableCheckbox;
+        private CheckBox WeeklyVariablesCheckbox;
     }
 }

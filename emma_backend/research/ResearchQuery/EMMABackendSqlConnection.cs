@@ -14,12 +14,20 @@ namespace ResearchQuery
     internal class EMMABackendSqlConnection
     {
         private MySqlConnection connection;
-        private MySqlDataReader reader;
+        private MySqlDataReader? reader;
 
         private string myConnectionString;
 
-        private List<string> studies; // studies available from the database
-        private List<KeyValuePair<string, int>> cohorts; // cohorts from selected studies
+        // studies available from the database
+        private List<string> studies;
+
+        // cohorts from selected studies
+        private List<KeyValuePair<string, int>> cohorts;
+
+        // Columns in the SQL calculation table, converted from SQL naming conventions
+        private List<string> calculateTableColumns;
+
+        private bool connected;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EMMABackendSqlConnection`1"/> class.
@@ -36,18 +44,36 @@ namespace ResearchQuery
             {
                 this.connection.ConnectionString = this.myConnectionString;
                 this.connection.Open();
+                this.connected = true;
             }
             catch (MySqlException ex)
             {
                 MessageBox.Show(ex.Message);
+                this.connected = false;
             }
 
             this.connection.Close();
+            this.reader = null;
 
             this.studies = new List<string>();
             this.cohorts = new List<KeyValuePair<string, int>>();
+            this.calculateTableColumns = new List<string>();
+            if (this.Connected)
+            {
+                this.GetStudies();
+                this.GetCalculationTableColumns();
+            }
+        }
 
-            this.GetStudies();
+        /// <summary>
+        /// Gets a value indicating whether or not a valid connection to the database was created.
+        /// </summary>
+        public bool Connected
+        {
+            get
+            {
+                return this.connected;
+            }
         }
 
         /// <summary>
@@ -61,11 +87,49 @@ namespace ResearchQuery
             }
         }
 
+        /// <summary>
+        /// Gets the colloquial names for the calculation table columns.
+        /// </summary>
+        public string[] CalculationTableColumns
+        {
+            get
+            {
+                return this.calculateTableColumns.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Returns the sql query result for a filtered calculation table.
+        /// </summary>
+        /// <param name="cohorts">A list of study-cohort pairs to filter the calculation table with.</param>
+        /// <returns>The sql table result.</returns>
         public DataTable GetCalculationTable(KeyValuePair<string, int>[] cohorts)
         {
-            StringBuilder sql_str = new StringBuilder("SELECT * FROM CALCULATIONS");
+            // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
+            // one of the selected studies and cohorts.
+            StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
+            if (cohorts.Length > 0)
+            {
+                participant_sql_str.Append(" WHERE ");
+            }
 
-            return this.ExecuteQuery(sql_str.ToString());
+            int index = 0;
+            foreach (KeyValuePair<string, int> study_cohort in cohorts)
+            {
+                participant_sql_str.Append($"(study = '{study_cohort.Key}' AND cohort = {study_cohort.Value})");
+
+                index++;
+                if (index < cohorts.Length)
+                {
+                    participant_sql_str.Append(" OR ");
+                }
+            }
+
+            // join the query results for participants table with the calculation table.
+            StringBuilder calculations_sql_str = new StringBuilder("SELECT C.* FROM Calculations C WHERE C.participant_id IN ");
+            calculations_sql_str.Append($"({participant_sql_str.ToString()})");
+
+            return this.ExecuteQuery(calculations_sql_str.ToString());
         }
 
         /// <summary>
@@ -138,6 +202,33 @@ namespace ResearchQuery
             }
         }
 
+        private void GetCalculationTableColumns()
+        {
+            DataTable query_results = this.ExecuteQuery("SHOW COLUMNS FROM Calculations");
+
+            int index = 0;
+            foreach (DataRow row in query_results.Rows)
+            {
+                object column_name = row["field"];
+                if (column_name.GetType() == typeof(string))
+                {
+                    if (!((string)column_name).Contains("v_"))
+                    {
+                        this.calculateTableColumns.Add((string)column_name);
+                    }
+                    else
+                    {
+                        this.calculateTableColumns.Add(((string)column_name).Substring(2));
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException("GetCalculationTableColumns() cannot process results of type: " + column_name.GetType().ToString());
+                }
+
+                index += 1;
+            }
+        }
 
         private DataTable ExecuteQuery(string sql_str)
         {

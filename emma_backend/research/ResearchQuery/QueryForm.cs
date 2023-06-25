@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -22,9 +23,12 @@ namespace ResearchQuery
             // connect to the EMMA Backend server.
             this.controller = new Controller();
             this.controller.ConnectToDatabase("localhost", "root", "root");
+            this.controller.LoadFilteringData();
 
             // get all studies in the EMMA Backend database.
             this.InitializeStudyListBox();
+
+            this.InitializeCalculationTableView();
 
             // enable double-buffering for calculation table display
             this.CurrentCalculationTableView.GetType()?.
@@ -34,6 +38,21 @@ namespace ResearchQuery
             // apply these optiosn from improved performance
             this.CurrentCalculationTableView.RowHeadersVisible = false;
             this.CurrentCalculationTableView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
+        }
+
+        private void InitializeCalculationTableView()
+        {
+            /*// add all columns in the calcultion table
+            foreach (string column_name in this.controller.GetCalculationTableColumns())
+            {
+                this.CurrentCalculationTableView.Columns.Add(column_name, column_name);
+            }
+
+            // add 50 empty rows
+            for (int i = 0; i < 50; i++)
+            {
+                this.CurrentCalculationTableView.Rows.Add();
+            }*/
         }
 
         private void InitializeStudyListBox()
@@ -55,6 +74,7 @@ namespace ResearchQuery
 
                 // clear cohort options and if nothing is selected leave it cleared
                 this.CohortSelectionView.Rows.Clear();
+                this.ViewCalculationTableButton.Enabled = false;
                 if (selected_studies.Length == 0)
                 {
                     return;
@@ -116,22 +136,43 @@ namespace ResearchQuery
 
         private void CohortSelectionView_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
         {
-            List<KeyValuePair<string, int>> selected_cohorts = new List<KeyValuePair<string, int>>();
-            foreach (DataGridViewRow cohort_row in ((DataGridView)sender).Rows)
+            foreach (DataGridViewRow cohort_row in this.CohortSelectionView.Rows)
             {
+
                 if (Convert.ToBoolean(cohort_row.Cells["CheckCohortColumn"].Value))
                 {
-                    string study = (string)cohort_row.Cells["StudyOptionColumn"].Value;
-                    int cohort = (int)cohort_row.Cells["CohortSelectionColumn"].Value;
-
-                    selected_cohorts.Add(new KeyValuePair<string, int>(study, cohort));
+                    this.ViewCalculationTableButton.Enabled = true;
+                    return;
                 }
             }
-
-            this.controller.UpdateCalculationTable(this.CurrentCalculationTableView, selected_cohorts.ToArray());
         }
 
         private void ViewCalculationTableButton_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.ViewCalculationTableButton.Enabled)
+            {
+                List<KeyValuePair<string, int>> selected_cohorts = new List<KeyValuePair<string, int>>();
+                foreach (DataGridViewRow cohort_row in this.CohortSelectionView.Rows)
+                {
+                    if (Convert.ToBoolean(cohort_row.Cells["CheckCohortColumn"].Value))
+                    {
+                        string study = (string)cohort_row.Cells["StudyOptionColumn"].Value;
+                        int cohort = (int)cohort_row.Cells["CohortSelectionColumn"].Value;
+
+                        selected_cohorts.Add(new KeyValuePair<string, int>(study, cohort));
+                    }
+                }
+
+                this.ShowNewCalculationTable(this.controller.GetCalculationTable(selected_cohorts.ToArray()));
+            }
+        }
+
+        private void ShowNewCalculationTable(DataTable? calculation_table)
+        {
+            this.CurrentCalculationTableView.DataSource = calculation_table;
+        }
+
+        private void CohortSelectionView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
 
         }
