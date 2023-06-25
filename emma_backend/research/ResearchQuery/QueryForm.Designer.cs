@@ -73,9 +73,12 @@
             // 
             // CurrentCalculationTableView
             // 
+            this.CurrentCalculationTableView.AllowUserToAddRows = false;
+            this.CurrentCalculationTableView.AllowUserToDeleteRows = false;
             this.CurrentCalculationTableView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.CurrentCalculationTableView.Location = new System.Drawing.Point(557, 12);
             this.CurrentCalculationTableView.Name = "CurrentCalculationTableView";
+            this.CurrentCalculationTableView.ReadOnly = true;
             this.CurrentCalculationTableView.RowHeadersWidth = 51;
             this.CurrentCalculationTableView.RowTemplate.Height = 29;
             this.CurrentCalculationTableView.Size = new System.Drawing.Size(991, 698);

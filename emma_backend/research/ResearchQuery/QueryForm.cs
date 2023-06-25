@@ -12,6 +12,7 @@ namespace ResearchQuery
     public partial class QueryForm : Form
     {
         private Controller controller;
+        private FilterSet filters;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryForm"/> class.
@@ -25,10 +26,11 @@ namespace ResearchQuery
             this.controller.ConnectToDatabase("localhost", "root", "root");
             this.controller.LoadFilteringData();
 
+            // initialize filters
+            this.filters = new FilterSet(ref this.DailyVariableCheckbox, ref this.WeeklyVariablesCheckbox);
+
             // get all studies in the EMMA Backend database.
             this.InitializeStudyListBox();
-
-            this.InitializeCalculationTableView();
 
             // enable double-buffering for calculation table display
             this.CurrentCalculationTableView.GetType()?.
@@ -38,21 +40,6 @@ namespace ResearchQuery
             // apply these optiosn from improved performance
             this.CurrentCalculationTableView.RowHeadersVisible = false;
             this.CurrentCalculationTableView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
-        }
-
-        private void InitializeCalculationTableView()
-        {
-            /*// add all columns in the calcultion table
-            foreach (string column_name in this.controller.GetCalculationTableColumns())
-            {
-                this.CurrentCalculationTableView.Columns.Add(column_name, column_name);
-            }
-
-            // add 50 empty rows
-            for (int i = 0; i < 50; i++)
-            {
-                this.CurrentCalculationTableView.Rows.Add();
-            }*/
         }
 
         private void InitializeStudyListBox()
@@ -163,7 +150,7 @@ namespace ResearchQuery
                     }
                 }
 
-                this.ShowNewCalculationTable(this.controller.GetCalculationTable(selected_cohorts.ToArray()));
+                this.ShowNewCalculationTable(this.controller.GetCalculationTable(this.filters));
             }
         }
 

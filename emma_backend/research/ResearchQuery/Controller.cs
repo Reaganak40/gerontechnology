@@ -10,6 +10,7 @@ namespace ResearchQuery
     internal class Controller
     {
         private EMMABackendSqlConnection? database;
+
         private string[] dailyVariables;
         private string[] weeklyVariables;
 
@@ -107,16 +108,35 @@ namespace ResearchQuery
         /// <summary>
         /// Given querying parameters, gets updated table results to provide a view of calculations to the screen.
         /// </summary>
-        /// <param name="cohorts">What study-cohort pairs to look for.</param>
+        /// <param name="filters">A wrapper containing all filtering parameters for the calculation table.</param>
         /// <returns>A filtered datatable according to the requested parameters.</returns>
-        public DataTable? GetCalculationTable(KeyValuePair<string, int>[] cohorts)
+        public DataTable? GetCalculationTable(FilterSet filters)
         {
             if (this.database == null)
             {
                 return null;
             }
 
-            DataTable calculation_table = this.database.GetCalculationTable(cohorts);
+            DataTable calculation_table;
+            if (filters.SelectDailyVariables && filters.SelectWeeklyVariables)
+            {
+                calculation_table = this.database.QueryCalculationTable();
+            }
+            else
+            {
+                if (filters.SelectDailyVariables)
+                {
+                    calculation_table = this.database.QueryCalculationTable(this.dailyVariables);
+                }
+                else if (filters.SelectWeeklyVariables)
+                {
+                    calculation_table = this.database.QueryCalculationTable(this.weeklyVariables);
+                }
+                else
+                {
+                    calculation_table = this.database.QueryCalculationTable(new string[0]);
+                }
+            }
 
             // remove v_ from all variable column names.
             foreach (DataColumn variable_col in calculation_table.Columns)
@@ -130,20 +150,6 @@ namespace ResearchQuery
             }
 
             return calculation_table;
-        }
-
-        /// <summary>
-        /// Goes to the database to find the proper column names for the DataGridView.
-        /// </summary>
-        /// <returns>A list of column names.</returns>
-        public string[] GetCalculationTableColumns()
-        {
-            if (this.database == null)
-            {
-                return new string[0];
-            }
-
-            return this.database.CalculationTableColumns;
         }
     }
 }

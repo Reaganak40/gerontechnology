@@ -101,33 +101,62 @@ namespace ResearchQuery
         /// <summary>
         /// Returns the sql query result for a filtered calculation table.
         /// </summary>
-        /// <param name="cohorts">A list of study-cohort pairs to filter the calculation table with.</param>
+        /// <param name="study_cohorts">A list of study-cohort pairs to filter the calculation table with.</param>
+        /// <param name="variables">A list of inclusive variables to use in the table. If none is provided, will select all.</param>
         /// <returns>The sql table result.</returns>
-        public DataTable GetCalculationTable(KeyValuePair<string, int>[] cohorts)
+        public DataTable QueryCalculationTable(string[]? variables = null)
         {
             // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
             // one of the selected studies and cohorts.
             StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
-            if (cohorts.Length > 0)
+            if (this.cohorts.Count > 0)
             {
                 participant_sql_str.Append(" WHERE ");
             }
 
             int index = 0;
-            foreach (KeyValuePair<string, int> study_cohort in cohorts)
+            foreach (KeyValuePair<string, int> sc_pair in this.cohorts)
             {
-                participant_sql_str.Append($"(study = '{study_cohort.Key}' AND cohort = {study_cohort.Value})");
+                participant_sql_str.Append($"(study = '{sc_pair.Key}' AND cohort = {sc_pair.Value})");
 
                 index++;
-                if (index < cohorts.Length)
+                if (index < this.cohorts.Count)
                 {
                     participant_sql_str.Append(" OR ");
                 }
             }
 
+            // Determine what columns this query should select.
+            StringBuilder calculations_sql_str;
+            if (variables is null)
+            {
+                calculations_sql_str = new StringBuilder("SELECT C.* FROM Calculations C");
+            }
+            else
+            {
+                calculations_sql_str = new StringBuilder("SELECT C.participant_id, C.week_number, C.year_number");
+
+                if (variables.Length > 0) 
+                {
+                    calculations_sql_str.Append(", ");
+                    index = 0;
+                    foreach (string var in variables)
+                    {
+                        calculations_sql_str.Append("C." + var);
+
+                        index++;
+                        if (index < variables.Length)
+                        {
+                            calculations_sql_str.Append(", ");
+                        }
+                    }
+                }
+
+                calculations_sql_str.Append(" FROM Calculations C");
+            }
+
             // join the query results for participants table with the calculation table.
-            StringBuilder calculations_sql_str = new StringBuilder("SELECT C.* FROM Calculations C WHERE C.participant_id IN ");
-            calculations_sql_str.Append($"({participant_sql_str.ToString()})");
+            calculations_sql_str.Append($" WHERE C.participant_id IN ({participant_sql_str.ToString()})");
 
             return this.ExecuteQuery(calculations_sql_str.ToString());
         }
@@ -206,27 +235,17 @@ namespace ResearchQuery
         {
             DataTable query_results = this.ExecuteQuery("SHOW COLUMNS FROM Calculations");
 
-            int index = 0;
             foreach (DataRow row in query_results.Rows)
             {
                 object column_name = row["field"];
                 if (column_name.GetType() == typeof(string))
                 {
-                    if (!((string)column_name).Contains("v_"))
-                    {
-                        this.calculateTableColumns.Add((string)column_name);
-                    }
-                    else
-                    {
-                        this.calculateTableColumns.Add(((string)column_name).Substring(2));
-                    }
+                    this.calculateTableColumns.Add((string)column_name);
                 }
                 else
                 {
                     throw new NotImplementedException("GetCalculationTableColumns() cannot process results of type: " + column_name.GetType().ToString());
                 }
-
-                index += 1;
             }
         }
 
