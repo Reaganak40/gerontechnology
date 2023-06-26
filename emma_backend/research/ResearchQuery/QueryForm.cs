@@ -163,5 +163,10 @@ namespace ResearchQuery
         {
 
         }
+
+        private void QueryForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

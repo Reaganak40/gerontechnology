@@ -39,15 +39,20 @@
             this.ViewCalculationTableButton = new System.Windows.Forms.Button();
             this.DailyVariableCheckbox = new System.Windows.Forms.CheckBox();
             this.WeeklyVariablesCheckbox = new System.Windows.Forms.CheckBox();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentCalculationTableView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CohortSelectionView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // StudyCheckListBox
             // 
             this.StudyCheckListBox.CheckOnClick = true;
             this.StudyCheckListBox.FormattingEnabled = true;
-            this.StudyCheckListBox.Location = new System.Drawing.Point(31, 48);
+            this.StudyCheckListBox.Location = new System.Drawing.Point(26, 43);
             this.StudyCheckListBox.Name = "StudyCheckListBox";
             this.StudyCheckListBox.Size = new System.Drawing.Size(177, 158);
             this.StudyCheckListBox.TabIndex = 0;
@@ -56,7 +61,7 @@
             // StudyLabel
             // 
             this.StudyLabel.AutoSize = true;
-            this.StudyLabel.Location = new System.Drawing.Point(31, 25);
+            this.StudyLabel.Location = new System.Drawing.Point(26, 20);
             this.StudyLabel.Name = "StudyLabel";
             this.StudyLabel.Size = new System.Drawing.Size(46, 20);
             this.StudyLabel.TabIndex = 1;
@@ -65,7 +70,7 @@
             // CohortLabel
             // 
             this.CohortLabel.AutoSize = true;
-            this.CohortLabel.Location = new System.Drawing.Point(234, 25);
+            this.CohortLabel.Location = new System.Drawing.Point(229, 20);
             this.CohortLabel.Name = "CohortLabel";
             this.CohortLabel.Size = new System.Drawing.Size(54, 20);
             this.CohortLabel.TabIndex = 3;
@@ -76,12 +81,13 @@
             this.CurrentCalculationTableView.AllowUserToAddRows = false;
             this.CurrentCalculationTableView.AllowUserToDeleteRows = false;
             this.CurrentCalculationTableView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.CurrentCalculationTableView.Location = new System.Drawing.Point(557, 12);
+            this.CurrentCalculationTableView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CurrentCalculationTableView.Location = new System.Drawing.Point(0, 0);
             this.CurrentCalculationTableView.Name = "CurrentCalculationTableView";
             this.CurrentCalculationTableView.ReadOnly = true;
             this.CurrentCalculationTableView.RowHeadersWidth = 51;
             this.CurrentCalculationTableView.RowTemplate.Height = 29;
-            this.CurrentCalculationTableView.Size = new System.Drawing.Size(991, 698);
+            this.CurrentCalculationTableView.Size = new System.Drawing.Size(771, 853);
             this.CurrentCalculationTableView.TabIndex = 4;
             // 
             // CohortSelectionView
@@ -98,7 +104,7 @@
             this.StudyOptionColumn,
             this.CohortSelectionColumn});
             this.CohortSelectionView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
-            this.CohortSelectionView.Location = new System.Drawing.Point(234, 48);
+            this.CohortSelectionView.Location = new System.Drawing.Point(229, 43);
             this.CohortSelectionView.MultiSelect = false;
             this.CohortSelectionView.Name = "CohortSelectionView";
             this.CohortSelectionView.RowHeadersVisible = false;
@@ -135,7 +141,7 @@
             // ViewCalculationTableButton
             // 
             this.ViewCalculationTableButton.Enabled = false;
-            this.ViewCalculationTableButton.Location = new System.Drawing.Point(31, 272);
+            this.ViewCalculationTableButton.Location = new System.Drawing.Point(26, 267);
             this.ViewCalculationTableButton.Name = "ViewCalculationTableButton";
             this.ViewCalculationTableButton.Size = new System.Drawing.Size(503, 29);
             this.ViewCalculationTableButton.TabIndex = 6;
@@ -148,7 +154,7 @@
             this.DailyVariableCheckbox.AutoSize = true;
             this.DailyVariableCheckbox.Checked = true;
             this.DailyVariableCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.DailyVariableCheckbox.Location = new System.Drawing.Point(31, 212);
+            this.DailyVariableCheckbox.Location = new System.Drawing.Point(26, 207);
             this.DailyVariableCheckbox.Name = "DailyVariableCheckbox";
             this.DailyVariableCheckbox.Size = new System.Drawing.Size(129, 24);
             this.DailyVariableCheckbox.TabIndex = 7;
@@ -160,32 +166,54 @@
             this.WeeklyVariablesCheckbox.AutoSize = true;
             this.WeeklyVariablesCheckbox.Checked = true;
             this.WeeklyVariablesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(31, 242);
+            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(26, 237);
             this.WeeklyVariablesCheckbox.Name = "WeeklyVariablesCheckbox";
             this.WeeklyVariablesCheckbox.Size = new System.Drawing.Size(142, 24);
             this.WeeklyVariablesCheckbox.TabIndex = 8;
             this.WeeklyVariablesCheckbox.Text = "Weekly Variables";
             this.WeeklyVariablesCheckbox.UseVisualStyleBackColor = true;
             // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.CohortSelectionView);
+            this.splitContainer1.Panel1.Controls.Add(this.StudyCheckListBox);
+            this.splitContainer1.Panel1.Controls.Add(this.WeeklyVariablesCheckbox);
+            this.splitContainer1.Panel1.Controls.Add(this.StudyLabel);
+            this.splitContainer1.Panel1.Controls.Add(this.DailyVariableCheckbox);
+            this.splitContainer1.Panel1.Controls.Add(this.CohortLabel);
+            this.splitContainer1.Panel1.Controls.Add(this.ViewCalculationTableButton);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.CurrentCalculationTableView);
+            this.splitContainer1.Size = new System.Drawing.Size(1332, 853);
+            this.splitContainer1.SplitterDistance = 557;
+            this.splitContainer1.TabIndex = 9;
+            // 
             // QueryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1560, 722);
-            this.Controls.Add(this.WeeklyVariablesCheckbox);
-            this.Controls.Add(this.DailyVariableCheckbox);
-            this.Controls.Add(this.ViewCalculationTableButton);
-            this.Controls.Add(this.CohortSelectionView);
-            this.Controls.Add(this.CurrentCalculationTableView);
-            this.Controls.Add(this.CohortLabel);
-            this.Controls.Add(this.StudyLabel);
-            this.Controls.Add(this.StudyCheckListBox);
+            this.ClientSize = new System.Drawing.Size(1332, 853);
+            this.Controls.Add(this.splitContainer1);
             this.Name = "QueryForm";
             this.Text = "Research Query";
+            this.Load += new System.EventHandler(this.QueryForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.CurrentCalculationTableView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CohortSelectionView)).EndInit();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -202,5 +230,6 @@
         private Button ViewCalculationTableButton;
         private CheckBox DailyVariableCheckbox;
         private CheckBox WeeklyVariablesCheckbox;
+        private SplitContainer splitContainer1;
     }
 }
