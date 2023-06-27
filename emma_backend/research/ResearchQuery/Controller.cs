@@ -105,6 +105,14 @@ namespace ResearchQuery
             return this.database.UpdateSelectedCohorts(selected_studies);
         }
 
+        public DataGridViewRow[] GetDateRanges(KeyValuePair<string, int>[] study_cohorts)
+        {
+            if (this.database == null)
+            {
+                return new DataGridViewRow[0];
+            }
+        }
+
         /// <summary>
         /// Given querying parameters, gets updated table results to provide a view of calculations to the screen.
         /// </summary>
@@ -120,21 +128,21 @@ namespace ResearchQuery
             DataTable calculation_table;
             if (filters.SelectDailyVariables && filters.SelectWeeklyVariables)
             {
-                calculation_table = this.database.QueryCalculationTable();
+                calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts);
             }
             else
             {
                 if (filters.SelectDailyVariables)
                 {
-                    calculation_table = this.database.QueryCalculationTable(this.dailyVariables);
+                    calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts, this.dailyVariables);
                 }
                 else if (filters.SelectWeeklyVariables)
                 {
-                    calculation_table = this.database.QueryCalculationTable(this.weeklyVariables);
+                    calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts, this.weeklyVariables);
                 }
                 else
                 {
-                    calculation_table = this.database.QueryCalculationTable(new string[0]);
+                    calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts, new string[0]);
                 }
             }
 

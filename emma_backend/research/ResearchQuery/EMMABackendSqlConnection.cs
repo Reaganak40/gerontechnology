@@ -104,23 +104,23 @@ namespace ResearchQuery
         /// <param name="study_cohorts">A list of study-cohort pairs to filter the calculation table with.</param>
         /// <param name="variables">A list of inclusive variables to use in the table. If none is provided, will select all.</param>
         /// <returns>The sql table result.</returns>
-        public DataTable QueryCalculationTable(string[]? variables = null)
+        public DataTable QueryCalculationTable(KeyValuePair<string, int>[] study_cohorts, string[]? variables = null)
         {
             // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
             // one of the selected studies and cohorts.
             StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
-            if (this.cohorts.Count > 0)
+            if (study_cohorts.Length > 0)
             {
                 participant_sql_str.Append(" WHERE ");
             }
 
             int index = 0;
-            foreach (KeyValuePair<string, int> sc_pair in this.cohorts)
+            foreach (KeyValuePair<string, int> sc_pair in study_cohorts)
             {
                 participant_sql_str.Append($"(study = '{sc_pair.Key}' AND cohort = {sc_pair.Value})");
 
                 index++;
-                if (index < this.cohorts.Count)
+                if (index < study_cohorts.Length)
                 {
                     participant_sql_str.Append(" OR ");
                 }
@@ -212,6 +212,62 @@ namespace ResearchQuery
             }
 
             return this.cohorts.ToArray();
+        }
+
+        public DataTable QueryDateRanges(KeyValuePair<string, int>[] study_cohorts)
+        {
+            "SELECT P.study, P.cohort, C.week_number, C.year_number FROM "
+            // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
+            // one of the selected studies and cohorts.
+            StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
+            if (study_cohorts.Length > 0)
+            {
+                participant_sql_str.Append(" WHERE ");
+            }
+
+            int index = 0;
+            foreach (KeyValuePair<string, int> sc_pair in study_cohorts)
+            {
+                participant_sql_str.Append($"(study = '{sc_pair.Key}' AND cohort = {sc_pair.Value})");
+
+                index++;
+                if (index < study_cohorts.Length)
+                {
+                    participant_sql_str.Append(" OR ");
+                }
+            }
+
+            // Determine what columns this query should select.
+            StringBuilder calculations_sql_str;
+            if (variables is null)
+            {
+                calculations_sql_str = new StringBuilder("SELECT DISTINCT FROM Calculations C");
+            }
+            else
+            {
+                calculations_sql_str = new StringBuilder("SELECT C.participant_id, C.week_number, C.year_number");
+
+                if (variables.Length > 0)
+                {
+                    calculations_sql_str.Append(", ");
+                    index = 0;
+                    foreach (string var in variables)
+                    {
+                        calculations_sql_str.Append("C." + var);
+
+                        index++;
+                        if (index < variables.Length)
+                        {
+                            calculations_sql_str.Append(", ");
+                        }
+                    }
+                }
+
+                calculations_sql_str.Append(" FROM Calculations C");
+            }
+
+            // join the query results for participants table with the calculation table.
+            calculations_sql_str.Append($" WHERE C.participant_id IN ({participant_sql_str.ToString()})");
         }
 
         private void GetStudies()

@@ -44,6 +44,7 @@ namespace ResearchQuery
 
         private void InitializeStudyListBox()
         {
+            // Get all the available studies in the database.
             string[] studies = this.controller.GetStudies();
 
             foreach (string study in studies)
@@ -54,6 +55,7 @@ namespace ResearchQuery
 
         private void StudyCheckListBox_MouseUp(object sender, MouseEventArgs e)
         {
+            // Updates the cohort options given the selected studies.
             if (sender.GetType() == typeof(CheckedListBox))
             {
                 string[] selected_studies = new string[((CheckedListBox)sender).CheckedItems.Count];
@@ -80,6 +82,7 @@ namespace ResearchQuery
 
         private void ResetCohortSelections(KeyValuePair<string, int>[] study_cohort_pairs)
         {
+            // Condition: The user has (de)selected a study, and the cohort options need to reset.
             int index = 0;
             foreach (KeyValuePair<string, int> study_cohort_pair in study_cohort_pairs)
             {
@@ -97,59 +100,66 @@ namespace ResearchQuery
         private void CohortSelectionView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             // updates checkbox if click a row, or the checkbox directly.
-            if (e.RowIndex >= 0)
+            var check = this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value;
+            if (check is null)
             {
-                if (e.ColumnIndex > 0)
+                this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = true;
+            }
+            else
+            {
+                if ((bool)check)
                 {
-                    var check = this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value;
-                    if (check is null)
-                    {
-                        this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = true;
-                    }
-                    else
-                    {
-                        if ((bool)check)
-                        {
-                            this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = false;
-                        }
-                        else
-                        {
-                            this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = true;
-                        }
-                    }
+                    this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = false;
                 }
+                else
+                {
+                    this.CohortSelectionView.Rows[e.RowIndex].Cells["CheckCohortColumn"].Value = true;
+                }
+            }
+
+            this.UpdateSelectedCohorts();
+        }
+
+        private void UpdateSelectedCohorts()
+        {
+            // Updates the filter for selected study and cohorts.
+            List<KeyValuePair<string, int>> selected_cohorts = new List<KeyValuePair<string, int>>();
+            foreach (DataGridViewRow cohort_row in this.CohortSelectionView.Rows)
+            {
+                if (Convert.ToBoolean(cohort_row.Cells["CheckCohortColumn"].Value))
+                {
+                    string study = (string)cohort_row.Cells["StudyOptionColumn"].Value;
+                    int cohort = (int)cohort_row.Cells["CohortSelectionColumn"].Value;
+
+                    selected_cohorts.Add(new KeyValuePair<string, int>(study, cohort));
+                }
+            }
+
+            this.filters.UpdateSelectedCohorts(selected_cohorts);
+
+            // if the user has selected at least one cohort, allow the user to view the calculation table.
+            if (selected_cohorts.Count > 0)
+            {
+                this.ViewCalculationTableButton.Enabled = true;
+            }
+            else
+            {
+                this.ViewCalculationTableButton.Enabled = false;
             }
         }
 
-        private void CohortSelectionView_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+        private void ResetDateRangeSelections()
         {
-            foreach (DataGridViewRow cohort_row in this.CohortSelectionView.Rows)
-            {
-
-                if (Convert.ToBoolean(cohort_row.Cells["CheckCohortColumn"].Value))
-                {
-                    this.ViewCalculationTableButton.Enabled = true;
-                    return;
-                }
-            }
+            this.controller.GetDateRanges(this.filters.SelectedCohorts);
         }
 
         private void ViewCalculationTableButton_MouseClick(object sender, MouseEventArgs e)
         {
+            // the user has clicked the view calculation table button, and we need to
+            // now update the calculation table view.
             if (this.ViewCalculationTableButton.Enabled)
             {
-                List<KeyValuePair<string, int>> selected_cohorts = new List<KeyValuePair<string, int>>();
-                foreach (DataGridViewRow cohort_row in this.CohortSelectionView.Rows)
-                {
-                    if (Convert.ToBoolean(cohort_row.Cells["CheckCohortColumn"].Value))
-                    {
-                        string study = (string)cohort_row.Cells["StudyOptionColumn"].Value;
-                        int cohort = (int)cohort_row.Cells["CohortSelectionColumn"].Value;
-
-                        selected_cohorts.Add(new KeyValuePair<string, int>(study, cohort));
-                    }
-                }
-
+                // Uses controller to logically create the data table for the users selected query.
                 this.ShowNewCalculationTable(this.controller.GetCalculationTable(this.filters));
             }
         }
@@ -159,14 +169,6 @@ namespace ResearchQuery
             this.CurrentCalculationTableView.DataSource = calculation_table;
         }
 
-        private void CohortSelectionView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void QueryForm_Load(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }
