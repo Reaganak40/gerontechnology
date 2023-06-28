@@ -40,11 +40,10 @@
             this.DailyVariableCheckbox = new System.Windows.Forms.CheckBox();
             this.WeeklyVariablesCheckbox = new System.Windows.Forms.CheckBox();
             this.FormSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.DateRangeComboBox = new System.Windows.Forms.ComboBox();
             this.DateRangeLabel = new System.Windows.Forms.Label();
             this.DateRangeSelectionView = new System.Windows.Forms.DataGridView();
             this.CheckDateRangeColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.CohortSelectionDateRangeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.StudySelectionDateRangeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.WeekDateRangeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.YearDateRangeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StartDateRangeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -154,7 +153,7 @@
             // ViewCalculationTableButton
             // 
             this.ViewCalculationTableButton.Enabled = false;
-            this.ViewCalculationTableButton.Location = new System.Drawing.Point(26, 528);
+            this.ViewCalculationTableButton.Location = new System.Drawing.Point(26, 551);
             this.ViewCalculationTableButton.Name = "ViewCalculationTableButton";
             this.ViewCalculationTableButton.Size = new System.Drawing.Size(503, 29);
             this.ViewCalculationTableButton.TabIndex = 6;
@@ -167,7 +166,7 @@
             this.DailyVariableCheckbox.AutoSize = true;
             this.DailyVariableCheckbox.Checked = true;
             this.DailyVariableCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.DailyVariableCheckbox.Location = new System.Drawing.Point(26, 468);
+            this.DailyVariableCheckbox.Location = new System.Drawing.Point(26, 491);
             this.DailyVariableCheckbox.Name = "DailyVariableCheckbox";
             this.DailyVariableCheckbox.Size = new System.Drawing.Size(129, 24);
             this.DailyVariableCheckbox.TabIndex = 7;
@@ -179,7 +178,7 @@
             this.WeeklyVariablesCheckbox.AutoSize = true;
             this.WeeklyVariablesCheckbox.Checked = true;
             this.WeeklyVariablesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(26, 498);
+            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(26, 521);
             this.WeeklyVariablesCheckbox.Name = "WeeklyVariablesCheckbox";
             this.WeeklyVariablesCheckbox.Size = new System.Drawing.Size(142, 24);
             this.WeeklyVariablesCheckbox.TabIndex = 8;
@@ -195,6 +194,7 @@
             // 
             // FormSplitContainer.Panel1
             // 
+            this.FormSplitContainer.Panel1.Controls.Add(this.DateRangeComboBox);
             this.FormSplitContainer.Panel1.Controls.Add(this.DateRangeLabel);
             this.FormSplitContainer.Panel1.Controls.Add(this.DateRangeSelectionView);
             this.FormSplitContainer.Panel1.Controls.Add(this.CohortSelectionView);
@@ -213,10 +213,23 @@
             this.FormSplitContainer.SplitterDistance = 547;
             this.FormSplitContainer.TabIndex = 9;
             // 
+            // DateRangeComboBox
+            // 
+            this.DateRangeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.DateRangeComboBox.FormattingEnabled = true;
+            this.DateRangeComboBox.Items.AddRange(new object[] {
+            "Select All",
+            "Unselect All",
+            "Select Newest"});
+            this.DateRangeComboBox.Location = new System.Drawing.Point(378, 225);
+            this.DateRangeComboBox.Name = "DateRangeComboBox";
+            this.DateRangeComboBox.Size = new System.Drawing.Size(151, 28);
+            this.DateRangeComboBox.TabIndex = 11;
+            // 
             // DateRangeLabel
             // 
             this.DateRangeLabel.AutoSize = true;
-            this.DateRangeLabel.Location = new System.Drawing.Point(26, 225);
+            this.DateRangeLabel.Location = new System.Drawing.Point(26, 238);
             this.DateRangeLabel.Name = "DateRangeLabel";
             this.DateRangeLabel.Size = new System.Drawing.Size(87, 20);
             this.DateRangeLabel.TabIndex = 10;
@@ -231,74 +244,60 @@
             this.DateRangeSelectionView.BackgroundColor = System.Drawing.SystemColors.Control;
             this.DateRangeSelectionView.ColumnHeadersHeight = 29;
             this.DateRangeSelectionView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.DateRangeSelectionView.ColumnHeadersVisible = false;
             this.DateRangeSelectionView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.CheckDateRangeColumn,
-            this.CohortSelectionDateRangeColumn,
-            this.StudySelectionDateRangeColumn,
             this.WeekDateRangeColumn,
             this.YearDateRangeColumn,
             this.StartDateRangeColumn,
             this.EndDateRangeColumn});
             this.DateRangeSelectionView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.DateRangeSelectionView.GridColor = System.Drawing.SystemColors.Control;
-            this.DateRangeSelectionView.Location = new System.Drawing.Point(26, 248);
+            this.DateRangeSelectionView.Location = new System.Drawing.Point(26, 261);
+            this.DateRangeSelectionView.MultiSelect = false;
             this.DateRangeSelectionView.Name = "DateRangeSelectionView";
             this.DateRangeSelectionView.RowHeadersVisible = false;
             this.DateRangeSelectionView.RowHeadersWidth = 51;
             this.DateRangeSelectionView.RowTemplate.Height = 29;
+            this.DateRangeSelectionView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.DateRangeSelectionView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.DateRangeSelectionView.Size = new System.Drawing.Size(503, 198);
             this.DateRangeSelectionView.TabIndex = 9;
+            this.DateRangeSelectionView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DateRangeSelectionView_CellClick);
             // 
             // CheckDateRangeColumn
             // 
             this.CheckDateRangeColumn.HeaderText = "";
             this.CheckDateRangeColumn.MinimumWidth = 6;
             this.CheckDateRangeColumn.Name = "CheckDateRangeColumn";
-            this.CheckDateRangeColumn.Width = 125;
-            // 
-            // CohortSelectionDateRangeColumn
-            // 
-            this.CohortSelectionDateRangeColumn.HeaderText = "Cohort #";
-            this.CohortSelectionDateRangeColumn.MinimumWidth = 6;
-            this.CohortSelectionDateRangeColumn.Name = "CohortSelectionDateRangeColumn";
-            this.CohortSelectionDateRangeColumn.Width = 125;
-            // 
-            // StudySelectionDateRangeColumn
-            // 
-            this.StudySelectionDateRangeColumn.HeaderText = "Study";
-            this.StudySelectionDateRangeColumn.MinimumWidth = 6;
-            this.StudySelectionDateRangeColumn.Name = "StudySelectionDateRangeColumn";
-            this.StudySelectionDateRangeColumn.Width = 125;
+            this.CheckDateRangeColumn.Width = 50;
             // 
             // WeekDateRangeColumn
             // 
             this.WeekDateRangeColumn.HeaderText = "Week";
             this.WeekDateRangeColumn.MinimumWidth = 6;
             this.WeekDateRangeColumn.Name = "WeekDateRangeColumn";
-            this.WeekDateRangeColumn.Width = 125;
+            this.WeekDateRangeColumn.Width = 75;
             // 
             // YearDateRangeColumn
             // 
             this.YearDateRangeColumn.HeaderText = "Year";
             this.YearDateRangeColumn.MinimumWidth = 6;
             this.YearDateRangeColumn.Name = "YearDateRangeColumn";
-            this.YearDateRangeColumn.Width = 125;
+            this.YearDateRangeColumn.Width = 75;
             // 
             // StartDateRangeColumn
             // 
             this.StartDateRangeColumn.HeaderText = "Start Date";
             this.StartDateRangeColumn.MinimumWidth = 6;
             this.StartDateRangeColumn.Name = "StartDateRangeColumn";
-            this.StartDateRangeColumn.Width = 125;
+            this.StartDateRangeColumn.Width = 150;
             // 
             // EndDateRangeColumn
             // 
             this.EndDateRangeColumn.HeaderText = "End Date";
             this.EndDateRangeColumn.MinimumWidth = 6;
             this.EndDateRangeColumn.Name = "EndDateRangeColumn";
-            this.EndDateRangeColumn.Width = 125;
+            this.EndDateRangeColumn.Width = 150;
             // 
             // QueryForm
             // 
@@ -333,15 +332,14 @@
         private SplitContainer FormSplitContainer;
         private Label DateRangeLabel;
         private DataGridView DateRangeSelectionView;
+        private DataGridViewCheckBoxColumn CheckCohortColumn;
+        private DataGridViewTextBoxColumn StudyOptionColumn;
+        private DataGridViewTextBoxColumn CohortSelectionColumn;
         private DataGridViewCheckBoxColumn CheckDateRangeColumn;
-        private DataGridViewTextBoxColumn CohortSelectionDateRangeColumn;
-        private DataGridViewTextBoxColumn StudySelectionDateRangeColumn;
         private DataGridViewTextBoxColumn WeekDateRangeColumn;
         private DataGridViewTextBoxColumn YearDateRangeColumn;
         private DataGridViewTextBoxColumn StartDateRangeColumn;
         private DataGridViewTextBoxColumn EndDateRangeColumn;
-        private DataGridViewCheckBoxColumn CheckCohortColumn;
-        private DataGridViewTextBoxColumn StudyOptionColumn;
-        private DataGridViewTextBoxColumn CohortSelectionColumn;
+        private ComboBox DateRangeComboBox;
     }
 }

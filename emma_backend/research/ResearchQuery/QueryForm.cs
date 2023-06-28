@@ -1,3 +1,4 @@
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -32,14 +33,11 @@ namespace ResearchQuery
             // get all studies in the EMMA Backend database.
             this.InitializeStudyListBox();
 
-            // enable double-buffering for calculation table display
-            this.CurrentCalculationTableView.GetType()?.
-                GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)?.
-                SetValue(this.CurrentCalculationTableView, true, null);
+            // programmatically adjust settings for DateRangeSelectionView
+            this.InitializeDateRangeView();
 
-            // apply these optiosn from improved performance
-            this.CurrentCalculationTableView.RowHeadersVisible = false;
-            this.CurrentCalculationTableView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
+            // programmatically adjust settings for CurrentCalculationTableView
+            this.InitializeCalculationTableView();
         }
 
         private void InitializeStudyListBox()
@@ -53,6 +51,26 @@ namespace ResearchQuery
             }
         }
 
+        private void InitializeDateRangeView()
+        {
+            foreach (DataGridViewColumn column in this.DateRangeSelectionView.Columns)
+            {
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+        }
+
+        private void InitializeCalculationTableView()
+        {
+            // enable double-buffering for calculation table display
+            this.CurrentCalculationTableView.GetType()?.
+                GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)?.
+                SetValue(this.CurrentCalculationTableView, true, null);
+
+            // apply these optiosn from improved performance
+            this.CurrentCalculationTableView.RowHeadersVisible = false;
+            this.CurrentCalculationTableView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
+        }
+
         private void StudyCheckListBox_MouseUp(object sender, MouseEventArgs e)
         {
             // Updates the cohort options given the selected studies.
@@ -63,6 +81,8 @@ namespace ResearchQuery
 
                 // clear cohort options and if nothing is selected leave it cleared
                 this.CohortSelectionView.Rows.Clear();
+                this.DateRangeSelectionView.Rows.Clear();
+
                 this.ViewCalculationTableButton.Enabled = false;
                 if (selected_studies.Length == 0)
                 {
@@ -137,20 +157,47 @@ namespace ResearchQuery
 
             this.filters.UpdateSelectedCohorts(selected_cohorts);
 
-            // if the user has selected at least one cohort, allow the user to view the calculation table.
-            if (selected_cohorts.Count > 0)
-            {
-                this.ViewCalculationTableButton.Enabled = true;
-            }
-            else
-            {
-                this.ViewCalculationTableButton.Enabled = false;
-            }
+            // if the user has selected at least one cohort, allow the user to select data ranges.
+            this.ResetDateRangeSelections();
         }
 
         private void ResetDateRangeSelections()
         {
-            this.controller.GetDateRanges(this.filters.SelectedCohorts);
+
+
+            DataTable results = this.controller.GetDateRanges(this.filters.SelectedCohorts);
+            this.ViewCalculationTableButton.Enabled = false;
+            this.DateRangeSelectionView.Rows.Clear();
+
+
+            int index = 0;
+            foreach (DataRow row in results.Rows)
+            {
+                object week = row["week_number"];
+                if (week.GetType() != typeof(int))
+                {
+                    throw new NotSupportedException("Row value for week_number should not be of type: " + week.GetType().ToString());
+                }
+                object year = row["year_number"];
+                if (year.GetType() != typeof(int))
+                {
+                    throw new NotSupportedException("Row value for year_number should not be of type: " + week.GetType().ToString());
+                }
+
+                index = this.DateRangeSelectionView.Rows.Add();
+
+                this.DateRangeSelectionView.Rows[index].Cells["WeekDateRangeColumn"].Value = week;
+                this.DateRangeSelectionView.Rows[index].Cells["WeekDateRangeColumn"].ReadOnly = true;
+
+                this.DateRangeSelectionView.Rows[index].Cells["YearDateRangeColumn"].Value = year;
+                this.DateRangeSelectionView.Rows[index].Cells["YearDateRangeColumn"].ReadOnly = true;
+
+                this.DateRangeSelectionView.Rows[index].Cells["StartDateRangeColumn"].Value = "Not implemented.";
+                this.DateRangeSelectionView.Rows[index].Cells["StartDateRangeColumn"].ReadOnly = true;
+
+                this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].Value = "NI";
+                this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].ReadOnly = true;
+            }
         }
 
         private void ViewCalculationTableButton_MouseClick(object sender, MouseEventArgs e)
@@ -169,6 +216,49 @@ namespace ResearchQuery
             this.CurrentCalculationTableView.DataSource = calculation_table;
         }
 
-        
+        private void DateRangeSelectionView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                // updates checkbox if click a row, or the checkbox directly.
+                var check = this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value;
+                if (check is null)
+                {
+                    this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value = true;
+                }
+                else
+                {
+                    if ((bool)check)
+                    {
+                        this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value = false;
+                    }
+                    else
+                    {
+                        this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value = true;
+                    }
+                }
+            }
+
+            this.UpdateSelectedDateRanges();
+        }
+
+        private void UpdateSelectedDateRanges()
+        {
+            // Updates the filter for selected study and cohorts.
+            this.ViewCalculationTableButton.Enabled = false;
+            List<KeyValuePair<int, int>> selected_dates = new List<KeyValuePair<int, int>>();
+            foreach (DataGridViewRow date_range_row in this.DateRangeSelectionView.Rows)
+            {
+                if (Convert.ToBoolean(date_range_row.Cells["CheckDateRangeColumn"].Value))
+                {
+                    this.ViewCalculationTableButton.Enabled = true;
+
+                    int week = (int)date_range_row.Cells["WeekDateRangeColumn"].Value;
+                    int year = (int)date_range_row.Cells["YearDateRangeColumn"].Value;
+
+                    selected_dates.Add(new KeyValuePair<int, int>(week, year));
+                }
+            }
+        }
     }
 }

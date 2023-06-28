@@ -105,12 +105,15 @@ namespace ResearchQuery
             return this.database.UpdateSelectedCohorts(selected_studies);
         }
 
-        public DataGridViewRow[] GetDateRanges(KeyValuePair<string, int>[] study_cohorts)
+        public DataTable GetDateRanges(KeyValuePair<string, int>[] study_cohorts)
         {
-            if (this.database == null)
+            if (this.database == null || study_cohorts.Length == 0)
             {
-                return new DataGridViewRow[0];
+                return new DataTable();
             }
+
+            // use the selected study and cohorts to find what week,year items dates they belong to.
+            return this.database.QueryDateRanges(study_cohorts);
         }
 
         /// <summary>

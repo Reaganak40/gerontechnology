@@ -214,11 +214,20 @@ namespace ResearchQuery
             return this.cohorts.ToArray();
         }
 
+        /// <summary>
+        /// Gets the queried table showing the available week,year pairs for the provided study_cohorts.
+        /// </summary>
+        /// <param name="study_cohorts">A list of study-cohort pairs to filter the calculation table with.</param>
+        /// <returns>The sql table result.</returns>
         public DataTable QueryDateRanges(KeyValuePair<string, int>[] study_cohorts)
         {
-            "SELECT P.study, P.cohort, C.week_number, C.year_number FROM "
             // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
             // one of the selected studies and cohorts.
+            StringBuilder calculations_sql_str = new StringBuilder(
+                "SELECT DISTINCT C.week_number, C.year_number FROM Calculations C");
+
+            // Build the right table for left join, that is, the Participant table filtered to the
+            // proper study-cohorts.
             StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
             if (study_cohorts.Length > 0)
             {
@@ -237,37 +246,9 @@ namespace ResearchQuery
                 }
             }
 
-            // Determine what columns this query should select.
-            StringBuilder calculations_sql_str;
-            if (variables is null)
-            {
-                calculations_sql_str = new StringBuilder("SELECT DISTINCT FROM Calculations C");
-            }
-            else
-            {
-                calculations_sql_str = new StringBuilder("SELECT C.participant_id, C.week_number, C.year_number");
-
-                if (variables.Length > 0)
-                {
-                    calculations_sql_str.Append(", ");
-                    index = 0;
-                    foreach (string var in variables)
-                    {
-                        calculations_sql_str.Append("C." + var);
-
-                        index++;
-                        if (index < variables.Length)
-                        {
-                            calculations_sql_str.Append(", ");
-                        }
-                    }
-                }
-
-                calculations_sql_str.Append(" FROM Calculations C");
-            }
-
             // join the query results for participants table with the calculation table.
-            calculations_sql_str.Append($" WHERE C.participant_id IN ({participant_sql_str.ToString()})");
+            calculations_sql_str.Append($" INNER JOIN ({participant_sql_str.ToString()}) P ON C.participant_id = P.participant_id ORDER BY C.year_number ASC, C.week_number ASC");
+            return this.ExecuteQuery(calculations_sql_str.ToString());
         }
 
         private void GetStudies()
