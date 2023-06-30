@@ -225,6 +225,7 @@
             this.DateRangeComboBox.Name = "DateRangeComboBox";
             this.DateRangeComboBox.Size = new System.Drawing.Size(151, 28);
             this.DateRangeComboBox.TabIndex = 11;
+            this.DateRangeComboBox.SelectedIndexChanged += new System.EventHandler(this.DateRangeComboBox_SelectedIndexChanged);
             // 
             // DateRangeLabel
             // 
@@ -263,6 +264,7 @@
             this.DateRangeSelectionView.Size = new System.Drawing.Size(503, 198);
             this.DateRangeSelectionView.TabIndex = 9;
             this.DateRangeSelectionView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DateRangeSelectionView_CellClick);
+            this.DateRangeSelectionView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DateRangeSelectionView_CellValueChanged);
             // 
             // CheckDateRangeColumn
             // 

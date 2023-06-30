@@ -1,4 +1,5 @@
 using MySqlX.XDevAPI.Common;
+using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -82,6 +83,8 @@ namespace ResearchQuery
                 // clear cohort options and if nothing is selected leave it cleared
                 this.CohortSelectionView.Rows.Clear();
                 this.DateRangeSelectionView.Rows.Clear();
+                this.DateRangeComboBox.SelectedIndex = -1;
+
 
                 this.ViewCalculationTableButton.Enabled = false;
                 if (selected_studies.Length == 0)
@@ -163,11 +166,10 @@ namespace ResearchQuery
 
         private void ResetDateRangeSelections()
         {
-
-
             DataTable results = this.controller.GetDateRanges(this.filters.SelectedCohorts);
             this.ViewCalculationTableButton.Enabled = false;
             this.DateRangeSelectionView.Rows.Clear();
+            this.DateRangeComboBox.SelectedIndex = -1;
 
 
             int index = 0;
@@ -198,6 +200,8 @@ namespace ResearchQuery
                 this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].Value = "NI";
                 this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].ReadOnly = true;
             }
+
+            this.filters.ResetSelectedDateRanges(this.DateRangeSelectionView.Rows);
         }
 
         private void ViewCalculationTableButton_MouseClick(object sender, MouseEventArgs e)
@@ -220,6 +224,8 @@ namespace ResearchQuery
         {
             if (e.RowIndex >= 0)
             {
+                this.DateRangeComboBox.SelectedIndex = -1;
+
                 // updates checkbox if click a row, or the checkbox directly.
                 var check = this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value;
                 if (check is null)
@@ -258,6 +264,72 @@ namespace ResearchQuery
 
                     selected_dates.Add(new KeyValuePair<int, int>(week, year));
                 }
+            }
+        }
+
+        private void DateRangeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.DateRangeComboBox.SelectedIndex >= 0)
+            {
+                #pragma warning disable SA1312 // VariableNamesMustBeginWithLowerCaseLetter
+                const int SELECT_ALL = 0;
+                const int UNSELECT_ALL = 1;
+                const int SELECT_NEWEST = 2;
+                #pragma warning restore SA1312 // VariableNamesMustBeginWithLowerCaseLetter
+
+                switch (this.DateRangeComboBox.SelectedIndex)
+                {
+                    case SELECT_ALL:
+                        foreach (DataGridViewRow row in this.DateRangeSelectionView.Rows)
+                        {
+                            row.Cells["CheckDateRangeColumn"].Value = true;
+                        }
+
+                        break;
+                    case UNSELECT_ALL:
+                        foreach (DataGridViewRow row in this.DateRangeSelectionView.Rows)
+                        {
+                            row.Cells["CheckDateRangeColumn"].Value = false;
+                        }
+
+                        break;
+                    case SELECT_NEWEST:
+                        // assumes bottom row is the newest
+                        int newest_week = (int)this.DateRangeSelectionView.Rows[this.DateRangeSelectionView.Rows.Count-1].Cells["WeekDateRangeColumn"].Value;
+                        int newest_year = (int)this.DateRangeSelectionView.Rows[this.DateRangeSelectionView.Rows.Count-1].Cells["YearDateRangeColumn"].Value;
+                        foreach (DataGridViewRow row in this.DateRangeSelectionView.Rows)
+                        {
+                            int row_week = (int)row.Cells["WeekDateRangeColumn"].Value;
+                            int row_year = (int)row.Cells["YearDateRangeColumn"].Value;
+
+                            // get only rows that are within last 4 weeks of the newest row.
+                            if ((((newest_week - row_week) < 4) && (newest_year == row_year)) ||
+                                ((newest_week < 4) && (52 - row_week < 4 - newest_week) && ((row_year + 1) == newest_year)))
+                            {
+                                row.Cells["CheckDateRangeColumn"].Value = true;
+                            }
+                            else
+                            {
+                                row.Cells["CheckDateRangeColumn"].Value = false;
+                            }
+                        }
+
+                        break;
+                    default:
+                        throw new Exception($"DateRangeComboBox Selected Index [{this.DateRangeComboBox.SelectedIndex}] is not defined.");
+                }
+            }
+        }
+
+        private void DateRangeSelectionView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex != -1 && e.ColumnIndex == this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].ColumnIndex)
+            {
+                int week = (int)this.DateRangeSelectionView.Rows[e.RowIndex].Cells["WeekDateRangeColumn"].Value;
+                int year = (int)this.DateRangeSelectionView.Rows[e.RowIndex].Cells["YearDateRangeColumn"].Value;
+                bool check = (bool)this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value;
+
+                this.filters.UpdateSelectedDateRange(week, year, check);
             }
         }
     }

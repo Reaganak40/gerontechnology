@@ -17,6 +17,8 @@ namespace ResearchQuery
 
         private List<KeyValuePair<string, int>> selectedCohorts;
 
+        private Dictionary<(int, int), bool> selectedDateRanges;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterSet"/> class.
         /// </summary>
@@ -28,6 +30,7 @@ namespace ResearchQuery
             this.selectWeeklyVariablesRef = weekly_variable_checkbox;
 
             this.selectedCohorts = new List<KeyValuePair<string, int>>();
+            this.selectedDateRanges = new Dictionary<(int, int), bool>();
         }
 
         /// <summary>
@@ -70,6 +73,41 @@ namespace ResearchQuery
         public void UpdateSelectedCohorts(List<KeyValuePair<string, int>> nSelectedCohorts)
         {
             this.selectedCohorts = nSelectedCohorts;
+        }
+
+        /// <summary>
+        /// Creates a new selected date range list, storing all the available data ranges with their boolean check values.
+        /// </summary>
+        /// <param name="dateRangeRows">An already initialized collection of date ranges.</param>
+        public void ResetSelectedDateRanges(DataGridViewRowCollection dateRangeRows)
+        {
+            this.selectedDateRanges = new Dictionary<(int, int), bool>();
+
+
+            foreach (DataGridViewRow row in dateRangeRows) 
+            {
+                int week = (int)row.Cells["WeekDateRangeColumn"].Value;
+                int year = (int)row.Cells["YearDateRangeColumn"].Value;
+                var check = row.Cells["CheckDateRangeColumn"].Value;
+
+                if (check is null)
+                {
+                    check = false;
+                }
+
+                this.selectedDateRanges[(week, year)] = (bool)check;
+            }
+        }
+
+        /// <summary>
+        /// Update a week,year date range to be checked or not checked (to use in calculations).
+        /// </summary>
+        /// <param name="week">Week of the calculation table.</param>
+        /// <param name="year">Year of the calculation table.</param>
+        /// <param name="check">True, when the user wants to include in query.</param>
+        public void UpdateSelectedDateRange(int week, int year, bool check)
+        {
+            this.selectedDateRanges[(week, year)] = check;
         }
     }
 }
