@@ -101,26 +101,25 @@ namespace ResearchQuery
         /// <summary>
         /// Returns the sql query result for a filtered calculation table.
         /// </summary>
-        /// <param name="study_cohorts">A list of study-cohort pairs to filter the calculation table with.</param>
-        /// <param name="variables">A list of inclusive variables to use in the table. If none is provided, will select all.</param>
+        /// <param name="args">A collection of arguments the dynamically defined specified queries.</param>
         /// <returns>The sql table result.</returns>
-        public DataTable QueryCalculationTable(KeyValuePair<string, int>[] study_cohorts, string[]? variables = null)
+        public DataTable QueryCalculationTable(EmmaQueryArgs args)
         {
             // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
             // one of the selected studies and cohorts.
             StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
-            if (study_cohorts.Length > 0)
+            if (args.StudyCohorts.Length > 0)
             {
                 participant_sql_str.Append(" WHERE ");
             }
 
             int index = 0;
-            foreach (KeyValuePair<string, int> sc_pair in study_cohorts)
+            foreach (KeyValuePair<string, int> sc_pair in args.StudyCohorts)
             {
                 participant_sql_str.Append($"(study = '{sc_pair.Key}' AND cohort = {sc_pair.Value})");
 
                 index++;
-                if (index < study_cohorts.Length)
+                if (index < args.StudyCohorts.Length)
                 {
                     participant_sql_str.Append(" OR ");
                 }
@@ -128,7 +127,7 @@ namespace ResearchQuery
 
             // Determine what columns this query should select.
             StringBuilder calculations_sql_str;
-            if (variables is null)
+            if (args.Variables is null)
             {
                 calculations_sql_str = new StringBuilder("SELECT C.* FROM Calculations C");
             }
@@ -136,16 +135,16 @@ namespace ResearchQuery
             {
                 calculations_sql_str = new StringBuilder("SELECT C.participant_id, C.week_number, C.year_number");
 
-                if (variables.Length > 0) 
+                if (args.Variables.Length > 0) 
                 {
                     calculations_sql_str.Append(", ");
                     index = 0;
-                    foreach (string var in variables)
+                    foreach (string var in args.Variables)
                     {
                         calculations_sql_str.Append("C." + var);
 
                         index++;
-                        if (index < variables.Length)
+                        if (index < args.Variables.Length)
                         {
                             calculations_sql_str.Append(", ");
                         }
@@ -157,6 +156,32 @@ namespace ResearchQuery
 
             // join the query results for participants table with the calculation table.
             calculations_sql_str.Append($" WHERE C.participant_id IN ({participant_sql_str.ToString()})");
+
+            // add date range conditions
+            if (args.DateRanges.Length > 0)
+            {
+                calculations_sql_str.Append(" AND (");
+            }
+
+            index = 0;
+            foreach (var date in args.DateRanges)
+            {
+                int week = date.Item1;
+                int year = date.Item2;
+
+                calculations_sql_str.Append($"(week_number = {week} AND year_number = {year}");
+
+                if ((index + 1) < args.DateRanges.Length)
+                {
+                    calculations_sql_str.Append(") OR");
+                }
+                else
+                {
+                    calculations_sql_str.Append("))");
+                }
+
+                index++;
+            }
 
             return this.ExecuteQuery(calculations_sql_str.ToString());
         }

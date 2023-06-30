@@ -28,6 +28,7 @@ namespace ResearchQuery
             this.controller.ConnectToDatabase("localhost", "root", "root");
             this.controller.LoadFilteringData();
 
+
             // initialize filters
             this.filters = new FilterSet(ref this.DailyVariableCheckbox, ref this.WeeklyVariablesCheckbox);
 
@@ -39,6 +40,8 @@ namespace ResearchQuery
 
             // programmatically adjust settings for CurrentCalculationTableView
             this.InitializeCalculationTableView();
+
+            
         }
 
         private void InitializeStudyListBox()
@@ -84,9 +87,9 @@ namespace ResearchQuery
                 this.CohortSelectionView.Rows.Clear();
                 this.DateRangeSelectionView.Rows.Clear();
                 this.DateRangeComboBox.SelectedIndex = -1;
-
-
+                this.DateRangeComboBox.Enabled = false;
                 this.ViewCalculationTableButton.Enabled = false;
+
                 if (selected_studies.Length == 0)
                 {
                     return;
@@ -170,6 +173,7 @@ namespace ResearchQuery
             this.ViewCalculationTableButton.Enabled = false;
             this.DateRangeSelectionView.Rows.Clear();
             this.DateRangeComboBox.SelectedIndex = -1;
+            this.DateRangeComboBox.Enabled = false;
 
 
             int index = 0;
@@ -199,6 +203,11 @@ namespace ResearchQuery
 
                 this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].Value = "NI";
                 this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].ReadOnly = true;
+            }
+
+            if (index != 0)
+            {
+                this.DateRangeComboBox.Enabled = true;
             }
 
             this.filters.ResetSelectedDateRanges(this.DateRangeSelectionView.Rows);
@@ -271,6 +280,7 @@ namespace ResearchQuery
         {
             if (this.DateRangeComboBox.SelectedIndex >= 0)
             {
+
                 #pragma warning disable SA1312 // VariableNamesMustBeginWithLowerCaseLetter
                 const int SELECT_ALL = 0;
                 const int UNSELECT_ALL = 1;
@@ -285,6 +295,7 @@ namespace ResearchQuery
                             row.Cells["CheckDateRangeColumn"].Value = true;
                         }
 
+                        this.ViewCalculationTableButton.Enabled = true;
                         break;
                     case UNSELECT_ALL:
                         foreach (DataGridViewRow row in this.DateRangeSelectionView.Rows)
@@ -292,6 +303,7 @@ namespace ResearchQuery
                             row.Cells["CheckDateRangeColumn"].Value = false;
                         }
 
+                        this.ViewCalculationTableButton.Enabled = false;
                         break;
                     case SELECT_NEWEST:
                         // assumes bottom row is the newest
@@ -314,6 +326,7 @@ namespace ResearchQuery
                             }
                         }
 
+                        this.ViewCalculationTableButton.Enabled = true;
                         break;
                     default:
                         throw new Exception($"DateRangeComboBox Selected Index [{this.DateRangeComboBox.SelectedIndex}] is not defined.");

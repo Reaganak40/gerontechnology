@@ -216,6 +216,7 @@
             // DateRangeComboBox
             // 
             this.DateRangeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.DateRangeComboBox.Enabled = false;
             this.DateRangeComboBox.FormattingEnabled = true;
             this.DateRangeComboBox.Items.AddRange(new object[] {
             "Select All",

@@ -67,6 +67,27 @@ namespace ResearchQuery
         }
 
         /// <summary>
+        /// Gets a list of week,year tuples the user has selected to filter the calculation table by.
+        /// </summary>
+        public (int, int)[] SelectedDateRanges
+        {
+            get
+            {
+                List<(int, int)> selected_ranges = new List<(int, int)>();
+
+                foreach (var item in this.selectedDateRanges)
+                {
+                    if (item.Value)
+                    {
+                        selected_ranges.Add(item.Key);
+                    }
+                }
+
+                return selected_ranges.ToArray();
+            }
+        }
+
+        /// <summary>
         /// Updates the filtering option for selected study and cohorts.
         /// </summary>
         /// <param name="nSelectedCohorts">A new list of selected study,cohort pairs.</param>

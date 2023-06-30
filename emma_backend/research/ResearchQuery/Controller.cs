@@ -105,6 +105,11 @@ namespace ResearchQuery
             return this.database.UpdateSelectedCohorts(selected_studies);
         }
 
+        /// <summary>
+        /// Queries the database for the date ranges belonging to the selected study-cohorts.
+        /// </summary>
+        /// <param name="study_cohorts">A list of pairs with each study and cohort.</param>
+        /// <returns>A sql queried datatable.</returns>
         public DataTable GetDateRanges(KeyValuePair<string, int>[] study_cohorts)
         {
             if (this.database == null || study_cohorts.Length == 0)
@@ -129,25 +134,26 @@ namespace ResearchQuery
             }
 
             DataTable calculation_table;
-            if (filters.SelectDailyVariables && filters.SelectWeeklyVariables)
+            EmmaQueryArgs queryArgs = new ();
+
+            queryArgs.StudyCohorts = filters.SelectedCohorts;
+            queryArgs.DateRanges = filters.SelectedDateRanges;
+
+            // else: selected variables is set to null which will lead to: SELECT * FROM Calculations
+            if (filters.SelectDailyVariables && !filters.SelectWeeklyVariables)
             {
-                calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts);
+                queryArgs.Variables = this.dailyVariables;
             }
-            else
+            else if (!filters.SelectDailyVariables && filters.SelectWeeklyVariables)
             {
-                if (filters.SelectDailyVariables)
-                {
-                    calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts, this.dailyVariables);
-                }
-                else if (filters.SelectWeeklyVariables)
-                {
-                    calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts, this.weeklyVariables);
-                }
-                else
-                {
-                    calculation_table = this.database.QueryCalculationTable(filters.SelectedCohorts, new string[0]);
-                }
+                queryArgs.Variables = this.weeklyVariables;
             }
+            else if (!(filters.SelectDailyVariables && filters.SelectWeeklyVariables))
+            {
+                queryArgs.Variables = new string[0];
+            }
+
+            calculation_table = this.database.QueryCalculationTable(queryArgs);
 
             // remove v_ from all variable column names.
             foreach (DataColumn variable_col in calculation_table.Columns)
