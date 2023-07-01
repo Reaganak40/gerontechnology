@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ResearchQuery
 {
+    using System.Globalization;
     internal class Controller
     {
         private EMMABackendSqlConnection? database;
@@ -23,6 +25,62 @@ namespace ResearchQuery
 
             this.dailyVariables = new string[0];
             this.weeklyVariables = new string[0];
+        }
+
+        /// <summary>
+        /// Gets the download path for a unix system.
+        /// </summary>
+        /// <returns>Returns the absolute path to the home directory.</returns>
+        public static string? GetHomePath()
+        {
+            // Not in .NET 2.0
+            // System.Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (System.Environment.OSVersion.Platform == System.PlatformID.Unix)
+            {
+                return System.Environment.GetEnvironmentVariable("HOME");
+            }
+
+            return System.Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+        }
+
+        /// <summary>
+        /// Finds the download path for the current system.
+        /// </summary>
+        /// <returns>An absolute path to the downloads directory.</returns>
+        public static string? GetDownloadFolderPath()
+        {
+            if (System.Environment.OSVersion.Platform == System.PlatformID.Unix)
+            {
+                string? homepath = GetHomePath();
+                if (homepath is null)
+                {
+                    return homepath;
+                }
+
+                string pathDownload = System.IO.Path.Combine(homepath, "Downloads");
+                return pathDownload;
+            }
+
+            return System.Convert.ToString(
+                Microsoft.Win32.Registry.GetValue(
+                     @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders",
+                     "{374DE290-123F-4565-9164-39C4925E467B}",
+                     string.Empty));
+        }
+
+        public static (string, string) GetCalenderDateRange(int week, int year)
+        {
+            DateTime end_date = ISOWeek.ToDateTime(year, week, DayOfWeek.Saturday);
+            
+            if (week == 1)
+            {
+                week = 53;
+                year -= 1;
+            }
+
+            DateTime start_date = ISOWeek.ToDateTime(year, week-1, DayOfWeek.Sunday);
+
+            return (start_date.ToString("yyyy-MM-dd"), end_date.ToString("yyyy-MM-dd"));
         }
 
         /// <summary>
@@ -168,5 +226,7 @@ namespace ResearchQuery
 
             return calculation_table;
         }
+
+        
     }
 }

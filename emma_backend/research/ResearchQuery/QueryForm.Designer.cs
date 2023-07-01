@@ -40,6 +40,11 @@
             this.DailyVariableCheckbox = new System.Windows.Forms.CheckBox();
             this.WeeklyVariablesCheckbox = new System.Windows.Forms.CheckBox();
             this.FormSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.CombineTablesCheckBox = new System.Windows.Forms.CheckBox();
+            this.BrowseSaveDirButton = new System.Windows.Forms.Button();
+            this.DownloadPathLabel = new System.Windows.Forms.Label();
+            this.DownloadResultsButton = new System.Windows.Forms.Button();
             this.DateRangeComboBox = new System.Windows.Forms.ComboBox();
             this.DateRangeLabel = new System.Windows.Forms.Label();
             this.DateRangeSelectionView = new System.Windows.Forms.DataGridView();
@@ -54,6 +59,7 @@
             this.FormSplitContainer.Panel1.SuspendLayout();
             this.FormSplitContainer.Panel2.SuspendLayout();
             this.FormSplitContainer.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DateRangeSelectionView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -98,7 +104,7 @@
             this.CurrentCalculationTableView.ReadOnly = true;
             this.CurrentCalculationTableView.RowHeadersWidth = 51;
             this.CurrentCalculationTableView.RowTemplate.Height = 29;
-            this.CurrentCalculationTableView.Size = new System.Drawing.Size(751, 823);
+            this.CurrentCalculationTableView.Size = new System.Drawing.Size(733, 695);
             this.CurrentCalculationTableView.TabIndex = 4;
             // 
             // CohortSelectionView
@@ -153,12 +159,13 @@
             // ViewCalculationTableButton
             // 
             this.ViewCalculationTableButton.Enabled = false;
-            this.ViewCalculationTableButton.Location = new System.Drawing.Point(26, 551);
+            this.ViewCalculationTableButton.Location = new System.Drawing.Point(26, 525);
             this.ViewCalculationTableButton.Name = "ViewCalculationTableButton";
             this.ViewCalculationTableButton.Size = new System.Drawing.Size(503, 29);
             this.ViewCalculationTableButton.TabIndex = 6;
             this.ViewCalculationTableButton.Text = "View Calculation Table";
             this.ViewCalculationTableButton.UseVisualStyleBackColor = true;
+            this.ViewCalculationTableButton.EnabledChanged += new System.EventHandler(this.ViewCalculationTableButton_EnabledChanged);
             this.ViewCalculationTableButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ViewCalculationTableButton_MouseClick);
             // 
             // DailyVariableCheckbox
@@ -166,7 +173,7 @@
             this.DailyVariableCheckbox.AutoSize = true;
             this.DailyVariableCheckbox.Checked = true;
             this.DailyVariableCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.DailyVariableCheckbox.Location = new System.Drawing.Point(26, 491);
+            this.DailyVariableCheckbox.Location = new System.Drawing.Point(26, 465);
             this.DailyVariableCheckbox.Name = "DailyVariableCheckbox";
             this.DailyVariableCheckbox.Size = new System.Drawing.Size(129, 24);
             this.DailyVariableCheckbox.TabIndex = 7;
@@ -178,7 +185,7 @@
             this.WeeklyVariablesCheckbox.AutoSize = true;
             this.WeeklyVariablesCheckbox.Checked = true;
             this.WeeklyVariablesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(26, 521);
+            this.WeeklyVariablesCheckbox.Location = new System.Drawing.Point(26, 495);
             this.WeeklyVariablesCheckbox.Name = "WeeklyVariablesCheckbox";
             this.WeeklyVariablesCheckbox.Size = new System.Drawing.Size(142, 24);
             this.WeeklyVariablesCheckbox.TabIndex = 8;
@@ -194,6 +201,7 @@
             // 
             // FormSplitContainer.Panel1
             // 
+            this.FormSplitContainer.Panel1.Controls.Add(this.panel1);
             this.FormSplitContainer.Panel1.Controls.Add(this.DateRangeComboBox);
             this.FormSplitContainer.Panel1.Controls.Add(this.DateRangeLabel);
             this.FormSplitContainer.Panel1.Controls.Add(this.DateRangeSelectionView);
@@ -209,9 +217,62 @@
             // 
             this.FormSplitContainer.Panel2.Controls.Add(this.CurrentCalculationTableView);
             this.FormSplitContainer.Panel2.Padding = new System.Windows.Forms.Padding(15);
-            this.FormSplitContainer.Size = new System.Drawing.Size(1332, 853);
+            this.FormSplitContainer.Size = new System.Drawing.Size(1314, 725);
             this.FormSplitContainer.SplitterDistance = 547;
             this.FormSplitContainer.TabIndex = 9;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.CombineTablesCheckBox);
+            this.panel1.Controls.Add(this.BrowseSaveDirButton);
+            this.panel1.Controls.Add(this.DownloadPathLabel);
+            this.panel1.Controls.Add(this.DownloadResultsButton);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel1.Location = new System.Drawing.Point(0, 584);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(547, 141);
+            this.panel1.TabIndex = 16;
+            // 
+            // CombineTablesCheckBox
+            // 
+            this.CombineTablesCheckBox.AutoSize = true;
+            this.CombineTablesCheckBox.Location = new System.Drawing.Point(26, 47);
+            this.CombineTablesCheckBox.Name = "CombineTablesCheckBox";
+            this.CombineTablesCheckBox.Size = new System.Drawing.Size(136, 24);
+            this.CombineTablesCheckBox.TabIndex = 14;
+            this.CombineTablesCheckBox.Text = "Combine Tables";
+            this.CombineTablesCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // BrowseSaveDirButton
+            // 
+            this.BrowseSaveDirButton.Location = new System.Drawing.Point(385, 97);
+            this.BrowseSaveDirButton.Name = "BrowseSaveDirButton";
+            this.BrowseSaveDirButton.Size = new System.Drawing.Size(144, 29);
+            this.BrowseSaveDirButton.TabIndex = 13;
+            this.BrowseSaveDirButton.Text = "Browse";
+            this.BrowseSaveDirButton.UseVisualStyleBackColor = true;
+            this.BrowseSaveDirButton.Click += new System.EventHandler(this.BrowseSaveDirButton_Click);
+            // 
+            // DownloadPathLabel
+            // 
+            this.DownloadPathLabel.AutoSize = true;
+            this.DownloadPathLabel.Location = new System.Drawing.Point(26, 74);
+            this.DownloadPathLabel.MaximumSize = new System.Drawing.Size(500, 0);
+            this.DownloadPathLabel.Name = "DownloadPathLabel";
+            this.DownloadPathLabel.Size = new System.Drawing.Size(113, 20);
+            this.DownloadPathLabel.TabIndex = 15;
+            this.DownloadPathLabel.Text = "Download Path:";
+            this.DownloadPathLabel.SizeChanged += new System.EventHandler(this.DownloadPathLabel_SizeChanged);
+            // 
+            // DownloadResultsButton
+            // 
+            this.DownloadResultsButton.Enabled = false;
+            this.DownloadResultsButton.Location = new System.Drawing.Point(26, 97);
+            this.DownloadResultsButton.Name = "DownloadResultsButton";
+            this.DownloadResultsButton.Size = new System.Drawing.Size(353, 29);
+            this.DownloadResultsButton.TabIndex = 12;
+            this.DownloadResultsButton.Text = "Download Results";
+            this.DownloadResultsButton.UseVisualStyleBackColor = true;
             // 
             // DateRangeComboBox
             // 
@@ -306,7 +367,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1332, 853);
+            this.ClientSize = new System.Drawing.Size(1314, 725);
             this.Controls.Add(this.FormSplitContainer);
             this.Name = "QueryForm";
             this.Text = "Research Query";
@@ -317,6 +378,8 @@
             this.FormSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.FormSplitContainer)).EndInit();
             this.FormSplitContainer.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DateRangeSelectionView)).EndInit();
             this.ResumeLayout(false);
 
@@ -344,5 +407,10 @@
         private DataGridViewTextBoxColumn StartDateRangeColumn;
         private DataGridViewTextBoxColumn EndDateRangeColumn;
         private ComboBox DateRangeComboBox;
+        private CheckBox CombineTablesCheckBox;
+        private Button BrowseSaveDirButton;
+        private Button DownloadResultsButton;
+        private Label DownloadPathLabel;
+        private Panel panel1;
     }
 }

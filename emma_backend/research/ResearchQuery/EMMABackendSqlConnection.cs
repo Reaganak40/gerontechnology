@@ -135,7 +135,7 @@ namespace ResearchQuery
             {
                 calculations_sql_str = new StringBuilder("SELECT C.participant_id, C.week_number, C.year_number");
 
-                if (args.Variables.Length > 0) 
+                if (args.Variables.Length > 0)
                 {
                     calculations_sql_str.Append(", ");
                     index = 0;

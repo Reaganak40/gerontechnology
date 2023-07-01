@@ -3,6 +3,7 @@ using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -15,6 +16,7 @@ namespace ResearchQuery
     {
         private Controller controller;
         private FilterSet filters;
+        private string downloadPath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryForm"/> class.
@@ -41,7 +43,9 @@ namespace ResearchQuery
             // programmatically adjust settings for CurrentCalculationTableView
             this.InitializeCalculationTableView();
 
-            
+            // Determine the automatic path to download calculation tables.
+            this.downloadPath = string.Empty;
+            this.InitializeDownloadPath();
         }
 
         private void InitializeStudyListBox()
@@ -73,6 +77,19 @@ namespace ResearchQuery
             // apply these optiosn from improved performance
             this.CurrentCalculationTableView.RowHeadersVisible = false;
             this.CurrentCalculationTableView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
+        }
+
+        private void InitializeDownloadPath()
+        {
+            string? dPath = Controller.GetDownloadFolderPath();
+
+            if (dPath is null)
+            {
+                dPath = Directory.GetCurrentDirectory();
+            }
+
+            this.downloadPath = dPath;
+            this.DownloadPathLabel.Text = "Download Path: " + dPath;
         }
 
         private void StudyCheckListBox_MouseUp(object sender, MouseEventArgs e)
@@ -198,10 +215,11 @@ namespace ResearchQuery
                 this.DateRangeSelectionView.Rows[index].Cells["YearDateRangeColumn"].Value = year;
                 this.DateRangeSelectionView.Rows[index].Cells["YearDateRangeColumn"].ReadOnly = true;
 
-                this.DateRangeSelectionView.Rows[index].Cells["StartDateRangeColumn"].Value = "Not implemented.";
+                (string, string) startEndDate = Controller.GetCalenderDateRange((int)week, (int)year);
+                this.DateRangeSelectionView.Rows[index].Cells["StartDateRangeColumn"].Value = startEndDate.Item1;
                 this.DateRangeSelectionView.Rows[index].Cells["StartDateRangeColumn"].ReadOnly = true;
 
-                this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].Value = "NI";
+                this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].Value = startEndDate.Item2;
                 this.DateRangeSelectionView.Rows[index].Cells["EndDateRangeColumn"].ReadOnly = true;
             }
 
@@ -254,24 +272,18 @@ namespace ResearchQuery
                 }
             }
 
-            this.UpdateSelectedDateRanges();
+            this.CheckSelectedDateRanges();
         }
 
-        private void UpdateSelectedDateRanges()
+        private void CheckSelectedDateRanges()
         {
-            // Updates the filter for selected study and cohorts.
             this.ViewCalculationTableButton.Enabled = false;
-            List<KeyValuePair<int, int>> selected_dates = new List<KeyValuePair<int, int>>();
             foreach (DataGridViewRow date_range_row in this.DateRangeSelectionView.Rows)
             {
                 if (Convert.ToBoolean(date_range_row.Cells["CheckDateRangeColumn"].Value))
                 {
                     this.ViewCalculationTableButton.Enabled = true;
-
-                    int week = (int)date_range_row.Cells["WeekDateRangeColumn"].Value;
-                    int year = (int)date_range_row.Cells["YearDateRangeColumn"].Value;
-
-                    selected_dates.Add(new KeyValuePair<int, int>(week, year));
+                    return;
                 }
             }
         }
@@ -344,6 +356,37 @@ namespace ResearchQuery
 
                 this.filters.UpdateSelectedDateRange(week, year, check);
             }
+        }
+
+        private void DownloadPathLabel_SizeChanged(object sender, EventArgs e)
+        {
+            const int padding = 3;
+            int y_absolute_val = this.DownloadResultsButton.Location.Y;
+
+            this.DownloadPathLabel.Location = new Point(
+                this.DownloadPathLabel.Location.X,
+                y_absolute_val - padding - this.DownloadPathLabel.Size.Height);
+
+            this.CombineTablesCheckBox.Location = new Point(
+                this.CombineTablesCheckBox.Location.X,
+                this.DownloadPathLabel.Location.Y - padding - this.CombineTablesCheckBox.Size.Height);
+        }
+
+        private void BrowseSaveDirButton_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fb = new FolderBrowserDialog();
+
+            if (fb.ShowDialog() == DialogResult.OK)
+            {
+                // Now here's our save folder
+                this.downloadPath = fb.SelectedPath;
+                this.DownloadPathLabel.Text = "Download Path: " + this.downloadPath;
+            }
+        }
+
+        private void ViewCalculationTableButton_EnabledChanged(object sender, EventArgs e)
+        {
+            this.DownloadResultsButton.Enabled = this.ViewCalculationTableButton.Enabled;
         }
     }
 }
