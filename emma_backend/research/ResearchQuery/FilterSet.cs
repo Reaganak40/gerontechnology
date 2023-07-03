@@ -19,6 +19,7 @@ namespace ResearchQuery
 
         private Dictionary<(int, int), bool> selectedDateRanges;
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterSet"/> class.
         /// </summary>
@@ -129,6 +130,17 @@ namespace ResearchQuery
         public void UpdateSelectedDateRange(int week, int year, bool check)
         {
             this.selectedDateRanges[(week, year)] = check;
+        }
+
+        /// <summary>
+        /// Gets the value indicating whether the date range for the given week and year has been selected.
+        /// </summary>
+        /// <param name="week">Week of the calculation table.</param>
+        /// <param name="year">Year of the calculation table.</param>
+        /// <returns>True if the user has selected this week,year.</returns>
+        public bool GetSelectedValueDateRange(int week, int year)
+        {
+            return this.selectedDateRanges[(week, year)];
         }
     }
 }

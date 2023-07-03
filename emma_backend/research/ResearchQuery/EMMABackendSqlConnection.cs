@@ -107,7 +107,7 @@ namespace ResearchQuery
         {
             // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
             // one of the selected studies and cohorts.
-            StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id FROM Participants");
+            StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id, study, cohort FROM Participants");
             if (args.StudyCohorts.Length > 0)
             {
                 participant_sql_str.Append(" WHERE ");
@@ -129,11 +129,11 @@ namespace ResearchQuery
             StringBuilder calculations_sql_str;
             if (args.Variables is null)
             {
-                calculations_sql_str = new StringBuilder("SELECT C.* FROM Calculations C");
+                calculations_sql_str = new StringBuilder("SELECT * FROM Calculations ");
             }
             else
             {
-                calculations_sql_str = new StringBuilder("SELECT C.participant_id, C.week_number, C.year_number");
+                calculations_sql_str = new StringBuilder("SELECT participant_id, week_number, year_number");
 
                 if (args.Variables.Length > 0)
                 {
@@ -154,13 +154,10 @@ namespace ResearchQuery
                 calculations_sql_str.Append(" FROM Calculations C");
             }
 
-            // join the query results for participants table with the calculation table.
-            calculations_sql_str.Append($" WHERE C.participant_id IN ({participant_sql_str.ToString()})");
-
             // add date range conditions
             if (args.DateRanges.Length > 0)
             {
-                calculations_sql_str.Append(" AND (");
+                calculations_sql_str.Append(" WHERE (");
             }
 
             index = 0;
@@ -183,7 +180,13 @@ namespace ResearchQuery
                 index++;
             }
 
-            return this.ExecuteQuery(calculations_sql_str.ToString());
+            string full_sql_str = $"SELECT P.study, P.cohort, C.*" +
+                $" FROM ({calculations_sql_str}) C" +
+                $" INNER JOIN ({participant_sql_str}) P" +
+                $" ON C.participant_id = P.participant_id" +
+                $" ORDER BY P.study ASC, P.cohort ASC, C.year_number ASC, C.week_number ASC";
+
+            return this.ExecuteQuery(full_sql_str);
         }
 
         /// <summary>

@@ -5,10 +5,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Deedle;
 
 namespace ResearchQuery
 {
     using System.Globalization;
+    using System.Windows.Forms;
+
     internal class Controller
     {
         private EMMABackendSqlConnection? database;
@@ -66,6 +69,30 @@ namespace ResearchQuery
                      @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders",
                      "{374DE290-123F-4565-9164-39C4925E467B}",
                      string.Empty));
+        }
+
+        /// <summary>
+        /// Saves a datatable to the provided filename as a csv.
+        /// </summary>
+        /// <param name="table">A datatable with data.</param>
+        /// <param name="filename">A full filepath to a save location (name and extension included).</param>
+        public static void DataTableToCSV(DataTable table, string filename)
+        {
+            // Problem resolved through:
+            // Credit: https://stackoverflow.com/a/4959869
+            StringBuilder sb = new StringBuilder();
+
+            IEnumerable<string> columnNames = table.Columns.Cast<DataColumn>().
+                                              Select(column => column.ColumnName);
+            sb.AppendLine(string.Join(",", columnNames));
+
+            foreach (DataRow row in table.Rows)
+            {
+                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+                sb.AppendLine(string.Join(",", fields));
+            }
+
+            File.WriteAllText(filename, sb.ToString());
         }
 
         public static (string, string) GetCalenderDateRange(int week, int year)
@@ -183,8 +210,9 @@ namespace ResearchQuery
         /// Given querying parameters, gets updated table results to provide a view of calculations to the screen.
         /// </summary>
         /// <param name="filters">A wrapper containing all filtering parameters for the calculation table.</param>
+        /// <param name="include_study_cohorts">Extra option to include the study and cohort in the calculation table.</param>
         /// <returns>A filtered datatable according to the requested parameters.</returns>
-        public DataTable? GetCalculationTable(FilterSet filters)
+        public DataTable? GetCalculationTable(FilterSet filters, bool include_study_cohorts = true)
         {
             if (this.database == null)
             {
@@ -196,6 +224,7 @@ namespace ResearchQuery
 
             queryArgs.StudyCohorts = filters.SelectedCohorts;
             queryArgs.DateRanges = filters.SelectedDateRanges;
+            queryArgs.AddStudyCohortColumns = include_study_cohorts;
 
             // else: selected variables is set to null which will lead to: SELECT * FROM Calculations
             if (filters.SelectDailyVariables && !filters.SelectWeeklyVariables)
@@ -227,6 +256,59 @@ namespace ResearchQuery
             return calculation_table;
         }
 
-        
+        public void SaveCalculationTables(string download_folder, FilterSet filters)
+        {
+            if (this.database == null)
+            {
+                return;
+            }
+
+            EmmaQueryArgs queryArgs = new ();
+            queryArgs.StudyCohorts = new KeyValuePair<string, int>[1];
+            queryArgs.DateRanges = new (int, int)[1];
+
+            // else: selected variables is set to null which will lead to: SELECT * FROM Calculations
+            if (filters.SelectDailyVariables && !filters.SelectWeeklyVariables)
+            {
+                queryArgs.Variables = this.dailyVariables;
+            }
+            else if (!filters.SelectDailyVariables && filters.SelectWeeklyVariables)
+            {
+                queryArgs.Variables = this.weeklyVariables;
+            }
+            else if (!(filters.SelectDailyVariables && filters.SelectWeeklyVariables))
+            {
+                queryArgs.Variables = new string[0];
+            }
+
+            foreach (KeyValuePair<string, int> study_cohort in filters.SelectedCohorts)
+            {
+                // create study directory if does not exist.
+                string filepath = Path.Combine(download_folder, study_cohort.Key);
+                Directory.CreateDirectory(filepath);
+
+                // create cohort directory for study if it does not exist.
+                filepath = Path.Combine(filepath, study_cohort.Value.ToString());
+                Directory.CreateDirectory(filepath);
+
+                // Save each weekly calculation table
+                foreach ((int, int) date_range in filters.SelectedDateRanges)
+                {
+                    queryArgs.StudyCohorts[0] = study_cohort;
+                    queryArgs.DateRanges[0] = date_range;
+
+                    DataTable? results = this.database.QueryCalculationTable(queryArgs);
+
+                    if (results == null)
+                    {
+                        continue;
+                    }
+
+                    (string, string) calender_range = GetCalenderDateRange(date_range.Item1, date_range.Item2);
+                    string filename = Path.Combine(filepath, $"{calender_range.Item1} to {calender_range.Item2}, Study {study_cohort.Key}, Cohort {study_cohort.Value}.csv");
+                    DataTableToCSV(results, filename);
+                }
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 
 namespace ResearchQuery
@@ -17,6 +18,7 @@ namespace ResearchQuery
         private Controller controller;
         private FilterSet filters;
         private string downloadPath;
+        private int downloadTableCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryForm"/> class.
@@ -46,6 +48,45 @@ namespace ResearchQuery
             // Determine the automatic path to download calculation tables.
             this.downloadPath = string.Empty;
             this.InitializeDownloadPath();
+            this.DownloadTableCount = 0;
+        }
+
+        private int DownloadTableCount
+        {
+            get
+            {
+                return this.downloadTableCount;
+            }
+
+            set
+            {
+                this.downloadTableCount = value;
+
+                if (!this.CombineTablesCheckBox.Checked)
+                {
+                    StringBuilder sb = new StringBuilder($"Download Results ({this.downloadTableCount} table");
+                    if (this.downloadTableCount != 1)
+                    {
+                        sb.Append('s');
+                    }
+
+                    sb.Append(')');
+
+                    this.DownloadResultsButton.Text = sb.ToString();
+                }
+                else
+                {
+                    if (this.downloadTableCount == 0)
+                    {
+                        this.DownloadResultsButton.Text = "Download Results (0 tables)";
+                    }
+                    else
+                    {
+                        this.DownloadResultsButton.Text = "Download Results (1 table)";
+
+                    }
+                }
+            }
         }
 
         private void InitializeStudyListBox()
@@ -191,6 +232,7 @@ namespace ResearchQuery
             this.DateRangeSelectionView.Rows.Clear();
             this.DateRangeComboBox.SelectedIndex = -1;
             this.DateRangeComboBox.Enabled = false;
+            this.downloadTableCount = 0;
 
 
             int index = 0;
@@ -277,7 +319,6 @@ namespace ResearchQuery
 
         private void CheckSelectedDateRanges()
         {
-            this.ViewCalculationTableButton.Enabled = false;
             foreach (DataGridViewRow date_range_row in this.DateRangeSelectionView.Rows)
             {
                 if (Convert.ToBoolean(date_range_row.Cells["CheckDateRangeColumn"].Value))
@@ -286,6 +327,7 @@ namespace ResearchQuery
                     return;
                 }
             }
+            this.ViewCalculationTableButton.Enabled = false;
         }
 
         private void DateRangeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -319,8 +361,8 @@ namespace ResearchQuery
                         break;
                     case SELECT_NEWEST:
                         // assumes bottom row is the newest
-                        int newest_week = (int)this.DateRangeSelectionView.Rows[this.DateRangeSelectionView.Rows.Count-1].Cells["WeekDateRangeColumn"].Value;
-                        int newest_year = (int)this.DateRangeSelectionView.Rows[this.DateRangeSelectionView.Rows.Count-1].Cells["YearDateRangeColumn"].Value;
+                        int newest_week = (int)this.DateRangeSelectionView.Rows[this.DateRangeSelectionView.Rows.Count - 1].Cells["WeekDateRangeColumn"].Value;
+                        int newest_year = (int)this.DateRangeSelectionView.Rows[this.DateRangeSelectionView.Rows.Count - 1].Cells["YearDateRangeColumn"].Value;
                         foreach (DataGridViewRow row in this.DateRangeSelectionView.Rows)
                         {
                             int row_week = (int)row.Cells["WeekDateRangeColumn"].Value;
@@ -354,7 +396,11 @@ namespace ResearchQuery
                 int year = (int)this.DateRangeSelectionView.Rows[e.RowIndex].Cells["YearDateRangeColumn"].Value;
                 bool check = (bool)this.DateRangeSelectionView.Rows[e.RowIndex].Cells["CheckDateRangeColumn"].Value;
 
-                this.filters.UpdateSelectedDateRange(week, year, check);
+                if (check != this.filters.GetSelectedValueDateRange(week, year))
+                {
+                    this.DownloadTableCount += (check ? 1 : -1) * this.filters.SelectedCohorts.Length;
+                    this.filters.UpdateSelectedDateRange(week, year, check);
+                }
             }
         }
 
@@ -387,6 +433,21 @@ namespace ResearchQuery
         private void ViewCalculationTableButton_EnabledChanged(object sender, EventArgs e)
         {
             this.DownloadResultsButton.Enabled = this.ViewCalculationTableButton.Enabled;
+
+            if (!this.DownloadResultsButton.Enabled)
+            {
+                this.DownloadTableCount = 0;
+            }
+        }
+
+        private void DownloadResultsButton_MouseClick(object sender, MouseEventArgs e)
+        {
+            this.controller.SaveCalculationTables(this.downloadPath, this.filters);
+        }
+
+        private void CombineTablesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            this.DownloadTableCount = this.DownloadTableCount;
         }
     }
 }

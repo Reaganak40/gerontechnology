@@ -44,6 +44,10 @@
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
           "dependencies": {
+            "Deedle": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
             "MySql.Data": {
               "target": "Package",
               "version": "[8.0.33, )"

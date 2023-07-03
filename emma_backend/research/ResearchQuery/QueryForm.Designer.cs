@@ -242,6 +242,7 @@
             this.CombineTablesCheckBox.TabIndex = 14;
             this.CombineTablesCheckBox.Text = "Combine Tables";
             this.CombineTablesCheckBox.UseVisualStyleBackColor = true;
+            this.CombineTablesCheckBox.CheckedChanged += new System.EventHandler(this.CombineTablesCheckBox_CheckedChanged);
             // 
             // BrowseSaveDirButton
             // 
@@ -273,6 +274,7 @@
             this.DownloadResultsButton.TabIndex = 12;
             this.DownloadResultsButton.Text = "Download Results";
             this.DownloadResultsButton.UseVisualStyleBackColor = true;
+            this.DownloadResultsButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DownloadResultsButton_MouseClick);
             // 
             // DateRangeComboBox
             // 
