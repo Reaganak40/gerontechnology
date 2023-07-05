@@ -65,9 +65,12 @@ querying application to interact with weekly calculation tables. The EMMA Dashbo
 
 ### Built With
 
-* [![MySQL][MySQL]][MySQL-url]
-* [![dotnet][dotnet]][dotnet-url]
-* [![chart.js][chart.js]][chartjs-url]
+* ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+* ![.Net](https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white)
+* ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+* ![Jinja](https://img.shields.io/badge/jinja-white.svg?style=for-the-badge&logo=jinja&logoColor=black)
+* ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+* ![Chart.js](https://img.shields.io/badge/chart.js-F5788D.svg?style=for-the-badge&logo=chart.js&logoColor=white)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
