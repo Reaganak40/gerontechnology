@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Reaganak40/gerontechnology">
-    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" width="227" height="223">
+    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" width="277" height="223">
   </a>
 
 <h3 align="center">Gerontechnology - GSUR</h3>
@@ -55,9 +55,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
+The GSUR program is to explore the links between such diverse and yet complementary disciplines of computer science, electrical engineering, nursing, sociology, medicine and clinical psychology.
+The neuropsychology and aging laboratory uses this code to compile and transform raw data from the EMMA project. It uses JSON to define complicated variables that researchers wish to
+extract from the data. The data-wrangling software can automatically extract, transform, and load incoming data into mySQL databases. Researchers can further query the data through a specialized
+querying application to interact with tabulated data. The EMMA Dashboard is also available as a web-based UI to provide a snapshot of how participants are progressing through the study.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
