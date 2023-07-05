@@ -65,7 +65,7 @@ querying application to interact with weekly calculation tables. The EMMA Dashbo
 
 ### Built With
 
-* ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+* ![Python][https://www.python.org/](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 * ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
 * ![Jinja](https://img.shields.io/badge/jinja-white.svg?style=for-the-badge&logo=jinja&logoColor=black)
 * ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
@@ -81,35 +81,29 @@ querying application to interact with weekly calculation tables. The EMMA Dashbo
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Depending on which tools you intend to use, you will need different to install different perquisites. Utilize
+npm and pip for these.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
+Install the latest npm packages and use the requirements file to install all python modules via pip.
 * npm
   ```sh
   npm install npm@latest -g
   ```
 
+* pip
+  ```sh
+  pip install -r requirements.txt
+  ```
+
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+Clone the repo
    ```sh
    git clone https://github.com/github_username/repo_name.git
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- USAGE EXAMPLES -->
