@@ -16,8 +16,9 @@ namespace ResearchQuery
         private CheckBox selectWeeklyVariablesRef;
 
         private List<KeyValuePair<string, int>> selectedCohorts;
-
         private Dictionary<(int, int), bool> selectedDateRanges;
+
+        private bool combineTables;
 
 
         /// <summary>
@@ -89,6 +90,23 @@ namespace ResearchQuery
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to combine the tables when downloading the query.
+        /// </summary>
+        public bool CombineTables
+        {
+            get
+            {
+                return this.combineTables;
+            }
+
+            set
+            {
+                this.combineTables = value;
+            }
+        }
+
+
+        /// <summary>
         /// Updates the filtering option for selected study and cohorts.
         /// </summary>
         /// <param name="nSelectedCohorts">A new list of selected study,cohort pairs.</param>
@@ -142,5 +160,6 @@ namespace ResearchQuery
         {
             return this.selectedDateRanges[(week, year)];
         }
+
     }
 }

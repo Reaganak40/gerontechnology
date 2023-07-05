@@ -108,6 +108,8 @@ namespace ResearchQuery
             // Use study-cohort restrictions to only get weekly calculations where the participant_id is in
             // one of the selected studies and cohorts.
             StringBuilder participant_sql_str = new StringBuilder("SELECT participant_id, study, cohort FROM Participants");
+            
+
             if (args.StudyCohorts.Length > 0)
             {
                 participant_sql_str.Append(" WHERE ");
@@ -180,13 +182,21 @@ namespace ResearchQuery
                 index++;
             }
 
-            string full_sql_str = $"SELECT P.study, P.cohort, C.*" +
+            StringBuilder combined_query_str = new StringBuilder("SELECT ");
+            if (args.AddStudyCohortColumns)
+            {
+                combined_query_str.Append("P.study, P.cohort, ");
+            }
+
+            combined_query_str.Append("C.*");
+
+            combined_query_str.Append(
                 $" FROM ({calculations_sql_str}) C" +
                 $" INNER JOIN ({participant_sql_str}) P" +
                 $" ON C.participant_id = P.participant_id" +
-                $" ORDER BY P.study ASC, P.cohort ASC, C.year_number ASC, C.week_number ASC";
+                $" ORDER BY P.study ASC, P.cohort ASC, C.year_number ASC, C.week_number ASC");
 
-            return this.ExecuteQuery(full_sql_str);
+            return this.ExecuteQuery(combined_query_str.ToString());
         }
 
         /// <summary>

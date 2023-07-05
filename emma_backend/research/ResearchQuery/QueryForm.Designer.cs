@@ -41,6 +41,7 @@
             this.WeeklyVariablesCheckbox = new System.Windows.Forms.CheckBox();
             this.FormSplitContainer = new System.Windows.Forms.SplitContainer();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.SuccessLabel = new System.Windows.Forms.Label();
             this.CombineTablesCheckBox = new System.Windows.Forms.CheckBox();
             this.BrowseSaveDirButton = new System.Windows.Forms.Button();
             this.DownloadPathLabel = new System.Windows.Forms.Label();
@@ -223,20 +224,32 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.SuccessLabel);
             this.panel1.Controls.Add(this.CombineTablesCheckBox);
             this.panel1.Controls.Add(this.BrowseSaveDirButton);
             this.panel1.Controls.Add(this.DownloadPathLabel);
             this.panel1.Controls.Add(this.DownloadResultsButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 584);
+            this.panel1.Location = new System.Drawing.Point(0, 560);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(547, 141);
+            this.panel1.Size = new System.Drawing.Size(547, 165);
             this.panel1.TabIndex = 16;
+            // 
+            // SuccessLabel
+            // 
+            this.SuccessLabel.AutoSize = true;
+            this.SuccessLabel.ForeColor = System.Drawing.Color.ForestGreen;
+            this.SuccessLabel.Location = new System.Drawing.Point(26, 122);
+            this.SuccessLabel.Name = "SuccessLabel";
+            this.SuccessLabel.Size = new System.Drawing.Size(63, 20);
+            this.SuccessLabel.TabIndex = 16;
+            this.SuccessLabel.Text = "Success!";
+            this.SuccessLabel.Visible = false;
             // 
             // CombineTablesCheckBox
             // 
             this.CombineTablesCheckBox.AutoSize = true;
-            this.CombineTablesCheckBox.Location = new System.Drawing.Point(26, 47);
+            this.CombineTablesCheckBox.Location = new System.Drawing.Point(26, 39);
             this.CombineTablesCheckBox.Name = "CombineTablesCheckBox";
             this.CombineTablesCheckBox.Size = new System.Drawing.Size(136, 24);
             this.CombineTablesCheckBox.TabIndex = 14;
@@ -246,7 +259,7 @@
             // 
             // BrowseSaveDirButton
             // 
-            this.BrowseSaveDirButton.Location = new System.Drawing.Point(385, 97);
+            this.BrowseSaveDirButton.Location = new System.Drawing.Point(385, 89);
             this.BrowseSaveDirButton.Name = "BrowseSaveDirButton";
             this.BrowseSaveDirButton.Size = new System.Drawing.Size(144, 29);
             this.BrowseSaveDirButton.TabIndex = 13;
@@ -257,7 +270,7 @@
             // DownloadPathLabel
             // 
             this.DownloadPathLabel.AutoSize = true;
-            this.DownloadPathLabel.Location = new System.Drawing.Point(26, 74);
+            this.DownloadPathLabel.Location = new System.Drawing.Point(26, 66);
             this.DownloadPathLabel.MaximumSize = new System.Drawing.Size(500, 0);
             this.DownloadPathLabel.Name = "DownloadPathLabel";
             this.DownloadPathLabel.Size = new System.Drawing.Size(113, 20);
@@ -268,12 +281,13 @@
             // DownloadResultsButton
             // 
             this.DownloadResultsButton.Enabled = false;
-            this.DownloadResultsButton.Location = new System.Drawing.Point(26, 97);
+            this.DownloadResultsButton.Location = new System.Drawing.Point(26, 89);
             this.DownloadResultsButton.Name = "DownloadResultsButton";
             this.DownloadResultsButton.Size = new System.Drawing.Size(353, 29);
             this.DownloadResultsButton.TabIndex = 12;
             this.DownloadResultsButton.Text = "Download Results";
             this.DownloadResultsButton.UseVisualStyleBackColor = true;
+            this.DownloadResultsButton.EnabledChanged += new System.EventHandler(this.DownloadResultsButton_EnabledChanged);
             this.DownloadResultsButton.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DownloadResultsButton_MouseClick);
             // 
             // DateRangeComboBox
@@ -414,5 +428,6 @@
         private Button DownloadResultsButton;
         private Label DownloadPathLabel;
         private Panel panel1;
+        private Label SuccessLabel;
     }
 }

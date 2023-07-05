@@ -401,6 +401,8 @@ namespace ResearchQuery
                     this.DownloadTableCount += (check ? 1 : -1) * this.filters.SelectedCohorts.Length;
                     this.filters.UpdateSelectedDateRange(week, year, check);
                 }
+
+                this.SuccessLabel.Visible = false;
             }
         }
 
@@ -427,6 +429,7 @@ namespace ResearchQuery
                 // Now here's our save folder
                 this.downloadPath = fb.SelectedPath;
                 this.DownloadPathLabel.Text = "Download Path: " + this.downloadPath;
+                this.SuccessLabel.Visible = false;
             }
         }
 
@@ -443,11 +446,21 @@ namespace ResearchQuery
         private void DownloadResultsButton_MouseClick(object sender, MouseEventArgs e)
         {
             this.controller.SaveCalculationTables(this.downloadPath, this.filters);
+            this.SuccessLabel.Visible = true;
         }
 
         private void CombineTablesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             this.DownloadTableCount = this.DownloadTableCount;
+            this.filters.CombineTables = this.CombineTablesCheckBox.Checked;
+        }
+
+        private void DownloadResultsButton_EnabledChanged(object sender, EventArgs e)
+        {
+            if (!this.DownloadResultsButton.Enabled)
+            {
+                this.SuccessLabel.Visible = false;
+            }
         }
     }
 }

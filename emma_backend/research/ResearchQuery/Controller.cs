@@ -256,6 +256,11 @@ namespace ResearchQuery
             return calculation_table;
         }
 
+        /// <summary>
+        /// Saves the calculation tables to the device.
+        /// </summary>
+        /// <param name="download_folder">The path to where the csv files will go.</param>
+        /// <param name="filters">The applied filters by the user for these tables.</param>
         public void SaveCalculationTables(string download_folder, FilterSet filters)
         {
             if (this.database == null)
@@ -264,8 +269,6 @@ namespace ResearchQuery
             }
 
             EmmaQueryArgs queryArgs = new ();
-            queryArgs.StudyCohorts = new KeyValuePair<string, int>[1];
-            queryArgs.DateRanges = new (int, int)[1];
 
             // else: selected variables is set to null which will lead to: SELECT * FROM Calculations
             if (filters.SelectDailyVariables && !filters.SelectWeeklyVariables)
@@ -280,6 +283,51 @@ namespace ResearchQuery
             {
                 queryArgs.Variables = new string[0];
             }
+
+            // Create only 1 CSV -- All calculation tables
+            if (filters.CombineTables)
+            {
+                queryArgs.StudyCohorts = filters.SelectedCohorts;
+                queryArgs.DateRanges = filters.SelectedDateRanges;
+                queryArgs.AddStudyCohortColumns = true;
+
+                DataTable? results = this.database.QueryCalculationTable(queryArgs);
+
+                if (results == null || results.Rows.Count == 0)
+                {
+                    return;
+                }
+
+                (int, int) earliest_date = filters.SelectedDateRanges[0];
+                (int, int) lastest_date = filters.SelectedDateRanges[filters.SelectedDateRanges.Length - 1];
+
+                string start = GetCalenderDateRange(earliest_date.Item1, earliest_date.Item2).Item1;
+                string end = GetCalenderDateRange(lastest_date.Item1, lastest_date.Item2).Item2;
+
+                StringBuilder study_list = new StringBuilder();
+
+                int index = 0;
+                foreach (KeyValuePair<string, int> study_cohort in filters.SelectedCohorts)
+                {
+                    study_list.Append($"{study_cohort.Key}-{study_cohort.Value}");
+
+                    if (index != filters.SelectedCohorts.Length - 1)
+                    {
+                        study_list.Append(", ");
+                    }
+
+                    index++;
+                }
+
+                string filename = Path.Combine(download_folder, $"{start} to {end}, Combined Studies ({study_list.ToString()}).csv");
+                DataTableToCSV(results, filename);
+                return;
+            }
+
+            // Create a csv for each week, study, cohort.
+            queryArgs.StudyCohorts = new KeyValuePair<string, int>[1];
+            queryArgs.DateRanges = new (int, int)[1];
+            queryArgs.AddStudyCohortColumns = false;
 
             foreach (KeyValuePair<string, int> study_cohort in filters.SelectedCohorts)
             {
@@ -299,7 +347,7 @@ namespace ResearchQuery
 
                     DataTable? results = this.database.QueryCalculationTable(queryArgs);
 
-                    if (results == null)
+                    if (results == null || results.Rows.Count == 0)
                     {
                         continue;
                     }
