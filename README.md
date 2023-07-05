@@ -57,23 +57,17 @@
 
 The GSUR program is to explore the links between such diverse and yet complementary disciplines of computer science, electrical engineering, nursing, sociology, medicine and clinical psychology.
 The neuropsychology and aging laboratory uses this code to compile and transform raw data from the EMMA project. It uses JSON to define complicated variables that researchers wish to
-extract from the data. The data-wrangling software can automatically extract, transform, and load incoming data into mySQL databases. Researchers can further query the data through a specialized
-querying application to interact with tabulated data. The EMMA Dashboard is also available as a web-based UI to provide a snapshot of how participants are progressing through the study.
+extract from the EMMA application. The data-wrangling software can automatically extract, transform, and load incoming data into mySQL databases. Researchers can further query the data through a specialized
+querying application to interact with weekly calculation tables. The EMMA Dashboard is also available as a web-based UI to provide a snapshot of how participants are progressing through the study.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-
 ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+* [![MySQL][MySQL]][MySQL-url]
+* [![dotnet][dotnet]][dotnet-url]
+* [![chart.js][chart.js]][chartjs-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -207,14 +201,16 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/reagan-kelley-2000/
 
-[product-screenshot]: images/screenshot.png
 
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
+[MySQL]: https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white
+[MySQL-url]: https://www.mysql.com/
+
+[dotnet]: (https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white)
+[dotnet-url]: https://dotnet.microsoft.com/en-us/
+
+[chart.js]: (https://img.shields.io/badge/chart.js-F5788D.svg?style=for-the-badge&logo=chart.js&logoColor=white)
+[chartjs-url]: https://www.chartjs.org/
+
 [Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
 [Angular-url]: https://angular.io/
 [Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
