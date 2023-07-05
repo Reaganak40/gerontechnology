@@ -220,16 +220,16 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 [contributors-shield]: https://img.shields.io/github/contributors/Reaganak40/gerontechnology.svg?style=for-the-badge
 [contributors-url]: https://github.com/Reaganak40/gerontechnology/graphs/contributors
 
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/Reaganak40/gerontechnology.svg?style=for-the-badge
 [forks-url]: https://github.com/Reaganak40/gerontechnology/network/members
 
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/starsReaganak40/gerontechnology.svg?style=for-the-badge
 [stars-url]: https://github.com/Reaganak40/gerontechnology/stargazers
 
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/Reaganak40/gerontechnology.svg?style=for-the-badge
 [issues-url]: https://github.com/Reaganak40/gerontechnology/issues
 
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/Reaganak40/gerontechnology.svg?style=for-the-badge
 [license-url]: https://github.com/Reaganak40/gerontechnology/blob/main/LICENSE
 
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
