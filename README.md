@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Reaganak40/gerontechnology">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Gerontechnology - WSU's Neuropsychology and Aging Laboratory</h3>
