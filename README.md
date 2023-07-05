@@ -31,13 +31,14 @@
 <br />
 <div align="center">
   <a href="https://github.com/Reaganak40/gerontechnology">
-    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" width="80" height="80">
+    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo">
   </a>
 
-<h3 align="center">Gerontechnology - WSU's Neuropsychology and Aging Laboratory</h3>
+<h3 align="center">Gerontechnology - GSUR</h3>
 
   <p align="center">
-    project_description
+    This repo contains software for ETL pipelines and research tools for the Neuropsychology and Aging Laboratory. The EMMA study is a research program being conducted by Dr. Schmitter-Edgecombe at Washington State University. This project is funded by the Department of Defense and has been reviewed and approved by the Washington State University Institutional Review Board. In this repo,
+    you will find software used in the EMMA data-wrangling procedures, research querying tools, and the dashboard UI which is a web-based application.
     <br />
     <a href="https://github.com/Reaganak40/gerontechnology"><strong>Explore the docs »</strong></a>
     <br />
