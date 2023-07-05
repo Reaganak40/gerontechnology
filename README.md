@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Reaganak40/gerontechnology">
-    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" style="max-width: 40%;">
+    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" width="227" height="223">
   </a>
 
 <h3 align="center">Gerontechnology - GSUR</h3>
@@ -50,35 +50,6 @@
     <a href="https://github.com/Reaganak40/gerontechnology/issues">Request Feature</a>
   </p>
 </div>
-
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
-
 
 
 <!-- ABOUT THE PROJECT -->
@@ -223,7 +194,7 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 [forks-shield]: https://img.shields.io/github/forks/Reaganak40/gerontechnology.svg?style=for-the-badge
 [forks-url]: https://github.com/Reaganak40/gerontechnology/network/members
 
-[stars-shield]: https://img.shields.io/github/starsReaganak40/gerontechnology.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/Reaganak40/gerontechnology.svg?style=for-the-badge
 [stars-url]: https://github.com/Reaganak40/gerontechnology/stargazers
 
 [issues-shield]: https://img.shields.io/github/issues/Reaganak40/gerontechnology.svg?style=for-the-badge
