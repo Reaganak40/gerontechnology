@@ -60,12 +60,9 @@ The neuropsychology and aging laboratory uses this code to compile and transform
 extract from the EMMA application. The data-wrangling software can automatically extract, transform, and load incoming data into mySQL databases. Researchers can further query the data through a specialized
 querying application to interact with weekly calculation tables. The EMMA Dashboard is also available as a web-based UI to provide a snapshot of how participants are progressing through the study.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 ### Built With
 
-* ![Python][https://www.python.org/](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+* ![Python][(https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)][https://www.python.org/]
 * ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
 * ![Jinja](https://img.shields.io/badge/jinja-white.svg?style=for-the-badge&logo=jinja&logoColor=black)
 * ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
@@ -81,7 +78,7 @@ querying application to interact with weekly calculation tables. The EMMA Dashbo
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Depending on which tools you intend to use, you will need different to install different perquisites. Utilize
+Depending on which tools you intend to use, you will need to install different perquisites. Utilize
 npm and pip for these.
 
 ### Prerequisites
@@ -101,10 +98,9 @@ Install the latest npm packages and use the requirements file to install all pyt
 
 Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/Reaganak40/gerontechnology.git
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -120,8 +116,8 @@ _For more examples, please refer to the [Documentation](https://github.com/Reaga
 <!-- ROADMAP -->
 ## Roadmap
 
-- [*] Date-Wrangling
-- [*] Research Query
+- [x] Date-Wrangling
+- [x] Research Query
 - [ ] EMMA Dashboard
 
 See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
