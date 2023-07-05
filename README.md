@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Reaganak40/gerontechnology">
-    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" style="max-width: 40%">
+    <img src="docs/images/neuropsychology_and_aging_lab_img.png" alt="Logo" style="max-width: 40%;">
   </a>
 
 <h3 align="center">Gerontechnology - GSUR</h3>
@@ -43,7 +43,7 @@
     <a href="https://labs.wsu.edu/neuropsychology-aging/home/emma-information/"><strong>Learn More »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/Reaganak40/gerontechnology/tree/main/docs">View Docs</a>
+    <a href="https://github.com/Reaganak40/gerontechnology/blob/main/docs/OFFLINE%20-%20EMMA%20Gerontechnology%20Docs.pdf">View Docs</a>
     ·
     <a href="https://github.com/Reaganak40/gerontechnology/issues">Report Bug</a>
     ·
@@ -217,7 +217,7 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/Reaganak40/gerontechnology.svg?style=for-the-badge
 [contributors-url]: https://github.com/Reaganak40/gerontechnology/graphs/contributors
 
 [forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
