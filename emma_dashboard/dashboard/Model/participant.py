@@ -1,12 +1,14 @@
 #!/usr/bin/python
-
 """ This file defines the Participant class
 """
 
+
+
 # * Modules
+
 # Local Imports
 from dashboard import db
-from .variable_graph import VariableGraph
+from .variable_graph import VariableGraph, ChartToJSON
 
 # * Quick Reference =============================================================================
 # * Participant     => Participant wrapper class that is used to contain all dashboard info for that participant.
@@ -37,6 +39,7 @@ class Participant:
         self.study = info['study']
         self.cohort = info['cohort']
         self.active = info['active']
+        
 
         self.get_tables()
         self.get_graphs()
@@ -50,108 +53,126 @@ class Participant:
         """ After getting the calculation tables, uses the VariableGraph class to create a dictionary of
             graphs that will by chart.js when accessing the participant page.
         """
-        self.graphs : dict[VariableGraph] = {}
+        self.charts : dict[VariableGraph] = {}
         
         # * GRAPH DEFINITIONS
-        
         # ==========================================
         # Snapshot Data
         # ==========================================
-        self.graphs['totalCalenderInteractions'] = VariableGraph(
+        self.charts['totalCalenderInteractions'] = ('TCI_chart', ChartToJSON(
             chart_id      = 'TCI_chart',
             title         = "Total Calender Interactions",
             graph_type    = "line",
             df            = self.tables, 
             df_columns    = ['v_SumTotalCalendarInteractions'], 
-            scope         = 'weekly', 
-            labels        = ['Daily Average Activity'],
-            border_color  = ['#0000FF'],
-            )
-        
-        self.graphs['totalEventInteractions'] = VariableGraph(
-            chart_id      = 'TEI_chart',
-            title         = "Total Event Interactions",
-            graph_type    = "line",
-            df            = self.tables, 
-            df_columns    = ['v_SumTotalEventInteractions'], 
-            scope         = 'weekly', 
-            labels        = ['Daily Average Activity'],
-            border_color  = ['#0000FF'],
-            )
-        
-        self.graphs['distinctUse'] = VariableGraph(
-            chart_id      = 'distance_use_chart',
-            title         = "Daily Distinct Uses",
-            graph_type    = "line",
-            df            = self.tables, 
-            df_columns    = ['v_DistinctUse'], 
             scope         = 'daily', 
-            labels        = ['Daily Distinct Use'],
-            border_color  = ['#ff00cc'],
-            )
+            labels        = ['Daily Average Activity'],
+            draw_colors   = ['#0000FF'],
+        ))
+        
+        # self.graphs['totalCalenderInteractions'] = VariableGraph(
+        #     chart_id      = 'TCI_chart',
+        #     title         = "Total Calender Interactions",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_SumTotalCalendarInteractions'], 
+        #     scope         = 'daily', 
+        #     labels        = ['Daily Average Activity'],
+        #     border_color  = ['#0000FF'],
+        #     )
+        # print("HELLO1")
+        # self.graphs['totalEventInteractions'] = VariableGraph(
+        #     chart_id      = 'TEI_chart',
+        #     title         = "Total Event Interactions",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_SumTotalEventInteractions'], 
+        #     scope         = 'daily', 
+        #     labels        = ['Daily Average Activity'],
+        #     border_color  = ['#0000FF'],
+        #     )
+        # print("HELLO2")
+        
+        # self.graphs['distinctUse'] = VariableGraph(
+        #     chart_id      = 'distance_use_chart',
+        #     title         = "Daily Distinct Uses",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_DistinctUse'], 
+        #     scope         = 'daily', 
+        #     labels        = ['Daily Distinct Use'],
+        #     border_color  = ['#ff00cc'],
+        #     )
+        # print("HELLO3")
 
-        # ==========================================
-        # Health Tracking Data
-        # ==========================================
-        self.graphs['PE'] = VariableGraph(
-            chart_id      = 'PE_chart',
-            title         = "Physical Exercise",
-            graph_type    = "line",
-            df            = self.tables, 
-            df_columns    = ['v_TotalPEWeeklyPHEX'], 
-            scope         = 'weekly', 
-            labels        = ['Weekly Activity'],
-            border_color  = ['#0000FF'],
-            goal_line     = ('static', 150)
-            )
+        # # ==========================================
+        # # Health Tracking Data
+        # # ==========================================
+        # self.graphs['PE'] = VariableGraph(
+        #     chart_id      = 'PE_chart',
+        #     title         = "Physical Exercise",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_TotalPEWeeklyPHEX'], 
+        #     scope         = 'weekly', 
+        #     labels        = ['Weekly Activity'],
+        #     border_color  = ['#0000FF'],
+        #     goal_line     = ('static', 150)
+        #     )
+        # print("HELLO4")
 
-        self.graphs['CE'] = VariableGraph(
-            chart_id      = 'CE_chart',
-            title         = "Cognitive Exercise",
-            graph_type    = "line",
-            df            = self.tables, 
-            df_columns    = ['v_TotalCEWeeklyMEEX'], 
-            scope         = 'weekly', 
-            labels        = ['Weekly Activity'],
-            border_color  = ['#A52A2A'],
-            goal_line     = ('static', 12)
-            )
+        # self.graphs['CE'] = VariableGraph(
+        #     chart_id      = 'CE_chart',
+        #     title         = "Cognitive Exercise",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_TotalCEWeeklyMEEX'], 
+        #     scope         = 'weekly', 
+        #     labels        = ['Weekly Activity'],
+        #     border_color  = ['#A52A2A'],
+        #     goal_line     = ('static', 12)
+        #     )
+        # print("HELLO5")
         
-        self.graphs['WE'] = VariableGraph(
-            chart_id      = 'WE_chart',
-            title         = "Well-being Exercise",
-            graph_type    = "line",
-            df            = self.tables, 
-            df_columns    = ['v_TotalWEWeeklyWELLX'], 
-            scope         = 'weekly', 
-            labels        = ['Weekly Activity'],
-            border_color  = ['#228B22'],
-            goal_line     = ('static', 3)
-            )
+        # self.graphs['WE'] = VariableGraph(
+        #     chart_id      = 'WE_chart',
+        #     title         = "Well-being Exercise",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_TotalWEWeeklyWELLX'], 
+        #     scope         = 'weekly', 
+        #     labels        = ['Weekly Activity'],
+        #     border_color  = ['#228B22'],
+        #     goal_line     = ('static', 3)
+        #     )
         
-        self.graphs['h_goals'] = VariableGraph(
-            chart_id       = 'h_goals_chart',
-            title          = "Health Goals",
-            graph_type     = "progress",
-            df             = self.tables, 
-            df_columns     = ['v_PEGoal', 'v_CEGoal', 'v_WEGoal'], 
-            scope          = 'weekly', 
-            labels         = ['PE Goal', 'CE Goal', 'WE Goal'],
-            border_color   = ['#00FFFF', '#C19A6B', '#AFE1AF'],
-            num_charts = 4,
-            progress_max=1,
-            )
+        # print("HELLO6")
         
-        # ==========================================
-        # General Use Data
-        # ==========================================
-        self.graphs['SumTotalEvent'] = VariableGraph(
-            chart_id      = 'SumTotalEvent_chart',
-            title         = "Total Event Interactions",
-            graph_type    = "line",
-            df            = self.tables, 
-            df_columns    = ['v_SumTotalEventInteractions'], 
-            scope         = 'weekly', 
-            labels        = ['Weekly Event Totals'],
-            border_color  = ['#CF9FFF']
-            )
+        # self.graphs['h_goals'] = VariableGraph(
+        #     chart_id       = 'h_goals_chart',
+        #     title          = "Health Goals",
+        #     graph_type     = "progress",
+        #     df             = self.tables, 
+        #     df_columns     = ['v_PEGoal', 'v_CEGoal', 'v_WEGoal'], 
+        #     scope          = 'weekly', 
+        #     labels         = ['PE Goal', 'CE Goal', 'WE Goal'],
+        #     border_color   = ['#00FFFF', '#C19A6B', '#AFE1AF'],
+        #     num_charts = 4,
+        #     progress_max=1,
+        #     )
+        # print("HELLO7")
+        
+        # # ==========================================
+        # # General Use Data
+        # # ==========================================
+        # self.graphs['SumTotalEvent'] = VariableGraph(
+        #     chart_id      = 'SumTotalEvent_chart',
+        #     title         = "Total Event Interactions",
+        #     graph_type    = "line",
+        #     df            = self.tables, 
+        #     df_columns    = ['v_SumTotalEventInteractions'], 
+        #     scope         = 'daily', 
+        #     labels        = ['Weekly Event Totals'],
+        #     border_color  = ['#CF9FFF']
+        #     )
+        # print("HELLO8")

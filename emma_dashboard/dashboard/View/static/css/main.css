@@ -5,11 +5,6 @@
     Created by: Reagan Kelley
  =========================================================== */
 
-html, body {
-  max-width: 100%;
-  overflow-x: scroll;
-}
-
 .collapsible {
   cursor: pointer;
   padding: 10px;

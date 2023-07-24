@@ -11,72 +11,8 @@
 {% block content %}
 <h1 align="center"> -- {{ participant.name }} -- </h1>
 
-
-<button type="button" class="collapsible"><h1>Participant Snapshot<h1></button>
-<div class="content" style="display: block;">
-
-    <div class="chartCard" style="height: calc(25vw - 80px);">
-        <div class="chartBox" style="width: 30%; border: solid #000000">
-            {% set current_graph = participant.graphs['totalCalenderInteractions'] %}
-            {% include 'chart.html' %}
-        </div>
-
-        <div class="chartBox" style="width: 30%; border: solid #000000">
-            {% set current_graph = participant.graphs['totalEventInteractions'] %}
-            {% include 'chart.html' %}
-        </div>
-
-        <div class="chartBox" style="width: 30%; border: solid #000000">
-            {% set current_graph = participant.graphs['distinctUse'] %}
-            {% include 'chart.html' %}
-        </div>
-    </div>
-</div>
-
-
-<button type="button" class="collapsible"><h1>Health Tracking Data<h1></button>
-<div class="content">
-    <div class="chartCard" style="height: calc(25vw - 80px);">
-        <div class="chartBox" style="width:30%; border: solid #0000FF">
-            {% set current_graph = participant.graphs['PE'] %}
-            {% include 'chart.html' %}
-        </div>
-
-        <div class="chartBox" style="width:30%; border: solid #A52A2A">
-            {% set current_graph = participant.graphs['CE'] %}
-            {% include 'chart.html' %}
-        </div>
-
-        <div class="chartBox" style="width:30%; border: solid #228B22">
-            {% set current_graph = participant.graphs['WE'] %}
-            {% include 'chart.html' %}
-        </div>
-    </div>
-
-</div>
-
-{% set current_graph = participant.graphs['h_goals'] %}
-
-<button type="button" class="collapsible"><h1>General Use Data<h1></button>
-<div class="content">
-</div>
-
-<table class="calculations-table">
-    <tr>
-        {% for col_name in participant.tables.columns %}
-            <th style="width:5%"> {{ col_name }}</th>
-        {% endfor %}
-    </tr>
-    {% for key, value in participant.tables.iterrows() %}
-        <tr>
-            {% for col_name in participant.tables.columns %}
-            <td>{{ value[col_name] }}</td>
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
-
-
+{% set current_chart = participant.charts['totalCalenderInteractions'] %}
+{% include 'chart.html' %}
 
 
 
