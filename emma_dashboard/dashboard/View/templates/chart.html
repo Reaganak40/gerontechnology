@@ -1,9 +1,13 @@
-{% if current_graph.type == "line" %}
-{% include 'line_chart.html' %}
-{% elif current_graph.type == "bar" %}
-{% include 'line_chart.html' %}
-{% elif current_graph.type == "pie" %}
-{% include 'pie_chart.html' %}
-{% elif current_graph.type == "progress" %}
-{% include 'progress_chart.html' %}
-{% endif %}
+<!--
+    current_chart[0] = ID for the graph
+-->
+<div>
+    <canvas id="{{ current_chart[0] }}"></canvas>
+</div>
+
+<!--
+    current_chart[1] = JSON object for the graph
+-->
+<script>
+    createChart({{ current_chart[1] | safe }});
+</script>

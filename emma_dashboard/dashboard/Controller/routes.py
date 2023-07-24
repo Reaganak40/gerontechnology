@@ -34,7 +34,8 @@ def info():
 
     try:
         p = Participant(participant_id)
-    except KeyError:
+    except KeyError as ke:
+        print(f"Unexpected KeyError: {ke}")
         return redirect(url_for('routes.index'), code=302)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
