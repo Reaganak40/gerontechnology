@@ -15,6 +15,7 @@ def ChartToJSON(**kwargs):
     
     graphData['title'] = kwargs['title']
     graphData['chart_id'] = kwargs['chart_id']
+    graphData['graph_type'] = kwargs['graph_type']
     
     if kwargs['graph_type'] == 'line':
         if kwargs['scope'] == 'daily':
@@ -26,25 +27,21 @@ def ChartToJSON(**kwargs):
                 dataset = {}
                 dataset['data'] = []
                 dataset['label'] = kwargs['labels'][index]
-                dataset['draw_color'] = kwargs['draw_colors'][index]
+                dataset['borderColor'] = kwargs['draw_colors'][index]
 
                 # create sql column names for daily variable
                 daily_columns = [daily_var + '_' + day + 'day' for day in ['Mon', 'Tues', 'Wednes', 'Thurs', 'Fri', 'Satur', 'Sun']]
 
                 # append all daily entries in chronological order
                 for row_index in range(len(df)):
-                    for column in daily_columns:
-                        dataset['data'].append(df.iloc[row_index][column])
-                    
-                
                     week, year = df.iloc[row_index][['week_number', 'year_number']]
-                    
-                    for day in range(1, 8):
-                        calender_date = date.fromisocalendar(int(year), int(week), day)
-                        graphData['x_labels'].append(str(calender_date) + " 00:00:00")
-                        #print(f"{count}: ",str(calender_date) + " 00:00:00")
-                        count += 1
-                        #print(calender_date, daily_columns[day-1], dataset['data'][-(8-day)])
+                    for day, column in enumerate(daily_columns):
+                        dataset['data'].append({})
+                        
+                        calender_date = date.fromisocalendar(int(year), int(week), day+1)
+                        dataset['data'][-1]['x'] = str(calender_date) + " 00:00:00" 
+                        dataset['data'][-1]['y'] = df.iloc[row_index][column]
+                dataset['spanGaps'] = True;
                 graphData['datasets'].append(dataset)
     return json.dumps(graphData)
                 
