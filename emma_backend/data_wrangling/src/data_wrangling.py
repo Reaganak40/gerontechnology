@@ -14,6 +14,7 @@ import sys
 from termcolor import colored
 from typing import Callable
 
+pd.options.mode.chained_assignment = None  # default='warn'
 
 # Local Imports
 try:
@@ -400,6 +401,71 @@ class DataWrangling:
         #    quit()
         return grouping1
 
+    def get_entries_counts(self, df, text_column, text_action,  day_of_week=-1):
+        # Filter the Dataset to only include rows from the given day of the week.
+        if(day_of_week >= 0):
+            df = Utils.filter_to_day_of_week(df, day_of_week)
+        
+        # only look at the columns to count text from (keep the participant ids)
+        df = df[['participantId'] + text_column]
+        
+        # need to check if numeric type before dropping NaN values. Numeric columns will not provide accurate character counts.
+        for column in text_column:
+            if pd.api.types.is_numeric_dtype(df[column].dtype):
+                err_msg = colored(f"EMMA Data-Wrangling Error: Column ['{column}'] is not a string dtype.", 'red')
+                raise Exception(err_msg)
+        
+        df = df.fillna('')
+        
+        # perform the text action on the text columns
+        if text_action == 'character_count':
+            for column in text_column:
+                df[column + '_count'] = df[column].astype(str).str.len()
+        else:
+            err_msg = colored(f"EMMA Data-Wrangling Error: Undefined text-action {text_action}", 'red')
+            raise Exception(err_msg)
+        
+        df['joined_sum'] = df[[col_name + "_count" for col_name in text_column]].sum(axis=1)        
+        return df.groupby('participantId')['joined_sum'].sum() # groups by participantID whilst summing the sum-column values
+
+    
+    def get_count_from_predefined(self, **kwargs):
+
+        participants_dict = kwargs['participants_dict']
+        variable_name = kwargs['variable_name']
+        variable_func = kwargs['variable_func']
+        
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Use each participant's already calculated variables to
+        # * defined a new variable.
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+        if(kwargs['defined_variable_x'] is not None):
+            for participant_id, variables in participants_dict.items():
+
+                X = variables.get(kwargs['defined_variable_x']) # get existing value for a variable
+                if X is None:
+                    continue
+                
+                if(kwargs['defined_variable_y'] is not None):
+                    Y = variables.get(kwargs['defined_variable_y'])
+                    if Y is None:
+                        continue
+                else:
+                    Y = 0
+                
+                defined_variable_used = True
+                participants_dict[participant_id][variable_name] = eval(variable_func[1], {"__builtins__": {}}, {'x' : X, 'y' : Y})
+
+        # raise Exception if defined variable's x and y are not defined properly
+        elif(kwargs['defined_variable_y'] is not None):
+            err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_y: [{kwargs['defined_variable_y']}], but no defined_variable-x given. (must provide an x if y is defined.)", "red")
+            raise Exception(err_msg)
+        else:
+            err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] has no dataset given but also no defined variables given either.", "red")
+            raise Exception(err_msg)
+        
+        return participants_dict
+    
     def process_eval(self, variable_name, eval_params):
         """Checks the function parameter provided by variable definitions, and ensures that it is formatted correctly and not code.
 
@@ -450,44 +516,6 @@ class DataWrangling:
                 raise SyntaxError(err_msg)
             
         return eval_args
-    
-    def get_count_from_predefined(self, **kwargs):
-
-        participants_dict = kwargs['participants_dict']
-        variable_name = kwargs['variable_name']
-        variable_func = kwargs['variable_func']
-        
-        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # * Use each participant's already calculated variables to
-        # * defined a new variable.
-        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-        if(kwargs['defined_variable_x'] is not None):
-            for participant_id, variables in participants_dict.items():
-
-                X = variables.get(kwargs['defined_variable_x']) # get existing value for a variable
-                if X is None:
-                    continue
-                
-                if(kwargs['defined_variable_y'] is not None):
-                    Y = variables.get(kwargs['defined_variable_y'])
-                    if Y is None:
-                        continue
-                else:
-                    Y = 0
-                
-                defined_variable_used = True
-                participants_dict[participant_id][variable_name] = eval(variable_func[1], {"__builtins__": {}}, {'x' : X, 'y' : Y})
-
-        # raise Exception if defined variable's x and y are not defined properly
-        elif(kwargs['defined_variable_y'] is not None):
-            err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] uses defined_variable_y: [{kwargs['defined_variable_y']}], but no defined_variable-x given. (must provide an x if y is defined.)", "red")
-            raise Exception(err_msg)
-        else:
-            err_msg = colored(f"EMMA Data-Wrangling Error: [{variable_name}] has no dataset given but also no defined variables given either.", "red")
-            raise Exception(err_msg)
-        
-        return participants_dict
-            
 
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
@@ -547,9 +575,20 @@ class DataWrangling:
                 day_of_week = kwargs['day_of_week']
                 ).items()
         
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Condition 3: New variable is defined through the entries
+        # *              table.
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif(kwargs['dataset_type'] == DatasetType.ENTRIES):
+            element_count_list = self.get_entries_counts(
+                kwargs['df'],
+                kwargs['text_column'],
+                kwargs['text_action'],
+                day_of_week=kwargs['day_of_week']
+            ).items()
         
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # * Condition 3: New variable is defined through more than 1
+        # * Condition 4: New variable is defined through more than 1
         # *              table, -- use already defined variables to
         # *              to foster more complicated calculations. 
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -561,9 +600,8 @@ class DataWrangling:
                 defined_variable_x=kwargs['defined_variable_x'],
                 defined_variable_y=kwargs['defined_variable_y']
             )
-            
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # * If condition 1 or 2, use the variable_func to do a more
+        # * If condition 1,2, or 3 use the variable_func to do a more
         # * complicated calculation with the aggregated results.
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         else:
@@ -579,7 +617,7 @@ class DataWrangling:
     
     # Last Edit on 12/7/2022 by Reagan Kelley
     # Originally written from EMMA_data_wrangling.ipynb
-    def get_variable_calculations(self, interactions_df : pd.DataFrame, events_df : pd.DataFrame) -> dict:
+    def get_variable_calculations(self, interactions_df : pd.DataFrame, events_df : pd.DataFrame, entries_df : pd.DataFrame) -> dict:
         """Given a week's worth of data in two DataFrames, interactions and events respectively, created a calculation table.
 
         Args:
@@ -645,6 +683,19 @@ class DataWrangling:
                     defined_variable_y=defined_variable_y   # when not None, provided a definition for Y for the function
                     
                 )
+            elif(dataset_type == DatasetType.ENTRIES):
+                text_column = properties.text_column
+                text_action = properties.text_action
+                participants = self.create_variable(
+                    participants_dict=participants,         # this participants dict will be updated
+                    df=entries_df,                          # the dataset used in this variable
+                    dataset_type=dataset_type,              # what type of dataset this variable needs
+                    variable_name=name,                     # the name of the variable
+                    variable_func=function,                 # the lambda function to do on every aggregate call
+                    day_of_week=day_of_week,                # if not -1, specifies the day to calculate
+                    text_column=text_column,                # The columns to read character entries from
+                    text_action=text_action                 # The action to take with the text entries
+                )
             else:
                 participants = self.create_variable(
                     participants_dict=participants,         # this participants dict will be updated
@@ -663,7 +714,6 @@ class DataWrangling:
             undeclared_variables = list(set(self.variableNames).difference(keys)) # these are the variables for each participant that were not calculated. (=0)
             for variable in undeclared_variables:
                 participants[participant_id][variable] = 0
-        
         return participants
 
     def read_data(self):
@@ -712,14 +762,16 @@ class DataWrangling:
         for date, interactions_df in self.data[DatasetType.INTERACTIONS].weekly_dfs.items():
             filename = "Week {}, {}".format(date[0], date[1])  # The Week and Year of the next dataframe that will be used to calculate variables.
             events_df = self.data[DatasetType.EVENTS].weekly_dfs.get((date[0], date[1]))
+            entries_df = self.data[DatasetType.ENTRIES].weekly_dfs.get((date[0], date[1]))
             
+
             # only create the next calculation table if interactions and events hold data for that week
-            if(events_df is not None):
+            if(events_df is not None) and (entries_df is not None):
                 used_weeks.append(date)
                 if(self.debug):
                     print(f"* Calculating variables for ({filename})")
             
-                participants = self.get_variable_calculations(interactions_df, events_df)  # Get variable calculations for each participant that week
+                participants = self.get_variable_calculations(interactions_df, events_df, entries_df)  # Get variable calculations for each participant that week
 
                 if(create_csvs):
                     self.participant_dict_to_csv(participants, "{}.csv".format(filename))      # Output results to the output directory
