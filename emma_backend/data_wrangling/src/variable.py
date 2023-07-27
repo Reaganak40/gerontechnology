@@ -88,6 +88,17 @@ class Variable:
             self.filter_by       = None 
             self.healthTrackType = None
             self.completed       = None
+            
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # * Get Entries attributes if Entries Variable
+        # * Make none for attributes otherwise to avoid contamination
+        # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if self.dataset_type == DatasetType.ENTRIES:
+            self.text_column = variable_definition.get("text_column", None)
+            self.text_action = variable_definition.get("text_action", None)
+        else:
+            self.text_column = None
+            self.text_action = None
 
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # * Get reference attributes if reference Variable
