@@ -335,11 +335,11 @@ namespace ResearchQuery
             if (this.DateRangeComboBox.SelectedIndex >= 0)
             {
 
-                #pragma warning disable SA1312 // VariableNamesMustBeginWithLowerCaseLetter
+#pragma warning disable SA1312 // VariableNamesMustBeginWithLowerCaseLetter
                 const int SELECT_ALL = 0;
                 const int UNSELECT_ALL = 1;
                 const int SELECT_NEWEST = 2;
-                #pragma warning restore SA1312 // VariableNamesMustBeginWithLowerCaseLetter
+#pragma warning restore SA1312 // VariableNamesMustBeginWithLowerCaseLetter
 
                 switch (this.DateRangeComboBox.SelectedIndex)
                 {
