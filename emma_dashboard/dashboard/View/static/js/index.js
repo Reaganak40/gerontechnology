@@ -15,6 +15,7 @@ function createLineChart(chartJSON) {
   
   var min_date_cutoff = new Date(chartJSON['datasets'][0]['data'].slice(-1)[0]['x'])
   min_date_cutoff.setMonth(min_date_cutoff.getMonth() - 1)
+  min_date_cutoff.setHours(min_date_cutoff.getHours() - 12)
 
   const chart = new Chart(ctx, {
       type: 'line',
@@ -31,14 +32,14 @@ function createLineChart(chartJSON) {
             y: { beginAtZero: true},
             
             x: {
-              type: 'timeseries',
+              type: 'time',
               time: {
                 unit: 'day'
               },
               min: min_date_cutoff,
 
               ticks: {
-                stepSize: 7
+                stepSize: 7,
               }
             }
           },

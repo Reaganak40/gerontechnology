@@ -11,12 +11,23 @@
 {% block content %}
 <h1 align="center"> -- {{ participant.name }} -- </h1>
 
-<div class="chartCard" style="height: calc(25vw - 80px);">
-    <div class="chartBox" style="width: 30%; border: solid #000000">
+<div class="chartCard" style="height: calc(40vw - 80px);">
+    <div class="chartBox" style="width: 40%;">
         {% set current_chart = participant.charts['totalCalenderInteractions'] %}
         {% include 'chart.html' %}
     </div>
+
+    <div class="chartBox" style="width: 40%;">
+        {% set current_chart = participant.charts['totalEventInteractions'] %}
+        {% include 'chart.html' %}
+    </div>
+
+    <div class="chartBox" style="width: 40%;">
+        {% set current_chart = participant.charts['distinctUse'] %}
+        {% include 'chart.html' %}
+    </div>
 </div>
+
 
 
 {% endblock %}

@@ -184,6 +184,7 @@ def main(args):
     
     removePHI(filename, datatype, remove_strategy="random-shift-encryption")
     
-
+def readConfig():
+    
 if __name__ == '__main__':
     main(sys.argv[1:])

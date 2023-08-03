@@ -1,0 +1,8 @@
+{
+    "Config" : [
+        {
+        "emma_backend_path" : "../emma_backend",
+        "safe_PHI_path" : "../safe" 
+        }
+    ]
+}

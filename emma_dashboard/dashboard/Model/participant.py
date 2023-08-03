@@ -70,39 +70,29 @@ class Participant:
             draw_colors   = ['#0000FF'],
         ))
         
-        # self.graphs['totalCalenderInteractions'] = VariableGraph(
-        #     chart_id      = 'TCI_chart',
-        #     title         = "Total Calender Interactions",
-        #     graph_type    = "line",
-        #     df            = self.tables, 
-        #     df_columns    = ['v_SumTotalCalendarInteractions'], 
-        #     scope         = 'daily', 
-        #     labels        = ['Daily Average Activity'],
-        #     border_color  = ['#0000FF'],
-        #     )
-        # print("HELLO1")
-        # self.graphs['totalEventInteractions'] = VariableGraph(
-        #     chart_id      = 'TEI_chart',
-        #     title         = "Total Event Interactions",
-        #     graph_type    = "line",
-        #     df            = self.tables, 
-        #     df_columns    = ['v_SumTotalEventInteractions'], 
-        #     scope         = 'daily', 
-        #     labels        = ['Daily Average Activity'],
-        #     border_color  = ['#0000FF'],
-        #     )
-        # print("HELLO2")
         
-        # self.graphs['distinctUse'] = VariableGraph(
-        #     chart_id      = 'distance_use_chart',
-        #     title         = "Daily Distinct Uses",
-        #     graph_type    = "line",
-        #     df            = self.tables, 
-        #     df_columns    = ['v_DistinctUse'], 
-        #     scope         = 'daily', 
-        #     labels        = ['Daily Distinct Use'],
-        #     border_color  = ['#ff00cc'],
-        #     )
+        
+        self.charts['totalEventInteractions'] = ('TEI_chart', ChartToJSON(
+            chart_id      = 'TEI_chart',
+            title         = "Total Event Interactions",
+            graph_type    = "line",
+            df            = self.tables, 
+            df_columns    = ['v_SumTotalEventInteractions'], 
+            scope         = 'daily', 
+            labels        = ['Daily Average Activity'],
+            draw_colors   = ['#0000FF'],
+            ))
+
+        self.charts['distinctUse'] = ('distinctUse_chart', ChartToJSON(
+            chart_id      = 'distinctUse_chart',
+            title         = "Daily Distinct Uses",
+            graph_type    = "line",
+            df            = self.tables, 
+            df_columns    = ['v_DistinctUse'], 
+            scope         = 'daily', 
+            labels        = ['Daily Distinct Use'],
+            draw_colors  = ['#ff00cc'],
+            ))
         # print("HELLO3")
 
         # # ==========================================

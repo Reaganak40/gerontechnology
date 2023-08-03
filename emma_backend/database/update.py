@@ -234,4 +234,4 @@ def add_participants_from_research(cxn_engine = None):
     add_participants_from_df(participants, cxn_engine)
 
 if __name__ == "__main__":
-    update_schema(debug=True)
+    add_participants_from_research()
