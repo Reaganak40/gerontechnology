@@ -29,7 +29,11 @@ namespace ResearchQuery
 
             // connect to the EMMA Backend server.
             this.controller = new Controller();
-            this.controller.ConnectToDatabase("localhost", "root", "root");
+            if (!this.controller.ConnectToDatabase())
+            {
+                this.Shown += new EventHandler(this.ResearchQuery_CloseOnStart);
+            }
+
             this.controller.LoadFilteringData();
 
 
@@ -461,6 +465,10 @@ namespace ResearchQuery
             {
                 this.SuccessLabel.Visible = false;
             }
+        }
+        private void ResearchQuery_CloseOnStart(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

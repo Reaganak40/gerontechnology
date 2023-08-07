@@ -46,9 +46,8 @@ namespace ResearchQuery
                 this.connection.Open();
                 this.connected = true;
             }
-            catch (MySqlException ex)
+            catch (MySqlException)
             {
-                MessageBox.Show(ex.Message);
                 this.connected = false;
             }
 

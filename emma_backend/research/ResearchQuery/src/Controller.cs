@@ -9,13 +9,13 @@ using Deedle;
 
 namespace ResearchQuery
 {
+    using Microsoft.VisualBasic.Logging;
     using System.Globalization;
     using System.Windows.Forms;
 
     internal class Controller
     {
         private EMMABackendSqlConnection? database;
-
         private string[] dailyVariables;
         private string[] weeklyVariables;
 
@@ -116,13 +116,15 @@ namespace ResearchQuery
         /// <param name="server">the name of the server-host where the EMMA Backend database is located.</param>
         /// <param name="user">username for credentials.</param>
         /// <param name="password">password for credentials.</param>
-        public void ConnectToDatabase(string server, string user, string password)
+        public bool ConnectToDatabase()
         {
-            this.database = new EMMABackendSqlConnection(server, user, password);
-            if (!this.database.Connected)
+            LoginForm login = new LoginForm();
+            if (login.ShowDialog() == DialogResult.OK)
             {
-                this.database = null;
+                this.database = login.Database;
             }
+
+            return this.database != null;
         }
 
         /// <summary>

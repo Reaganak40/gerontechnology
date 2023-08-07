@@ -375,7 +375,7 @@
             ClientSize = new Size(1314, 725);
             Controls.Add(FormSplitContainer);
             Name = "QueryForm";
-            Text = "Research Query v1.0";
+            Text = "Research Query v1.1";
             ((System.ComponentModel.ISupportInitialize)CurrentCalculationTableView).EndInit();
             ((System.ComponentModel.ISupportInitialize)CohortSelectionView).EndInit();
             FormSplitContainer.Panel1.ResumeLayout(false);
