@@ -1001,6 +1001,23 @@
             "text_column" : ["title"],
             "text_action" : "character_count",
             "function" : ["x", "x"]
+        },
+        {
+            "name" : "EntriesWordCount",
+            "dataset" : "Entries",
+            "scope" : "weekly",
+            "text_column" : ["title"],
+            "text_action" : "word_count",
+            "function" : ["x", "x"]
+        },
+        {
+            "name" : "EntriesTitleCharacterCount",
+            "dataset" : "Entries",
+            "scope" : "weekly",
+            "filter_by" : [["title", "note"]],
+            "text_column" : ["title"],
+            "text_action" : "character_count",
+            "function" : ["x", "x"]
         }
     ]
 }

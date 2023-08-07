@@ -401,7 +401,7 @@ class DataWrangling:
         #    quit()
         return grouping1
 
-    def get_entries_counts(self, df, text_column, text_action,  day_of_week=-1):
+    def get_entries_counts(self, df, text_column, text_action, filter_by, day_of_week=-1):
         # Filter the Dataset to only include rows from the given day of the week.
         if(day_of_week >= 0):
             df = Utils.filter_to_day_of_week(df, day_of_week)
@@ -417,10 +417,46 @@ class DataWrangling:
         
         df = df.fillna('')
         
+        # create a SQL string to filter DataFrame to only include rows with filter values
+        if filter_by is not None and len(filter_by) > 0:
+            query_string = ""
+            index = 0
+            for column_name, filter_value in filter_by:
+                if type(filter_value) is int or type(filter_value) is bool:
+                    query_string += '({} == {})'.format(column_name, filter_value)
+                elif type(filter_value) is str:
+                    query_string += '({} == "{}")'.format(column_name, filter_value.lower())
+                elif type(filter_value) is list:
+                    if len(filter_value) > 0:
+                        query_string += "("
+                        for i in range(len(filter_value)):
+                            if type(filter_value[i]) is int:
+                                query_string += '{} == {}'.format(column_name, filter_value[i])
+                            elif type(filter_value[i]) is str:
+                                query_string += '{} == "{}"'.format(column_name, filter_value[i])
+                            else:
+                                raise Exception("Unsupported list element: {}".format(type(filter_value[i])))
+
+                            if((i+1) < len(filter_value)):
+                                query_string += " or "
+                        query_string += ")"
+                    else:
+                        raise Exception("filter_by variable of type 'list' cannot be empty")
+                else:
+                    raise Exception("filter_by variable of type '{}' is not supported".format(type(filter_value)))
+
+                index += 1
+                if index < len(filter_by):
+                    query_string += " and "
+            df = df.query(query_string)
+            
+        
         # perform the text action on the text columns
         if text_action == 'character_count':
             for column in text_column:
                 df[column + '_count'] = df[column].astype(str).str.len()
+        elif text_action == 'word_count':
+            df[column + '_count'] = df[column].astype(str).str.count(' ') + 1
         else:
             err_msg = colored(f"EMMA Data-Wrangling Error: Undefined text-action {text_action}", 'red')
             raise Exception(err_msg)
@@ -584,6 +620,7 @@ class DataWrangling:
                 kwargs['df'],
                 kwargs['text_column'],
                 kwargs['text_action'],
+                kwargs['filter_by'],
                 day_of_week=kwargs['day_of_week']
             ).items()
         
@@ -686,6 +723,7 @@ class DataWrangling:
             elif(dataset_type == DatasetType.ENTRIES):
                 text_column = properties.text_column
                 text_action = properties.text_action
+                filter_by = properties.filter_by
                 participants = self.create_variable(
                     participants_dict=participants,         # this participants dict will be updated
                     df=entries_df,                          # the dataset used in this variable
@@ -693,6 +731,7 @@ class DataWrangling:
                     variable_name=name,                     # the name of the variable
                     variable_func=function,                 # the lambda function to do on every aggregate call
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
+                    filter_by=filter_by,                    # the columns and values to filter the rows by before sum/count
                     text_column=text_column,                # The columns to read character entries from
                     text_action=text_action                 # The action to take with the text entries
                 )

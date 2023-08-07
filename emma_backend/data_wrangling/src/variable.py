@@ -96,6 +96,7 @@ class Variable:
         if self.dataset_type == DatasetType.ENTRIES:
             self.text_column = variable_definition.get("text_column", None)
             self.text_action = variable_definition.get("text_action", None)
+            self.filter_by = variable_definition.get("filter_by", None)
         else:
             self.text_column = None
             self.text_action = None
