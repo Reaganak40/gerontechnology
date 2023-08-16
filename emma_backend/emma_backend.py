@@ -62,8 +62,6 @@ def update_database(calculation_tables, cxn_engine = None, debug : bool = False)
     if (debug):
         print(colored("\nAdding data to the database:", "blue"))
 
-    cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
-    
     # table : ((week, year), dataframe)
     for table in calculation_tables:
         update_from_dataframe(table[1].copy(), table[0][0], table[0][1], cxn_engine,
@@ -110,15 +108,36 @@ def emma_backend(args):
         no_database = True if int(args[args.index("--no_database") + 1]) == 1 else False
     except:
         no_database = False
-    
+        
+        # get server host for emma_backend Database
+        try:
+            db_host = args[args.index("--db_host") + 1]
+        except:
+            db_host = "no_host_provided"
+        
+        # get the username credentials for emma_backend Database
+        try:
+            db_username = args[args.index("--db_username") + 1]
+        except:
+            db_username = "no_user"
+        
+        # get the password credentials for emma_backend Database
+        try:
+            db_password = args[args.index("--db_password") + 1]
+        except:
+            db_password = "no_password"
+        
     try:
         research  = True if int(args[args.index("--research") + 1]) == 1 else False
     except:
         research  = False
     
+    
+    
+    
     # * Add information to database if requested.
     if not no_database:
-        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
+        cxn_engine = connect_to_db("emma_backend", host=db_host, user=db_username, password=db_password, use_engine=True)
     else:
         cxn_engine = None
 

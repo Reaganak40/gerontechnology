@@ -33,7 +33,7 @@ except:
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial implementation
-def connect_to_db(database_name : str, user= None, password = None, create=False, use_engine=False):
+def connect_to_db(database_name : str, host=None, user=None, password=None, create=False, use_engine=False):
     """ Prompts for user and password and then when validated connects
         to back-end database
     Args:
@@ -46,25 +46,25 @@ def connect_to_db(database_name : str, user= None, password = None, create=False
         try:
             if(not create):
                 if(user is not None and password is not None):
-                    cxn = mysql.connector.connect(host="localhost",
+                    cxn = mysql.connector.connect(host=host,
                             user=user,
                             password=password,
                             database=database_name
                             )
                 else:
-                    cxn = mysql.connector.connect(host="localhost",
+                    cxn = mysql.connector.connect(host=host,
                             user=input("Enter username: "),
                             password=getpass("Enter password: "),
                             database=database_name
                             )
             else:
                 if(user is not None and password is not None):
-                    cxn = mysql.connector.connect(host="localhost",
+                    cxn = mysql.connector.connect(host=host,
                             user=user,
                             password=password,
                             )
                 else:
-                    cxn = mysql.connector.connect(host="localhost",
+                    cxn = mysql.connector.connect(host=host,
                             user=input("Enter username: "),
                             password=getpass("Enter password: "),
                             )
@@ -79,7 +79,7 @@ def connect_to_db(database_name : str, user= None, password = None, create=False
         if(user is None or password is None):
             user=input("Enter username: "),
             password=getpass("Enter password: ")
-        connection_str = "mysql://{}:{}@localhost/{}".format(user, password, database_name)
+        connection_str = "mysql://{}:{}@{}/{}".format(user, password, host, database_name)
         return create_engine(connection_str, future=True)
 
 # Last Edit on 12/30/2022 by Reagan Kelley
