@@ -8,6 +8,7 @@ from termcolor import colored
 from pathlib import Path
 
 just_fix_windows_console()
+# added comment
 
 logs = ""
 def log(start, timestamp, msg):
