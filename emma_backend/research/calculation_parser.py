@@ -32,6 +32,7 @@ def get_all_participants(cxn_engine = None):
         # get all excel files in the directory, exclude hidden recovery files
         filenames = glob.glob(str(participant_table_path) + "\[!~$]*.xlsx")
         for file in filenames:
+            print(file)
             current_participant_table = pd.read_excel(file)
             columns = current_participant_table.columns
 
