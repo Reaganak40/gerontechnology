@@ -31,8 +31,10 @@ def get_all_participants(cxn_engine = None):
         participants = None
         # get all excel files in the directory, exclude hidden recovery files
         filenames = glob.glob(str(participant_table_path) + "\[!~$]*.xlsx")
+        if len(filenames) == 0:
+            raise Exception("No participant tables found.")
+        
         for file in filenames:
-            print(file)
             current_participant_table = pd.read_excel(file)
             columns = current_participant_table.columns
 
