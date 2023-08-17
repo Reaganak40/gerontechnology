@@ -65,6 +65,11 @@ class Variable:
                 
             self.type = variable_definition.get("type", None)
             self.source = variable_definition.get("source", None)
+            
+            self.sum = None
+            self.count = None
+            self.text_column = None
+            self.text_action = None
         else:
             self.tokens     = None
             self.distinct   = None
@@ -79,13 +84,12 @@ class Variable:
         if self.dataset_type == DatasetType.EVENTS:
             self.sum = variable_definition.get("sum", None)
             self.count = variable_definition.get("count", None)
+            self.text_column = variable_definition.get("text_column", None)
+            self.text_action = variable_definition.get("text_action", None)
             self.filter_by = variable_definition.get("filter_by", None)
             self.healthTrackType = variable_definition.get("healthTrackType", None)
             self.completed = variable_definition.get("completed", False)
         else:
-            self.sum             = None
-            self.count           = None
-            self.filter_by       = None 
             self.healthTrackType = None
             self.completed       = None
             
@@ -94,12 +98,11 @@ class Variable:
         # * Make none for attributes otherwise to avoid contamination
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if self.dataset_type == DatasetType.ENTRIES:
+            self.sum = variable_definition.get("sum", None)
+            self.count = variable_definition.get("count", None)
             self.text_column = variable_definition.get("text_column", None)
             self.text_action = variable_definition.get("text_action", None)
             self.filter_by = variable_definition.get("filter_by", None)
-        else:
-            self.text_column = None
-            self.text_action = None
 
         # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # * Get reference attributes if reference Variable

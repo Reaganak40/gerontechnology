@@ -17,14 +17,34 @@ def log(start, timestamp, msg):
     print(colored(log_timestamp, "blue"), end='')
     print(msg)
     logs += log_timestamp + msg + "\n"
-    
-    
+
+def update_log_txt():
+    global logs
+    if os.path.isfile("log.txt"):
+        logs = "\n" + logs
+    with open("log.txt", 'a+') as f:
+        f.write(logs)
+
+def terminate(start, timestamp):
+    global logs
+    log(start, timestamp, "EMMA Backend session ended prematurely.")
+    update_log_txt()
+    exit()
+
+
+def try_run_python(command):
+    try:
+        subprocess.run(command, shell=True, check=True, capture_output=True)
+    except subprocess.CalledProcessError as err:
+        err_msg = err.stderr.decode('utf8').replace("\n", "")[:-1]
+        log(start, timestamp, f"{command[1]} encountered an error: {err_msg}")
+        terminate(start, timestamp)
 
 # Get time of execution
 start = time.time()
 timestamp = str(datetime.datetime.now()).replace(":", ".")
 
-log(start, timestamp, "New Data-Wrangling session started.")
+log(start, timestamp, "New EMMA Backend session started.")
 
 # read config settings
 f = open('config.json')
@@ -37,20 +57,42 @@ events = ""
 interactions = ""
 for file in os.listdir(os.getcwd()):
     if file.startswith("entries"):
+        if len(entries) != 0:
+            log(start, timestamp, "Error: Found multiple entries files in directory.")
+            terminate(start, timestamp)
+            
         entries = file
     elif file.startswith("events"):
+        if len(events) != 0:
+            log(start, timestamp, "Error: Found multiple events files in directory.")
+            terminate(start, timestamp)
+            
         events = file
     elif file.startswith("interactions"):
+        if len(interactions) != 0:
+            log(start, timestamp, "Error: Found multiple interactions files in directory.")
+            terminate(start, timestamp)
         interactions = file
+
+
+if len(entries) == 0:
+    log(start, timestamp, "Error: Could not locate entries dataset in directory.")
+    terminate(start, timestamp)
+elif len(events) == 0:
+    log(start, timestamp, "Error: Could not locate events dataset in directory.")
+    terminate(start, timestamp)
+elif len(interactions) == 0:
+    log(start, timestamp, "Error: Could not locate interactions dataset in directory.")
+    terminate(start, timestamp)
 
 log(start, timestamp, "Entries/Events/Interaction datasets found.")
 
 # Run removePHI on entries
-subprocess.run(["python", "removePHI.py", "--filename", entries, "--type", "entries"])
+try_run_python(["python", "removePHI.py", "--filename", entries, "--type", "entries"])
 log(start, timestamp, f"Removed PHI from dataset: {entries}")
 
 # Run removePHI on events
-subprocess.run(["python", "removePHI.py", "--filename", events, "--type", "events"])
+try_run_python(["python", "removePHI.py", "--filename", events, "--type", "events"])
 log(start, timestamp, f"Removed PHI from dataset: {events}")
 
 
@@ -86,12 +128,11 @@ entries_noPHI = os.path.join(timestamp, entries_noPHI)
 events_noPHI = os.path.join(timestamp, events_noPHI)
 interactions = os.path.join(timestamp, interactions)
 
-subprocess.run(["python", emma_backend_py,
+try_run_python(["python", emma_backend_py,
                 "--interactions", interactions, "--events", events_noPHI, "--entries", entries_noPHI,
-                "--debug", "0", "--research", "1",
+                "--debug", "1", "--research", "1",
                 "--db_host", data["db_host"], "--db_username", data["db_username"], "--db_password", data["db_password"]])
 
-log(start, timestamp, "Data-wrangling session complete.")
+log(start, timestamp, "EMMA Backend session ended successfully.")
 
-with open("log.txt", 'a+') as f:
-    f.write(logs)
+update_log_txt()

@@ -122,7 +122,7 @@ def removePHI(filename, datatype, remove_strategy="replace"):
                     
                     # replace any number with a random char
                     if c >= '0' and c <= '9':
-                        c = 'A' + randint(0, 26)
+                        c = chr(ord('A') + randint(0, 26))
                         
                     # shift the char between uppercase and lowercase letters
                     if (c >= 'A' and c <= 'Z') or (c >= 'a' and c <= 'z'):

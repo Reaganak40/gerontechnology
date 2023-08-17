@@ -229,7 +229,7 @@ class DataWrangling:
                     if res.get(study_name) is None:
                         res[study_name] = [name]
                     else:
-                        res.append(name)
+                        res[study_name].append(name)
         return res
     
     # Last Edit on 12/7/2022 by Reagan Kelley
@@ -318,7 +318,7 @@ class DataWrangling:
         
         return grouping1.groupby(['participantId']).sum() # returns the sum of each elementIDs use for each participant
 
-    def get_events_counts(self, df, sum, count, filter_by, healthTrackType, completed = False, day_of_week=-1):
+    def get_events_counts(self, df, sum, count, text_column, text_action, filter_by, healthTrackType, completed = False, day_of_week=-1):
         """ Given a DataFrame which contains participant events,
             returns a sum in a column for given healthTrackType for each participant.
 
@@ -334,136 +334,53 @@ class DataWrangling:
         if(day_of_week >= 0):
             df = Utils.filter_to_day_of_week(df, day_of_week)
 
-        query_string = ""
-
-        # create a SQL string to filter DataFrame to only include rows with desired healthTrackType vlaues
+        # create a SQL string to filter DataFrame to only include rows with desired healthTrackType values
         if healthTrackType is not None:
-            query_string += "("
+            query_string = "("
             for i in range(len(healthTrackType)):
                 query_string += "healthTrackType == '{}'".format(healthTrackType[i].lower())
                 if((i+1) < len(healthTrackType)):
                     query_string += " or "
             query_string += ")"
+            df = df.query(query_string)
         
         # create a SQL string to filter DataFrame to only include rows with filter values
         if filter_by is not None and len(filter_by) > 0:
-            if healthTrackType is not None:
-                query_string += " and "
-            
-            index = 0
-            for column_name, filter_value in filter_by:
-                if type(filter_value) is int or type(filter_value) is bool:
-                    query_string += '({} == {})'.format(column_name, filter_value)
-                elif type(filter_value) is str:
-                    query_string += '({} == "{}")'.format(column_name, filter_value.lower())
-                elif type(filter_value) is list:
-                    if len(filter_value) > 0:
-                        query_string += "("
-                        for i in range(len(filter_value)):
-                            if type(filter_value[i]) is int:
-                                query_string += '{} == {}'.format(column_name, filter_value[i])
-                            elif type(filter_value[i]) is str:
-                                query_string += '{} == "{}"'.format(column_name, filter_value[i])
-                            else:
-                                raise Exception("Unsupported list element: {}".format(type(filter_value[i])))
-
-                            if((i+1) < len(filter_value)):
-                                query_string += " or "
-                        query_string += ")"
-                    else:
-                        raise Exception("filter_by variable of type 'list' cannot be empty")
-                else:
-                    raise Exception("filter_by variable of type '{}' is not supported".format(type(filter_value)))
-
-                index += 1
-                if index < len(filter_by):
-                    query_string += " and "
+            df = Utils.df_filter_by(df, filter_by)
 
         # Add to the SQL string if want to only check completed events.
         if(completed):
-            query_string += " and (completed == 1)"
+            query_string = "(completed == 1)"
+            df = df.query(query_string)
 
-        filtered_entries = df.query(query_string)
-        filtered_entries = filtered_entries[filtered_entries['healthTrackData'].notna()] #remove entries where the healthTrackData has no value. 
+        df = df[df['healthTrackData'].notna()] #remove entries where the healthTrackData has no value. 
         
-        #if filter_by is not None:
-        #    print(filtered_entries)
-        
-        if sum is not None:
-            grouping1 = filtered_entries.groupby('participantId')[sum].sum() # groups by participantID whilst summing the sum-column values.
+        if text_action is not None:
+            return Utils.get_calculation_from_text(df, text_column, text_action)
         elif count is not None:
-            grouping1 = filtered_entries.groupby('participantId')[count].count() # groups by participantID whilst summing the count of value instances.
-        else:
-            raise Exception("sum nor count variable defined for event variable.")
+            return Utils.get_calculation_from_count(df, count)
+        elif sum is not None:
+            return Utils.get_calculation_from_sum(df, sum)
         
-        #if filter_by is not None:
-        #    print("\n", grouping1)
-        #    quit()
-        return grouping1
+        raise Exception("Missing sum/count/text attribute.")
 
-    def get_entries_counts(self, df, text_column, text_action, filter_by, day_of_week=-1):
+    def get_entries_counts(self, df, sum, count, text_column, text_action, filter_by, day_of_week=-1):
         # Filter the Dataset to only include rows from the given day of the week.
         if(day_of_week >= 0):
             df = Utils.filter_to_day_of_week(df, day_of_week)
         
-        # only look at the columns to count text from (keep the participant ids)
-        df = df[['participantId'] + text_column]
-        
-        # need to check if numeric type before dropping NaN values. Numeric columns will not provide accurate character counts.
-        for column in text_column:
-            if pd.api.types.is_numeric_dtype(df[column].dtype):
-                err_msg = colored(f"EMMA Data-Wrangling Error: Column ['{column}'] is not a string dtype.", 'red')
-                raise Exception(err_msg)
-        
-        df = df.fillna('')
-        
         # create a SQL string to filter DataFrame to only include rows with filter values
         if filter_by is not None and len(filter_by) > 0:
-            query_string = ""
-            index = 0
-            for column_name, filter_value in filter_by:
-                if type(filter_value) is int or type(filter_value) is bool:
-                    query_string += '({} == {})'.format(column_name, filter_value)
-                elif type(filter_value) is str:
-                    query_string += '({} == "{}")'.format(column_name, filter_value.lower())
-                elif type(filter_value) is list:
-                    if len(filter_value) > 0:
-                        query_string += "("
-                        for i in range(len(filter_value)):
-                            if type(filter_value[i]) is int:
-                                query_string += '{} == {}'.format(column_name, filter_value[i])
-                            elif type(filter_value[i]) is str:
-                                query_string += '{} == "{}"'.format(column_name, filter_value[i])
-                            else:
-                                raise Exception("Unsupported list element: {}".format(type(filter_value[i])))
-
-                            if((i+1) < len(filter_value)):
-                                query_string += " or "
-                        query_string += ")"
-                    else:
-                        raise Exception("filter_by variable of type 'list' cannot be empty")
-                else:
-                    raise Exception("filter_by variable of type '{}' is not supported".format(type(filter_value)))
-
-                index += 1
-                if index < len(filter_by):
-                    query_string += " and "
-            df = df.query(query_string)
-            
+            df = Utils.df_filter_by(df, filter_by)
         
-        # perform the text action on the text columns
-        if text_action == 'character_count':
-            for column in text_column:
-                df[column + '_count'] = df[column].astype(str).str.len()
-        elif text_action == 'word_count':
-            df[column + '_count'] = df[column].astype(str).str.count(' ') + 1
-        else:
-            err_msg = colored(f"EMMA Data-Wrangling Error: Undefined text-action {text_action}", 'red')
-            raise Exception(err_msg)
+        if text_action is not None:
+            return Utils.get_calculation_from_text(df, text_column, text_action)
+        elif count is not None:
+            return Utils.get_calculation_from_count(df, count)
+        elif sum is not None:
+            return Utils.get_calculation_from_sum(df, sum)
         
-        df['joined_sum'] = df[[col_name + "_count" for col_name in text_column]].sum(axis=1)        
-        return df.groupby('participantId')['joined_sum'].sum() # groups by participantID whilst summing the sum-column values
-
+        raise Exception("Missing sum/count/text attribute.")
     
     def get_count_from_predefined(self, **kwargs):
 
@@ -605,6 +522,8 @@ class DataWrangling:
                 kwargs['df'],
                 kwargs['sum'],
                 kwargs['count'],
+                kwargs['text_column'],
+                kwargs['text_action'],
                 kwargs['filter_by'],
                 kwargs['healthTrackType'],
                 completed = kwargs['completed'],
@@ -618,6 +537,8 @@ class DataWrangling:
         elif(kwargs['dataset_type'] == DatasetType.ENTRIES):
             element_count_list = self.get_entries_counts(
                 kwargs['df'],
+                kwargs['sum'],
+                kwargs['count'],
                 kwargs['text_column'],
                 kwargs['text_action'],
                 kwargs['filter_by'],
@@ -700,6 +621,8 @@ class DataWrangling:
             elif(dataset_type == DatasetType.EVENTS):
                 sum = properties.sum
                 count = properties.count
+                text_column = properties.text_column
+                text_action = properties.text_action
                 healthTrackType = properties.healthTrackType
                 completed = properties.completed
                 filter_by = properties.filter_by
@@ -713,6 +636,8 @@ class DataWrangling:
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
                     sum=sum,                                # the column to sum by participantIDs
                     count = count,                          # the column to count by ParticipantIDs
+                    text_column=text_column,                # The columns to read character entries from
+                    text_action=text_action,                # The action to take with the text entries
                     filter_by=filter_by,                    # the columns and values to filter the rows by before sum/count
                     healthTrackType=healthTrackType,        # What tags to filter by for the healthTrackType
                     completed=completed,                    # only look at completed events when true
@@ -721,6 +646,8 @@ class DataWrangling:
                     
                 )
             elif(dataset_type == DatasetType.ENTRIES):
+                sum = properties.sum
+                count = properties.count
                 text_column = properties.text_column
                 text_action = properties.text_action
                 filter_by = properties.filter_by
@@ -733,7 +660,9 @@ class DataWrangling:
                     day_of_week=day_of_week,                # if not -1, specifies the day to calculate
                     filter_by=filter_by,                    # the columns and values to filter the rows by before sum/count
                     text_column=text_column,                # The columns to read character entries from
-                    text_action=text_action                 # The action to take with the text entries
+                    text_action=text_action,                # The action to take with the text entries
+                    sum=sum,                                # the column to sum by participantIDs
+                    count=count,                            # the column to count by ParticipantIDs
                 )
             else:
                 participants = self.create_variable(

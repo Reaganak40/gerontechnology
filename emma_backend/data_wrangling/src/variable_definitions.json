@@ -1,20 +1,6 @@
 {
     "Variables" : [
         {
-            "name" : "CalenderUse_Av",
-            "dataset" : "Interactions",
-            "elementIDs" : [9],
-            "scope" : "weekly",
-            "function" : ["x", "x/7"]
-        },
-        {
-            "name" : "CalenderUse",
-            "dataset" : "Interactions",
-            "elementIDs" : [9],
-            "scope" : "daily",
-            "function" : ["x", "x"]
-        },
-        {
             "name" : "SumTotalCalendarInteractions_Av",
             "dataset" : "Interactions",
             "elementIDs" : [9, 18, 19, 20],
@@ -33,7 +19,8 @@
             "dataset" : "Interactions",
             "elementIDs" : [9],
             "scope" : "weekly",
-            "function" : ["x", "x/4"]
+            "function" : ["x", "x/4"],
+            "study":["BB"]
         },
         {
             "name" : "TodayPageUse",
@@ -41,7 +28,8 @@
             "elementIDs" : [8, 13, 379, 380, 381, 384],
             "scope" : "daily",
             "function" : ["x", "x"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "TodayPageUse_Av",
@@ -49,7 +37,8 @@
             "elementIDs" : [8, 13, 14, 379, 380, 381, 384],
             "scope" : "weekly",
             "function" : ["x", "x/7"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "SumTotalEventInteractions_Av",
@@ -71,7 +60,8 @@
             "elementIDs" : [8, 13, 14, 379, 380, 381, 384],
             "scope" : "daily",
             "function" : ["x", "x/3"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "SumTotalLTGNoteInteractions_Av",
@@ -79,7 +69,8 @@
             "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["LTG"],
             "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "function" : ["x", "x/7"],
+            "study":["BB"]
         },
         {
             "name" : "SumTotalLTGNoteInteractions",
@@ -87,7 +78,8 @@
             "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["LTG"],
             "scope" : "daily",
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["BB"]
         },
         {
             "name" : "LTGFolderUse",
@@ -96,7 +88,8 @@
             "tokens" : ["LTG"],
             "scope" : "daily",
             "function" : ["x", "x"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "LTGFolderUse_Av",
@@ -105,7 +98,8 @@
             "tokens" : ["LTG"],
             "scope" : "weekly",
             "function" : ["x", "x/7"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "LTGGoal",
@@ -114,7 +108,8 @@
             "tokens" : ["LTG"],
             "scope" :"weekly",
             "distinct" : true,
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["BB"]
         },
         {
             "name" : "SumTotalFZNoteInteractions_Av",
@@ -122,7 +117,8 @@
             "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["FZ"],
             "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "function" : ["x", "x/7"],
+            "study":["BB"]
         },
         {
             "name" : "SumTotalFZNoteInteractions",
@@ -130,7 +126,8 @@
             "elementIDs" : [24, 64, 65, 220],
             "tokens" : ["FZ"],
             "scope" : "daily",
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["BB"]
         },
         {
             "name" : "FZFolderUse",
@@ -139,7 +136,8 @@
             "tokens" : ["FZ"],
             "scope" : "daily",
             "function" : ["x", "x"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "FZFolderUse_Av",
@@ -148,7 +146,8 @@
             "tokens" : ["FZ"],
             "scope" : "weekly",
             "function" : ["x", "x/7"],
-            "distinct" : true
+            "distinct" : true,
+            "study":["BB"]
         },
         {
             "name" : "FZGoal",
@@ -157,7 +156,8 @@
             "tokens" : ["FZ"],
             "scope" :"weekly",
             "distinct" : true,
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["BB"]
         },
         {
             "name" : "TotalPEWeeklyPHEX",
@@ -178,17 +178,11 @@
             "function" : ["x", "x"]
         },
         {
-            "name" : "PEGoal",
+            "name" : "PEGoal_BB",
             "defined-variable-x" : "TotalPEWeeklyPHEX",
             "function" : ["x", "x/150"],
             "study" : ["BB"]
 
-        },
-        {
-            "name" : "PEGoal_DoD",
-            "defined-variable-x" : "TotalPEWeeklyPHEX",
-            "function" : ["x", "x/150"],
-            "study" : ["DoD"]
         },
         {
             "name" : "TotalCEWeeklyMEEX",
@@ -209,9 +203,10 @@
             "function" : ["x", "x"]
         },
         {
-            "name" : "CEGoal",
+            "name" : "CEGoal_BB",
             "defined-variable-x" : "TotalCEWeeklyMEEX",
-            "function" : ["x", "x/12"]
+            "function" : ["x", "x/12"],
+            "study": ["BB"]
         },
         {
             "name" : "TotalWEWeeklyWELLX",
@@ -232,9 +227,10 @@
             "function" : ["x", "x"]
         },
         {
-            "name" : "WEGoal",
+            "name" : "WEGoal_BB",
             "defined-variable-x" : "TotalWEWeeklyWELLX",
-            "function" : ["x", "x/3"]
+            "function" : ["x", "x/3"],
+            "study":["BB"]
         },
         {
             "name" : "DistinctUse",
@@ -363,6 +359,21 @@
             "function": ["x", "x/7"]
         },
         {
+            "name": "ProfilePage",
+            "dataset": "Interactions",
+            "elementIDs": [10],
+            "function": ["x", "x"],
+            "scope":"daily",
+            "study":["DoD"]
+        },
+        {
+            "name": "ProfilePage_Av",
+            "dataset": "Interactions",
+            "elementIDs": [10],
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
             "name": "CreateEvent",
             "dataset": "Interactions",
             "elementIDs": [13],
@@ -470,32 +481,116 @@
             "function" : ["x", "x"]
         },
         {
-            "name" : "SumGraphInteractions_HT_Av",
+            "name" : "SumGraphInteractions_HT_Av_BB",
             "dataset" : "Interactions",
-            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "elementIDs" : [365, 248, 257, 294, 260, 283, 259, 301],
             "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "function" : ["x", "x/7"],
+            "study":["BB"]
         },
         {
-            "name" : "SumGraphInteractions_HT",
+            "name" : "SumGraphInteractions_HT_BB",
             "dataset" : "Interactions",
-            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "elementIDs" : [365, 248, 257, 294, 260, 283, 259, 301],
             "scope" : "daily",
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["BB"]
         },
         {
-            "name" : "SumGraphInteractions_HT_Av",
+            "name" : "SumGraphInteractions_HT_Av_DoD",
             "dataset" : "Interactions",
-            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "elementIDs" : [365, 248, 257, 294, 260, 283, 259, 301, 256, 389, 255, 407, 254, 406, 258, 463, 394, 261, 405],
             "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
         },
         {
-            "name" : "SumGraphInteractions_HT",
+            "name" : "SumGraphInteractions_HT_DoD",
             "dataset" : "Interactions",
-            "elementIDs" : [366,253,365,257,248,294,260,283,259,301],
+            "elementIDs" : [365, 248, 257, 294, 260, 283, 259, 301, 256, 389, 255, 407, 254, 406, 258, 463, 394, 261, 405],
             "scope" : "daily",
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_MED_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [256, 389],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_MED",
+            "dataset" : "Interactions",
+            "elementIDs" : [256, 389],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_BP_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [255, 407],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_BP",
+            "dataset" : "Interactions",
+            "elementIDs" : [255, 407],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_WT_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [254, 406],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_WT",
+            "dataset" : "Interactions",
+            "elementIDs" : [254, 406],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_CT_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [258, 463],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_CT",
+            "dataset" : "Interactions",
+            "elementIDs" : [258, 463],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_HRER_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [261, 394, 405],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumGraphInteractions_HRER",
+            "dataset" : "Interactions",
+            "elementIDs" : [261, 394, 405],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
         },
         {
             "name" : "SumGraphInteractions_PE_Av",
@@ -540,6 +635,22 @@
             "function" : ["x", "x"]
         },
         {
+            "name" : "ChangeGoal_HT",
+            "dataset" : "Interactions",
+            "elementIDs" : [247],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "ChangeGoal_HT_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [247],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
             "name" : "EnterData_PE_Av",
             "dataset" : "Interactions",
             "elementIDs" : [292],
@@ -580,6 +691,86 @@
             "elementIDs" : [299],
             "scope" : "daily",
             "function" : ["x", "x"]
+        },
+        {
+            "name" : "EnterData_MED_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [386],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_MED",
+            "dataset" : "Interactions",
+            "elementIDs" : [386],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_BP_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [274, 275],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_BP",
+            "dataset" : "Interactions",
+            "elementIDs" : [274,275],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_WT_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [268],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_WT",
+            "dataset" : "Interactions",
+            "elementIDs" : [268],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_HR_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [421, 422, 423, 424, 425],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_HR",
+            "dataset" : "Interactions",
+            "elementIDs" : [421, 422, 423, 423, 425],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_ER_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [426, 427, 428, 429, 430],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "EnterData_ER",
+            "dataset" : "Interactions",
+            "elementIDs" : [426, 427, 428, 429, 430],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
         },
         {
             "name": "SumEventActions_NonSched",
@@ -854,6 +1045,114 @@
             "function": ["x", "x/7"]
         },
         {
+            "name": "EventActions_HT_MED",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "meds"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_MED_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "meds"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_BP",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "bp"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_BP_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "bp"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_WT",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "weight"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_WT_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "weight"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_CT",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "cogt"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_CT_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "cogt"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_HR",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "hrt"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_HR_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "hrt"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_ER",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "ert"]],
+            "scope":"daily",
+            "count": "eventId",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "EventActions_HT_ER_Av",
+            "dataset":"Events",
+            "filter_by": [["healthTrackType", "ert"]],
+            "scope":"weekly",
+            "count": "eventId",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
             "name": "HiddenEvents_Count",
             "dataset":"Events",
             "filter_by": [["action", "create"], ["recurringHide", 1]],
@@ -888,14 +1187,32 @@
             "dataset" : "Interactions",
             "elementIDs" : [314, 324, 321, 383, 316],
             "scope" : "weekly",
-            "function" : ["x", "x/7"]
+            "function" : ["x", "x/7"],
+            "study":["BB"]
         },
         {
             "name" : "SumTotalWBJInteractions",
             "dataset" : "Interactions",
             "elementIDs" : [314, 324, 321, 383, 316],
             "scope" : "daily",
-            "function" : ["x", "x"]
+            "function" : ["x", "x"],
+            "study":["BB"]
+        },
+        {
+            "name" : "SumTotalMedInfoInteractions_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [431, 315, 320, 323, 313, 382],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumTotalMedInfoInteractions",
+            "dataset" : "Interactions",
+            "elementIDs" : [431, 315, 320, 323, 313, 382],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
         },
         {
             "name" : "SumUserNoteInteractions_Av",
@@ -939,32 +1256,214 @@
             "function" : ["x", "x/7"]
         },
         {
+            "name" : "NoteInteractions_User_WBJ",
+            "defined-variable-x" : "TotalUserNoteInteractions",
+            "defined-variable-y" : "SumTotalWBJInteractions",
+            "function" : ["x, y", "x+y"],
+            "study":["BB"]
+        },
+        {
+            "name" : "SumNoteInteractions_User_Med",
+            "defined-variable-x" : "TotalUserNoteInteractions",
+            "defined-variable-y" : "SumTotalMedInfoInteractions",
+            "function" : ["x, y", "x+y"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "SumNoteInteractions_User_Med_Av",
+            "defined-variable-x" : "SumNoteInteractions_User_Med",
+            "function" : ["x","x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "NoteInteractions_FZ_LTG",
+            "defined-variable-x" : "SumTotalFZNoteInteractions",
+            "defined-variable-y" : "SumTotalLTGNoteInteractions",
+            "function" : ["x, y", "x+y"],
+            "study":["BB"]
+        },
+        {
+            "name" : "SumNoteInteractions_BB",
+            "defined-variable-x" : "NoteInteractions_User_WBJ",
+            "defined-variable-y" : "NoteInteractions_FZ_LTG",
+            "function" : ["x, y", "x+y"],
+            "study":["BB"]
+        },
+        {
+            "name" : "SumNoteInteractions_BB_Av",
+            "defined-variable-x" : "SumNoteInteractions_BB",
+            "function" : ["x", "x/7"],
+            "study":["BB"]
+        },
+        {
             "name" : "Notes_SortBy_Av",
             "dataset" : "Interactions",
-            "elementIDs" : [],
+            "elementIDs" : [229,311],
             "scope" : "weekly",
             "function" : ["x", "x/7"]
         },
         {
             "name" : "Notes_SortBy",
             "dataset" : "Interactions",
-            "elementIDs" : [],
+            "elementIDs" : [229,311],
             "scope" : "daily",
             "function" : ["x", "x"]
         },
         {
             "name" : "Notes_Search_Av",
             "dataset" : "Interactions",
-            "elementIDs" : [],
+            "elementIDs" : [55,228,329],
             "scope" : "weekly",
             "function" : ["x", "x/7"]
         },
         {
             "name" : "Notes_Search",
             "dataset" : "Interactions",
-            "elementIDs" : [],
+            "elementIDs" : [55,228,329],
             "scope" : "daily",
             "function" : ["x", "x"]
+        },
+        {
+            "name" : "Notes_Picture_Av",
+            "dataset" : "Interactions",
+            "elementIDs" : [61],
+            "scope" : "weekly",
+            "function" : ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name" : "Notes_Picture",
+            "dataset" : "Interactions",
+            "elementIDs" : [61],
+            "scope" : "daily",
+            "function" : ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "NumNotes_Create",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "note"], ["action", "create"]],
+            "scope":"daily",
+            "count": "entryId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "NumNotes_Create_Av",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "note"], ["action", "create"]],
+            "scope":"weekly",
+            "count": "entryId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "NumNotes_Edit",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "note"], ["action", "edit"]],
+            "scope":"daily",
+            "count": "entryId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "NumNotes_Edit_Av",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "note"], ["action", "edit"]],
+            "scope":"weekly",
+            "count": "entryId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "NumNotes_Delete",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "note"], ["action", "delete"]],
+            "scope":"daily",
+            "count": "entryId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "NumNotes_Delete_Av",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "note"], ["action", "delete"]],
+            "scope":"weekly",
+            "count": "entryId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "NumNotes_Move",
+            "dataset":"Interactions",
+            "elementIDs":[305],
+            "scope":"daily",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "NumNotes_Move_Av",
+            "dataset":"Interactions",
+            "elementIDs":[305],
+            "scope":"weekly",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "Notes_View_DoD",
+            "dataset":"Interactions",
+            "elementIDs":[382,220],
+            "scope":"daily",
+            "function": ["x", "x"],
+            "study":["DoD"]
+        },
+        {
+            "name": "Notes_View_DoD_Av",
+            "dataset":"Interactions",
+            "elementIDs":[382,220],
+            "scope":"weekly",
+            "function": ["x", "x/7"],
+            "study":["DoD"]
+        },
+        {
+            "name": "Notes_View_BB",
+            "dataset":"Interactions",
+            "elementIDs":[383,220],
+            "scope":"daily",
+            "function": ["x", "x"],
+            "study":["BB"]
+        },
+        {
+            "name": "Notes_View_BB_Av",
+            "dataset":"Interactions",
+            "elementIDs":[383,220],
+            "scope":"weekly",
+            "function": ["x", "x/7"],
+            "study":["BB"]
+        },
+        {
+            "name": "NumFolders_Create",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "folder"], ["action", "create"]],
+            "scope":"daily",
+            "count": "entryId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "NumFolders_Create_Av",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "folder"], ["action", "create"]],
+            "scope":"weekly",
+            "count": "entryId",
+            "function": ["x", "x/7"]
+        },
+        {
+            "name": "NumFolders_Delete",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "folder"], ["action", "delete"]],
+            "scope":"daily",
+            "count": "entryId",
+            "function": ["x", "x"]
+        },
+        {
+            "name": "NumFolders_Delete_Av",
+            "dataset":"Entries",
+            "filter_by": [["entryType", "folder"], ["action", "delete"]],
+            "scope":"weekly",
+            "count": "entryId",
+            "function": ["x", "x/7"]
         },
         {
             "name" : "UseHelp_Av",
@@ -983,41 +1482,108 @@
         {
             "name" : "HelpInteractions_Av",
             "dataset" : "Interactions",
-            "elementIDs" : [12, 31, 232, 233, 231, 36, 234, 33, 37, 235, 308, 30],
+            "elementIDs" : [31,308, 408, 233, 231, 36, 234, 33, 37, 411, 232],
             "scope" : "weekly",
             "function" : ["x", "x/7"]
         },
         {
             "name" : "HelpInteractions",
             "dataset" : "Interactions",
-            "elementIDs" : [12, 31, 232, 233, 231, 36, 234, 33, 37, 235, 308, 30],
+            "elementIDs" : [31,308, 408, 233, 231, 36, 234, 33, 37, 411, 232],
             "scope" : "daily",
             "function" : ["x", "x"]
         },
         {
-            "name" : "EntriesCharacterCount",
-            "dataset" : "Entries",
-            "scope" : "weekly",
-            "text_column" : ["title"],
-            "text_action" : "character_count",
-            "function" : ["x", "x"]
+            "name": "NotesCharacterCount_Av",
+            "dataset": "Entries",
+            "scope":"weekly",
+            "text_column": ["title", "content"],
+            "text_action": "character_count",
+            "function":["x","x/7"]
         },
         {
-            "name" : "EntriesWordCount",
-            "dataset" : "Entries",
-            "scope" : "weekly",
-            "text_column" : ["title"],
-            "text_action" : "word_count",
-            "function" : ["x", "x"]
+            "name": "NotesWordCount_Av",
+            "dataset": "Entries",
+            "scope":"weekly",
+            "text_column": ["title", "content"],
+            "text_action": "word_count",
+            "function":["x","x/7"]
         },
         {
-            "name" : "EntriesTitleCharacterCount",
-            "dataset" : "Entries",
-            "scope" : "weekly",
-            "filter_by" : [["title", "note"]],
-            "text_column" : ["title"],
-            "text_action" : "character_count",
-            "function" : ["x", "x"]
+            "name": "EventCharacterCount_Av",
+            "dataset": "Events",
+            "scope":"weekly",
+            "text_column": ["taskTitle", "taskDescription"],
+            "text_action": "character_count",
+            "function":["x","x/7"]
+        },
+        {
+            "name": "EventWordCount_Av",
+            "dataset": "Events",
+            "scope":"weekly",
+            "text_column": ["taskTitle", "taskDescription"],
+            "text_action": "word_count",
+            "function":["x","x/7"]
+        },
+        {
+            "name" : "OverallWordCount_Av",
+            "defined-variable-x" : "NotesWordCount_Av",
+            "defined-variable-y" : "EventWordCount_Av",
+            "function" : ["x, y", "x+y"]
+        },
+        {
+            "name" : "OverallCharacterCount_Av",
+            "defined-variable-x" : "NotesCharacterCount_Av",
+            "defined-variable-y" : "EventCharacterCount_Av",
+            "function" : ["x, y", "x+y"]
+        },
+        {
+            "name": "EventWordCount_Create_Av",
+            "dataset": "Events",
+            "scope":"weekly",
+            "text_column": ["taskTitle", "taskDescription"],
+            "filter_by":[["action","create"]],
+            "text_action": "word_count",
+            "function":["x","x/7"]
+        },
+        {
+            "name": "NotesWordCount_Create_Av",
+            "dataset": "Entries",
+            "scope":"weekly",
+            "text_column": ["title", "content"],
+            "filter_by":[["action","create"]],
+            "text_action": "word_count",
+            "function":["x","x/7"]
+        },
+        {
+            "name" : "OverallWordCount_Create_Av",
+            "defined-variable-x" : "NotesWordCount_Create_Av",
+            "defined-variable-y" : "EventWordCount_Create_Av",
+            "function" : ["x, y", "x+y"]
+        },
+        {
+            "name": "EventWordCount_Edit_Av",
+            "dataset": "Events",
+            "scope":"weekly",
+            "text_column": ["taskTitle", "taskDescription"],
+            "filter_by":[["action","edit"]],
+            "text_action": "word_count",
+            "function":["x","x/7"]
+        },
+        {
+            "name": "NotesWordCount_Edit_Av",
+            "dataset": "Entries",
+            "scope":"weekly",
+            "text_column": ["title", "content"],
+            "filter_by":[["action","edit"]],
+            "text_action": "word_count",
+            "function":["x","x/7"]
+        },
+        {
+            "name" : "OverallWordCount_Edit_Av",
+            "defined-variable-x" : "NotesWordCount_Edit_Av",
+            "defined-variable-y" : "EventWordCount_Edit_Av",
+            "function" : ["x, y", "x+y"]
         }
     ]
 }

@@ -104,7 +104,7 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
         Exception: Will raise an exception if variables are mismatched, and given parameters for how to deal with them (e.g, allow_missing_values)
     """
     if(cxn_engine is None):
-        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
+        cxn_engine = connect_to_db("emma_backend", Globals.db_host, Globals.db_username, Globals.db_password, use_engine=True)
 
     # The following list comprehension changes the data wrangling variable names to proper SQL names.
     # variables = [(SQL Name, Original Name)]
@@ -134,7 +134,8 @@ def update_from_dataframe(calculations_table : pd.DataFrame, week, year, cxn_eng
         
         # add missing variables to the database schema
         # Create a list of tuples to define new calculation table columns [(name_of_column, type)]
-        update_schema([(x[0], str(calculations_table[x[1]].dtypes)) for x in undefined_variables], debug=debug)
+        update_schema([(x[0], str(calculations_table[x[1]].dtypes)) for x in undefined_variables],
+                      cxn_engine.url.host, cxn_engine.url.username, cxn_engine.url.password, debug=debug)
             
     variable_translations : dict(str, str) = dict((y, x) for x, y in variables)
 
@@ -173,7 +174,7 @@ def add_undefined_participants(calculations_table, cxn_engine):
 
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial Implementation
-def update_schema(new_calculation_variables, debug=False):
+def update_schema(new_calculation_variables, host, username, password, debug=False):
     """ Updates the database calculations table columns given
         with new columns to add to the table schema.
 
@@ -181,7 +182,7 @@ def update_schema(new_calculation_variables, debug=False):
         force_delete (bool, optional): When true, will drop columns from the calculation table
         if those columns are no longer defined in dashboard variables. Defaults to False, to avoid accidental deletions.
     """
-    cxn = connect_to_db("emma_backend", user="root", password="root", create=True)
+    cxn = connect_to_db("emma_backend", host, username, password, create=True)
 
     cursor = cxn.cursor()
 
@@ -228,7 +229,7 @@ def add_participants_from_df(participant_table : pd.DataFrame, cxn_engine = None
     
 def add_participants_from_research(cxn_engine = None):
     if(cxn_engine is None):
-        cxn_engine = connect_to_db("emma_backend", Globals.db_username, Globals.db_password, use_engine=True)
+        cxn_engine = connect_to_db("emma_backend", Globals.db_host, Globals.db_username, Globals.db_password, use_engine=True)
     
     participants = get_all_participants()
     add_participants_from_df(participants, cxn_engine)
