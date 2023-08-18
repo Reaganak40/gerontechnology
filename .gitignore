@@ -99,10 +99,7 @@ StyleCopReport.xml
 *.obj
 *.iobj
 *.pch
-<<<<<<< HEAD
-=======
 *.pdb
->>>>>>> 29d3b5ec5b942c88304d21aa7ad747fc206e8277
 *.ipdb
 *.pgc
 *.pgd
@@ -114,7 +111,6 @@ StyleCopReport.xml
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
-*.log
 *.tlog
 *.vspscc
 *.vssscc
