@@ -1,6 +1,6 @@
 *.csv
 *.xlsx
-
+*.exe
 
 .vscode/*
 !.vscode/settings.json
