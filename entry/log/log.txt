@@ -1,0 +1,103 @@
+[Log][2023-08-17 13.03.09.400828 +0] New Data-Wrangling session started.
+[Log][2023-08-17 13.03.09.400828 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 13.03.09.400828 +6] Removed PHI from dataset: entries_0_2023-01-01_2023-07-01_noPHI.xlsx
+[Log][2023-08-17 13.03.09.400828 +29] removePHI.py encountered an error: Traceback (most recent call last):  File "C:\dev\Gerontechnology\entry\removePHI.py", line 188, in <module>    main(sys.argv[1:])  File "C:\dev\Gerontechnology\entry\removePHI.py", line 185, in main    removePHI(filename, datatype, remove_strategy="random-shift-encryption")  File "C:\dev\Gerontechnology\entry\removePHI.py", line 96, in removePHI    raise AttributeError(err_msg)AttributeError: removePHI: events data file missing column taskTitle, determined unsafe for removePHI process.
+[Log][2023-08-17 13.03.09.400828 +29] Data-wrangling session ended prematurely.
+
+[Log][2023-08-17 13.05.44.891990 +0] New Data-Wrangling session started.
+[Log][2023-08-17 13.05.44.891990 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 13.05.44.891990 +6] Removed PHI from dataset: entries_0_2023-01-01_2023-07-01_noPHI.xlsx
+[Log][2023-08-17 13.05.44.891990 +119] Removed PHI from dataset: events_0_2023-01-01_2023-07-01_noPHI.xlsx
+[Log][2023-08-17 13.05.44.891990 +119] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-17 13.05.44.891990
+[Log][2023-08-17 13.05.44.891990 +119] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-17 13.05.44.891990
+[Log][2023-08-17 13.05.44.891990 +119] Starting data-wrangling pipeline...
+[Log][2023-08-17 13.05.44.891990 +267] C:\dev\Gerontechnology\emma_backend\emma_backend.py encountered an error: Traceback (most recent call last):  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__    self._dbapi_connection = engine.raw_connection()                             ^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3275, in raw_connection    return self.pool.connect()           ^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 455, in connect    return _ConnectionFairy._checkout(self)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 1271, in _checkout    fairy = _ConnectionRecord.checkout(pool)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 719, in checkout    rec = pool._do_get()          ^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 168, in _do_get    with util.safe_reraise():  File "C:\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 147, in __exit__    raise exc_value.with_traceback(exc_tb)  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 166, in _do_get    return self._create_connection()           ^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 396, in _create_connection    return _ConnectionRecord(self)           ^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 681, in __init__    self.__connect()  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 905, in __connect    with util.safe_reraise():  File "C:\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 147, in __exit__    raise exc_value.with_traceback(exc_tb)  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 901, in __connect    self.dbapi_connection = connection = pool._invoke_creator(self)                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\create.py", line 636, in connect    return dialect.connect(*cargs, **cparams)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 580, in connect    return self.loaded_dbapi.connect(*cargs, **cparams)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\MySQLdb\__init__.py", line 123, in Connect    return Connection(*args, **kwargs)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\MySQLdb\connections.py", line 185, in __init__    super().__init__(*args, **kwargs2)MySQLdb.OperationalError: (2002, "Can't connect to server on 'localhost' (10061)")The above exception was the direct cause of the following exception:Traceback (most recent call last):  File "C:\dev\Gerontechnology\emma_backend\emma_backend.py", line 154, in <module>    emma_backend(sys.argv[1:])  File "C:\dev\Gerontechnology\emma_backend\emma_backend.py", line 146, in emma_backend    update_research(tables, dw.get_study_list(), cxn_engine, debug=dw.debug)  File "C:\dev\Gerontechnology\emma_backend\emma_backend.py", line 86, in update_research    populate_research_tables(calculation_tables, study_list, cxn_engine, debug=debug)  File "C:\dev\Gerontechnology\emma_backend\research\calculation_parser.py", line 69, in populate_research_tables    participants : pd.DataFrame = get_all_participants(cxn_engine)                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\dev\Gerontechnology\emma_backend\research\calculation_parser.py", line 56, in get_all_participants    df = pd.DataFrame(cxn_engine.connect().execute(text('SELECT * FROM PARTICIPANTS')))                      ^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3251, in connect    return self._connection_cls(self)           ^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 147, in __init__    Connection._handle_dbapi_exception_noconnection(  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 2413, in _handle_dbapi_exception_noconnection    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__    self._dbapi_connection = engine.raw_connection()                             ^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3275, in raw_connection    return self.pool.connect()           ^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 455, in connect    return _ConnectionFairy._checkout(self)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 1271, in _checkout    fairy = _ConnectionRecord.checkout(pool)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 719, in checkout    rec = pool._do_get()          ^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 168, in _do_get    with util.safe_reraise():  File "C:\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 147, in __exit__    raise exc_value.with_traceback(exc_tb)  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 166, in _do_get    return self._create_connection()           ^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 396, in _create_connection    return _ConnectionRecord(self)           ^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 681, in __init__    self.__connect()  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 905, in __connect    with util.safe_reraise():  File "C:\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 147, in __exit__    raise exc_value.with_traceback(exc_tb)  File "C:\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 901, in __connect    self.dbapi_connection = connection = pool._invoke_creator(self)                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\create.py", line 636, in connect    return dialect.connect(*cargs, **cparams)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 580, in connect    return self.loaded_dbapi.connect(*cargs, **cparams)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\MySQLdb\__init__.py", line 123, in Connect    return Connection(*args, **kwargs)           ^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\Python311\Lib\site-packages\MySQLdb\connections.py", line 185, in __init__    super().__init__(*args, **kwargs2)sqlalchemy.exc.OperationalError: (MySQLdb.OperationalError) (2002, "Can't connect to server on 'localhost' (10061)")(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[Log][2023-08-17 13.05.44.891990 +267] Data-wrangling session ended prematurely.
+
+[Log][2023-08-17 13.14.37.411887 +0] New EMMA Backend session started.
+[Log][2023-08-17 13.14.37.411887 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 13.14.37.411887 +6] Removed PHI from dataset: entries_0_2023-01-01_2023-07-01_noPHI.xlsx
+[Log][2023-08-17 13.14.37.411887 +103] Removed PHI from dataset: events_0_2023-01-01_2023-07-01_noPHI.xlsx
+[Log][2023-08-17 13.14.37.411887 +103] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-17 13.14.37.411887
+[Log][2023-08-17 13.14.37.411887 +103] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-17 13.14.37.411887
+[Log][2023-08-17 13.14.37.411887 +103] Starting data-wrangling pipeline...
+[Log][2023-08-17 13.14.37.411887 +278] EMMA Backend session ended successfully.
+
+[Log][2023-08-17 13.29.26.583266 +0] New EMMA Backend session started.
+[Log][2023-08-17 13.29.26.583266 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 13.29.26.583266 +2] removePHI.py encountered an error: Traceback (most recent call last):  File "C:\dev\Gerontechnology\entry\removePHI.py", line 188, in <module>    main(sys.argv[1:])  File "C:\dev\Gerontechnology\entry\removePHI.py", line 185, in main    removePHI(filename, datatype, remove_strategy="random-shift-encryption")  File "C:\dev\Gerontechnology\entry\removePHI.py", line 125, in removePHI    c = 'A' + randint(0, 26)        ~~~~^~~~~~~~~~~~~~~~TypeError: can only concatenate str (not "int") to str
+[Log][2023-08-17 13.29.26.583266 +2] EMMA Backend session ended prematurely.
+
+[Log][2023-08-17 13.32.04.124100 +0] New EMMA Backend session started.
+[Log][2023-08-17 13.32.04.124100 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 13.32.04.124100 +2] Removed PHI from dataset: entries_07_2023_phiNO.xlsx
+[Log][2023-08-17 13.32.04.124100 +22] Removed PHI from dataset: events_07_2023_phiNO.xlsx
+[Log][2023-08-17 13.32.04.124100 +22] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-17 13.32.04.124100
+[Log][2023-08-17 13.32.04.124100 +22] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-17 13.32.04.124100
+[Log][2023-08-17 13.32.04.124100 +22] Starting data-wrangling pipeline...
+[Log][2023-08-17 13.32.04.124100 +41] C:\dev\Gerontechnology\emma_backend\emma_backend.py encountered an error: Traceback (most recent call last):  File "C:\dev\Gerontechnology\emma_backend\emma_backend.py", line 154, in <module>    emma_backend(sys.argv[1:])  File "C:\dev\Gerontechnology\emma_backend\emma_backend.py", line 102, in emma_backend    tables = dw.create_weekly_calculations_table(return_tables=True)  # now that data file is read into program, get each weekly calculation table             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\dev\Gerontechnology\emma_backend\data_wrangling\src\data_wrangling.py", line 813, in create_weekly_calculations_table    participants = self.get_variable_calculations(interactions_df, events_df, entries_df)  # Get variable calculations for each participant that week                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\dev\Gerontechnology\emma_backend\data_wrangling\src\data_wrangling.py", line 727, in get_variable_calculations    participants = self.create_variable(                   ^^^^^^^^^^^^^^^^^^^^^  File "C:\dev\Gerontechnology\emma_backend\data_wrangling\src\data_wrangling.py", line 619, in create_variable    element_count_list = self.get_entries_counts(                         ^^^^^^^^^^^^^^^^^^^^^^^^  File "C:\dev\Gerontechnology\emma_backend\data_wrangling\src\data_wrangling.py", line 410, in get_entries_counts    df = df[['participantId'] + text_column]            ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~TypeError: can only concatenate list (not "NoneType") to list
+[Log][2023-08-17 13.32.04.124100 +41] EMMA Backend session ended prematurely.
+
+[Log][2023-08-17 15.08.33.059136 +0] New EMMA Backend session started.
+[Log][2023-08-17 15.08.33.059136 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 15.08.33.059136 +3] Removed PHI from dataset: entries_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-17 15.08.33.059136 +28] Removed PHI from dataset: events_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-17 15.08.33.059136 +72] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-17 15.08.33.059136
+[Log][2023-08-17 15.08.33.059136 +72] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-17 15.08.33.059136
+[Log][2023-08-17 15.08.33.059136 +72] Starting data-wrangling pipeline...
+[Log][2023-08-17 15.08.33.059136 +159] EMMA Backend session ended successfully.
+
+[Log][2023-08-17 15.20.33.514750 +0] New EMMA Backend session started.
+[Log][2023-08-17 15.20.33.514750 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-17 15.20.33.514750 +5] Removed PHI from dataset: entries_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-17 15.20.33.514750 +38] Removed PHI from dataset: events_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-17 15.20.33.514750 +38] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-17 15.20.33.514750
+[Log][2023-08-17 15.20.33.514750 +38] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-17 15.20.33.514750
+[Log][2023-08-17 15.20.33.514750 +38] Starting data-wrangling pipeline...
+[Log][2023-08-17 15.20.33.514750 +163] EMMA Backend session ended successfully.
+
+[Log][2023-08-18 17.58.50.347278 +0] New EMMA Backend session started.
+[Log][2023-08-18 17.58.50.347278 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-18 17.58.50.347278 +4] Removed PHI from dataset: entries_07_2023_phiNO.xlsx
+[Log][2023-08-18 17.58.50.347278 +24] Removed PHI from dataset: events_07_2023_phiNO.xlsx
+[Log][2023-08-18 17.58.50.347278 +173] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-18 17.58.50.347278
+[Log][2023-08-18 17.58.50.347278 +173] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-18 17.58.50.347278
+[Log][2023-08-18 17.58.50.347278 +173] Starting data-wrangling pipeline...
+[Log][2023-08-18 17.58.50.347278 +262] EMMA Backend session ended successfully.
+
+[Log][2023-08-18 18.20.48.132964 +0] New EMMA Backend session started.
+[Log][2023-08-18 18.20.48.132964 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-18 18.20.48.132964 +1] src\removePHI.py encountered an error: Traceback (most recent call last):  File "C:\dev\Gerontechnology\entry\src\removePHI.py", line 188, in <module>    main(sys.argv[1:])  File "C:\dev\Gerontechnology\entry\src\removePHI.py", line 185, in main    removePHI(filename, datatype, remove_strategy="random-shift-encryption")  File "C:\dev\Gerontechnology\entry\src\removePHI.py", line 75, in removePHI    raise FileNotFoundError(err_msg)FileNotFoundError: File does not exist: [C:\dev\Gerontechnology\entry\src\entries_07_2023_phiNO.xlsx]
+[Log][2023-08-18 18.20.48.132964 +1] EMMA Backend session ended prematurely.
+
+[Log][2023-08-18 18.21.10.493029 +0] New EMMA Backend session started.
+[Log][2023-08-18 18.21.10.493029 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-18 18.21.10.493029 +1] src\removePHI.py encountered an error: Traceback (most recent call last):  File "C:\dev\Gerontechnology\entry\src\removePHI.py", line 188, in <module>    main(sys.argv[1:])  File "C:\dev\Gerontechnology\entry\src\removePHI.py", line 185, in main    removePHI(filename, datatype, remove_strategy="random-shift-encryption")  File "C:\dev\Gerontechnology\entry\src\removePHI.py", line 75, in removePHI    raise FileNotFoundError(err_msg)FileNotFoundError: File does not exist: [C:\dev\Gerontechnology\entry\src\entries_07_2023_phiNO.xlsx]
+[Log][2023-08-18 18.21.10.493029 +1] EMMA Backend session ended prematurely.
+
+[Log][2023-08-18 18.29.34.811595 +0] New EMMA Backend session started.
+[Log][2023-08-18 18.29.34.811595 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-18 18.29.34.811595 +2] Removed PHI from dataset: entries_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-18 18.29.34.811595 +24] Removed PHI from dataset: events_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-18 18.29.34.811595 +24] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-18 18.29.34.811595
+[Log][2023-08-18 18.29.34.811595 +24] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-18 18.29.34.811595
+[Log][2023-08-18 18.29.34.811595 +24] Starting data-wrangling pipeline...
+[Log][2023-08-18 18.29.34.811595 +110] EMMA Backend session ended successfully.
+
+[Log][2023-08-18 18.32.51.270490 +0] New EMMA Backend session started.
+[Log][2023-08-18 18.32.51.270490 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-18 18.32.51.270490 +3] Removed PHI from dataset: entries_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-18 18.32.51.270490 +24] Removed PHI from dataset: events_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-18 18.32.51.270490 +24] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-18 18.32.51.270490
+[Log][2023-08-18 18.32.51.270490 +24] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-18 18.32.51.270490
+[Log][2023-08-18 18.32.51.270490 +24] Starting data-wrangling pipeline...
+[Log][2023-08-18 18.32.51.270490 +106] EMMA Backend session ended successfully.
+
+[Log][2023-08-18 18.38.01.929593 +0] New EMMA Backend session started.
+[Log][2023-08-18 18.38.01.929593 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-18 18.38.01.929593 +3] Removed PHI from dataset: entries_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-18 18.38.01.929593 +24] Removed PHI from dataset: events_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-18 18.38.01.929593 +24] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-18 18.38.01.929593
+[Log][2023-08-18 18.38.01.929593 +24] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-18 18.38.01.929593
+[Log][2023-08-18 18.38.01.929593 +24] Starting data-wrangling pipeline...
+[Log][2023-08-18 18.38.01.929593 +104] EMMA Backend session ended successfully.
