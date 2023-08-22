@@ -113,7 +113,7 @@ def sql_shell(cxn : mysql.connector.MySQLConnection = None):
 # Last Edit on 12/30/2022 by Reagan Kelley
 # Initial implementation
 def main():
-    cxn = connect_to_db("emma_backend", create=True)
+    cxn = connect_to_db("emma_backend", create=True, host="localhost")
     sql_shell(cxn)
 
 if os.name == 'nt':
