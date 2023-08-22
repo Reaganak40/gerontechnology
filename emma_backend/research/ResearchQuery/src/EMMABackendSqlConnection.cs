@@ -35,19 +35,38 @@ namespace ResearchQuery
         /// <param name="server">the name of the server-host where the EMMA Backend database is located.</param>
         /// <param name="userid">username for credentials.</param>
         /// <param name="password">password for credentials.</param>
-        public EMMABackendSqlConnection(string server, string userid, string password)
+        /// <param name="failStr">An out parameter to provide details on a failed construction.</param>
+        /// 
+        public EMMABackendSqlConnection(string server, string userid, string password, out string failStr)
         {
             this.connection = new MySqlConnection();
             this.myConnectionString = $"server={server};user id={userid};password={password};database=emma_backend";
 
+            failStr = string.Empty;
             try
             {
                 this.connection.ConnectionString = this.myConnectionString;
                 this.connection.Open();
                 this.connected = true;
             }
-            catch (MySqlException)
+            catch (MySqlException e)
             {
+                switch (e.Number)
+                {
+                    case 0:
+                        failStr = "Cannot connect to server. Contact administrator";
+                        break;
+                    case 1042:
+                        failStr = "Invalid server/host. Please try again.";
+                        break;
+                    case 1045:
+                        failStr = "Invalid username/password. Please try again.";
+                        break;
+                    default:
+                        failStr = $"Something went wrong. Error code: {e.Number}";
+                        break;
+                }
+
                 this.connected = false;
             }
 

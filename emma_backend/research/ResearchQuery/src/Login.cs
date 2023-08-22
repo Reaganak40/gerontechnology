@@ -46,7 +46,8 @@ namespace ResearchQuery
 
         private void UseCredentials()
         {
-            this.database = new EMMABackendSqlConnection(this.ServerInput.Text, this.UserInput.Text, this.PasswordInput.Text);
+            string failStr;
+            this.database = new EMMABackendSqlConnection(this.ServerInput.Text, this.UserInput.Text, this.PasswordInput.Text, out failStr);
 
             if (this.database.Connected)
             {
@@ -55,6 +56,7 @@ namespace ResearchQuery
             }
             else
             {
+                this.InvalidLabel.Text = failStr;
                 this.InvalidLabel.Visible = true;
                 this.database = null;
             }

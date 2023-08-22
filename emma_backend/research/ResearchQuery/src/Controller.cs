@@ -116,6 +116,7 @@ namespace ResearchQuery
         /// <param name="server">the name of the server-host where the EMMA Backend database is located.</param>
         /// <param name="user">username for credentials.</param>
         /// <param name="password">password for credentials.</param>
+        /// <returns>True, if connection was successful.</returns>
         public bool ConnectToDatabase()
         {
             LoginForm login = new LoginForm();

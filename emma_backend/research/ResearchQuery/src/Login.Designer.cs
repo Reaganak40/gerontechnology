@@ -96,7 +96,7 @@
             // LoginButton
             // 
             LoginButton.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            LoginButton.Location = new Point(134, 250);
+            LoginButton.Location = new Point(134, 253);
             LoginButton.Name = "LoginButton";
             LoginButton.Size = new Size(119, 44);
             LoginButton.TabIndex = 6;
@@ -119,6 +119,7 @@
             InvalidLabel.AutoSize = true;
             InvalidLabel.ForeColor = Color.Red;
             InvalidLabel.Location = new Point(33, 213);
+            InvalidLabel.MaximumSize = new Size(300, 0);
             InvalidLabel.Name = "InvalidLabel";
             InvalidLabel.Size = new Size(182, 20);
             InvalidLabel.TabIndex = 8;
@@ -129,7 +130,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(382, 322);
+            ClientSize = new Size(382, 324);
             Controls.Add(InvalidLabel);
             Controls.Add(captionLabel);
             Controls.Add(LoginButton);
