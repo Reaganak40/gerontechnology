@@ -101,3 +101,12 @@
 [Log][2023-08-18 18.38.01.929593 +24] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-18 18.38.01.929593
 [Log][2023-08-18 18.38.01.929593 +24] Starting data-wrangling pipeline...
 [Log][2023-08-18 18.38.01.929593 +104] EMMA Backend session ended successfully.
+
+[Log][2023-08-22 15.53.08.495910 +0] New EMMA Backend session started.
+[Log][2023-08-22 15.53.08.495910 +0] Entries/Events/Interaction datasets found.
+[Log][2023-08-22 15.53.08.495910 +2] Removed PHI from dataset: entries_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-22 15.53.08.495910 +23] Removed PHI from dataset: events_07_2023_phiNO_NoPHI.xlsx
+[Log][2023-08-22 15.53.08.495910 +23] Moved PHI files to: C:\dev\Gerontechnology\safe\2023-08-22 15.53.08.495910
+[Log][2023-08-22 15.53.08.495910 +23] Moved filtered datasets to: C:\dev\Gerontechnology\emma_backend\data_wrangling\data\input\2023-08-22 15.53.08.495910
+[Log][2023-08-22 15.53.08.495910 +23] Starting data-wrangling pipeline...
+[Log][2023-08-22 15.53.08.495910 +99] EMMA Backend session ended successfully.

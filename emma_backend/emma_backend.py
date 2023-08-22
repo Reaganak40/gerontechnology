@@ -6,7 +6,7 @@ from termcolor import colored
 from data_wrangling.src.data_wrangling import DataWrangling
 from database.globals import Globals
 from database.sql_shell import connect_to_db
-from database.update import update_from_dataframe
+from database.update import update_from_dataframe, add_participants_from_research
 from research.calculation_parser import populate_research_tables
 
 # ? VSCode Extensions Used:
@@ -147,6 +147,8 @@ def emma_backend(args):
     
     # * Update database if connected to it
     if not no_database:
+        if research:
+            add_participants_from_research(cxn_engine)
         update_database(tables, cxn_engine, debug=dw.debug)
 
 

@@ -227,12 +227,32 @@ def add_participants_from_df(participant_table : pd.DataFrame, cxn_engine = None
     
     participant_table.to_sql('participants', con=cxn_engine, if_exists='append', method=mysql_replace_into, index=False)
     
-def add_participants_from_research(cxn_engine = None):
+def add_participants_from_research(cxn_engine = None, db_host=Globals.db_host, db_username=Globals.db_username, db_password=Globals.db_password):
     if(cxn_engine is None):
-        cxn_engine = connect_to_db("emma_backend", Globals.db_host, Globals.db_username, Globals.db_password, use_engine=True)
+        cxn_engine = connect_to_db("emma_backend", db_host, db_username, db_password, use_engine=True)
     
     participants = get_all_participants()
     add_participants_from_df(participants, cxn_engine)
 
 if __name__ == "__main__":
-    add_participants_from_research()
+    args = sys.argv[1:]
+    
+     # get server host for emma_backend Database
+    try:
+        db_host = args[args.index("--db_host") + 1]
+    except:
+        db_host = "no_host_provided"
+    
+    # get the username credentials for emma_backend Database
+    try:
+        db_username = args[args.index("--db_username") + 1]
+    except:
+        db_username = "no_user"
+    
+    # get the password credentials for emma_backend Database
+    try:
+        db_password = args[args.index("--db_password") + 1]
+    except:
+        db_password = "no_password"
+    
+    add_participants_from_research(db_host=db_host, db_username=db_username, db_password=db_password)
