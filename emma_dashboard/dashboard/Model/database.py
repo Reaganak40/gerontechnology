@@ -33,4 +33,4 @@ class Database():
     def get_tables(self, id) -> pd.DataFrame:
         with self.db.connect() as connection:
             df = pd.read_sql(text('SELECT * FROM calculations WHERE participant_id={}'.format(id)), connection)
-            return df.replace(to_replace='None', value=np.nan).dropna()
+            return df.dropna(axis=1, how="all")

@@ -5,6 +5,11 @@
     Created by: Reagan Kelley
  =========================================================== */
 
+html, body {
+  max-width: 100%;
+  overflow-x: scroll;
+}
+
 .collapsible {
   cursor: pointer;
   padding: 10px;
@@ -37,17 +42,18 @@
   width: 95vw;
   height: calc(30vw - 80px);
   display: flex;
-  flex-direction: column;
-  
+  align-items: middle;
+  justify-content: center;
+  position: relative;
   overflow: auto;
 }
 
 /* This parent div that contains a single chart canvas, this allows the wh dimensions of the chart to be changed. */
 .chartBox {
   width: 500px;
-  height: 250px;
+  height: 85%;
   padding: 10px;
-  border: solid 0px rgba(54, 162, 235, 1);
+  border: solid 3px rgba(54, 162, 235, 1);
   background: white;
   margin: 10px;
 }

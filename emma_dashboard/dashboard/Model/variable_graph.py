@@ -4,52 +4,16 @@
 """
 
 # * Modules
-from datetime import date
-import json
 import pandas as pd
+
+from datetime import date
 import time
 
-def ChartToJSON(**kwargs):
-    graphData = {}
-    df = kwargs['df']
-    
-    graphData['title'] = kwargs['title']
-    graphData['chart_id'] = kwargs['chart_id']
-    graphData['graph_type'] = kwargs['graph_type']
-    
-    if kwargs['graph_type'] == 'line':
-        if kwargs['scope'] == 'daily':
-            
-            graphData['x_labels'] = []
-            graphData['datasets'] = []
-            count = 0
-            for index, daily_var in enumerate(kwargs['df_columns']):
-                dataset = {}
-                dataset['data'] = []
-                dataset['label'] = kwargs['labels'][index]
-                dataset['borderColor'] = kwargs['draw_colors'][index]
-
-                # create sql column names for daily variable
-                daily_columns = [daily_var + '_' + day + 'day' for day in ['Mon', 'Tues', 'Wednes', 'Thurs', 'Fri', 'Satur', 'Sun']]
-
-                # append all daily entries in chronological order
-                for row_index in range(len(df)):
-                    week, year = df.iloc[row_index][['week_number', 'year_number']]
-                    for day, column in enumerate(daily_columns):
-                        dataset['data'].append({})
-                        
-                        calender_date = date.fromisocalendar(int(year), int(week), day+1)
-                        dataset['data'][-1]['x'] = str(calender_date) + " 00:00:00" 
-                        dataset['data'][-1]['y'] = df.iloc[row_index][column]
-                dataset['spanGaps'] = True;
-                graphData['datasets'].append(dataset)
-    return json.dumps(graphData)
-                
 class VariableGraph:
     """ The VariableGraph class is really a helper class, with the use of jinja2, to define a chart.js graph in JavaScript.
     """
     def __init__(self, chart_id='NoID', title="Graph Title", graph_type="line", df = pd.DataFrame(), df_columns=[], scope='weekly',
-                labels=[], border_color=[], num_charts = -1, pie_max = -1, progress_max=0, goal_line = None):
+                labels=[], border_color=[], num_charts = 4, pie_max = -1, progress_max=0, goal_line = None):
         """ Constructor for a VariableGraph object
 
         Args:
@@ -138,10 +102,11 @@ class VariableGraph:
         # *    -- CREATE LINE OR BAR CHART --
         # * =====================================
         else:
+                    
             if self.scope == 'weekly':
                 for index, column in enumerate(df_columns):
                     dataset = {}
-                    dataset['data'] = list(df[column]) 
+                    dataset['data'] = list(df[column])
                     dataset['label'] = labels[index]
                     dataset['border_color'] = border_color[index]
                     self.datasets.append(dataset)
@@ -173,7 +138,6 @@ class VariableGraph:
                             for day in range(1, 8):
                                 calender_date = date.fromisocalendar(int(year), int(week), day)
                                 self.x_labels.append(str(calender_date) + " 00:00:00")
-                                #print(f"{count}: ",str(calender_date) + " 00:00:00")
                                 count += 1
                                 #print(calender_date, daily_columns[day-1], dataset['data'][-(8-day)])
                         self.datasets.append(dataset)
@@ -186,5 +150,3 @@ class VariableGraph:
                     self.goal_line = [goal_line[1]] * len(self.datasets[0]['data'])
             else:
                 self.goal_line = None
-                
-
